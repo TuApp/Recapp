@@ -1,9 +1,15 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">#3F51B5</item>
-        <item name="colorPrimaryDark">#303F9F</item>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/my_primary</item>
+        <item name="colorPrimaryDark">@color/my_primary_dark</item>
+        <item name="colorAccent">@color/my_accent</item>
+        <item name="android:textColorPrimary">@color/my_primary_text</item>
+        <item name="android:itemBackground">@color/item_background</item>
+        <!--This property change the color of the option menu -->
+
+
     </style>
 
 </resources>

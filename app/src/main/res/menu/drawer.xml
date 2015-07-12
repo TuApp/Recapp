@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:checkableBehavior="single">
+        <item android:title="@string/my_home"
+            android:checked="true"
+            android:icon="@drawable/ic_home">
+
+        </item>
+        <item android:id="@+id/favorites"
+            android:title="@string/my_favorites"
+            android:icon="@drawable/ic_favorites">
+
+        </item>
+        <item android:id="@+id/appointments"
+            android:title="@string/my_appointments"
+            android:icon="@drawable/ic_calendar">
+
+        </item>
+        <item android:id="@+id/comments"
+            android:title="@string/my_comments"
+            android:icon="@drawable/ic_comments">
+
+        </item>
+        <item android:id="@+id/account"
+            android:title="@string/my_account">
+            <menu>
+                <item android:id="@+id/sign_out"
+                    android:title="@string/action_sign_out"
+                    android:icon="@drawable/ic_sign_out"></item>
+                <item android:id="@+id/disconnect"
+                    android:title="@string/action_disconnect"
+                    android:icon="@drawable/ic_disconnect"></item>
+            </menu>
+        </item>
+
+    </group>
+
+    <group android:id="@+id/footer"
+        android:checkableBehavior="none">
+        <item android:title="@string/action_settings"
+            android:icon="@drawable/ic_settings"></item>
+        <item android:title="@string/action_help"
+            android:icon="@drawable/ic_help">
+        </item>
+    </group>
+
+
+
+</menu>

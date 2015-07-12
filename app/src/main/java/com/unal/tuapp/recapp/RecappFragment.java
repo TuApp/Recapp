@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +35,8 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_recapp,container,false);
-
+        Toolbar toolbar = (Toolbar) root.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         mGooglePlus=GooglePlus.getInstance(getActivity(), this, this);
         mSignInProgress = mGooglePlus.STATE_DEFAULT;
         mSignInButton = (SignInButton) root.findViewById(R.id.googlePlus);
@@ -85,7 +88,7 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
     public void onConnected(Bundle bundle) {
         mSignInProgress = mGooglePlus.STATE_DEFAULT;
         //Toast.makeText(getActivity(),"User connected",Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(getActivity(),SignOut.class);
+        Intent intent = new Intent(getActivity(),NavigationDrawer.class);
         startActivity(intent);
     }
 

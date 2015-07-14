@@ -35,6 +35,7 @@
     </android.support.design.widget.CoordinatorLayout>
 
 
+
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_drawer"
         android:layout_width="wrap_content"
@@ -52,6 +53,7 @@
         app:headerLayout="@layout/drawer_header"
         app:menu="@menu/drawer"
         app:itemTextColor="@color/navigation_item"/>
+
 
 </android.support.v4.widget.DrawerLayout>
 

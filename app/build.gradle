@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.unal.tuapp.recapp"
-        minSdkVersion 10
+        minSdkVersion 11
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -26,4 +26,6 @@ dependencies {
     compile 'com.android.support:design:22.2.0'
     compile 'com.google.android.gms:play-services:+'
     compile 'de.hdodenhof:circleimageview:1.3.0'
+    compile 'com.android.support:recyclerview-v7:+'
+    compile 'jp.wasabeef:recyclerview-animators:1.2.1@aar'
 }

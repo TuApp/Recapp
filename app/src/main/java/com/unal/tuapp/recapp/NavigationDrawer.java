@@ -6,8 +6,11 @@ import android.media.Image;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -28,10 +31,15 @@ import com.google.android.gms.plus.model.people.Person;
 public class NavigationDrawer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private NavigationView navDrawer;
+    private NavigationView filterNavDrawer;
+    private TabLayout tabLayout;
     private DrawerLayout navigationDrawer;
+    private Toolbar toolbar;
+    private ViewPager viewPager;
     private GooglePlus mGooglePlus;
     private static final int PROFILE_PIC_SIZE = 600;
     private View root;
+    private View root1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,14 +66,17 @@ public class NavigationDrawer extends AppCompatActivity implements NavigationVie
             new LoadProfileImage(root,imageView).execute(personPhotoUrl);
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        viewPager = (ViewPager) findViewById(R.id.view_pager);
+        setUpToolbar();
+        setUpViewPager();
+        setUpTabLayout();
 
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         navigationDrawer = (DrawerLayout) findViewById(R.id.navigation_drawer);
         navDrawer = (NavigationView) findViewById(R.id.nav_drawer);
+        filterNavDrawer = (NavigationView) findViewById(R.id.filter_nav_drawer);
         navDrawer.setNavigationItemSelectedListener(this);
 
     }
@@ -96,6 +107,7 @@ public class NavigationDrawer extends AppCompatActivity implements NavigationVie
     public boolean onNavigationItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()){
             case R.id.favorites:
+                Snackbar.make(root,"algo",Snackbar.LENGTH_LONG).show();
                 break;
             case R.id.appointments:
                 break;
@@ -122,6 +134,29 @@ public class NavigationDrawer extends AppCompatActivity implements NavigationVie
         menuItem.setChecked(true);
         navigationDrawer.closeDrawers();
         return false;
+    }
+
+    public void setUpToolbar(){
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+    public void setUpTabLayout(){
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        tabLayout.setTabMode(TabLayout.MODE_FIXED);
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.places)));
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.map)));
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.events)));
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.tutorial)));
+        tabLayout.setupWithViewPager(viewPager);
+    }
+    public void setUpViewPager(){
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        viewPagerAdapter.addFragment(new PlacesFragment(),getResources().getString(R.string.places));
+        viewPagerAdapter.addFragment(new MapFragment(),getResources().getString(R.string.map));
+        viewPagerAdapter.addFragment(new EventsFragment(),getResources().getString(R.string.events));
+        viewPagerAdapter.addFragment(new TutorialFragment(),getResources().getString(R.string.tutorial));
+        viewPager.setAdapter(viewPagerAdapter);
     }
 
 

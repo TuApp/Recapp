@@ -10,4 +10,8 @@
     <string name="my_comments">My comments</string>
     <string name="my_appointments">My appointments</string>
     <string name="my_favorites">My favorites</string>
+    <string name="places">Places</string>
+    <string name="map">Map</string>
+    <string name="events">Events</string>
+    <string name="tutorial">Tutorial</string>
 </resources>

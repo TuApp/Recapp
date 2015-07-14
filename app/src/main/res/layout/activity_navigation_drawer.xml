@@ -4,28 +4,55 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/navigation_drawer">
-
-    <LinearLayout
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordination_navigation_drawer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include layout="@layout/toolbar" />
-        <!-- We use this to show the main content it can be a fragment
-        that we can change dynamically'-->
-        <FrameLayout android:id="@+id/container"
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true">
+
+            <include layout="@layout/toolbar" />
+            <!-- We use this to show the main content it can be a fragment
+            that we can change dynamically'-->
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/toolbar"
+                android:background="?attr/colorPrimary"/>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    </android.support.design.widget.CoordinatorLayout>
 
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_drawer"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
+        android:layout_gravity="left"
         app:headerLayout="@layout/drawer_header"
         app:menu="@menu/drawer"
         app:itemTextColor="@color/navigation_item"/>
 
+    <android.support.design.widget.NavigationView
+        android:id="@+id/filter_nav_drawer"
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_gravity="right"
+        app:headerLayout="@layout/drawer_header"
+        app:menu="@menu/drawer"
+        app:itemTextColor="@color/navigation_item"/>
 
 </android.support.v4.widget.DrawerLayout>
+
+

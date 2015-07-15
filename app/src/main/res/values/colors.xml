@@ -10,4 +10,5 @@
     <color name="item_background">#616161</color>
     <color name="navigation_item">#424242</color>
     <color name="profile">#D32F2F</color>
+    <color name="filter_header">#81D4FA</color>
 </resources>

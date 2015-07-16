@@ -31,6 +31,7 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
 
 
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -56,7 +57,6 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
     @Override
     public void onStart(){
         super.onStart();
-
         /*I need to set the instance of singleton in null and after that I need to create it again
         *I don't know but if I don't do that the program doesn't work correctly
         */
@@ -90,6 +90,7 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
         //Toast.makeText(getActivity(),"User connected",Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getActivity(),NavigationDrawer.class);
         startActivity(intent);
+
     }
 
     @Override
@@ -123,6 +124,12 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
                 mGooglePlus.mGoogleApiClient.connect();
             }
         }
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        getActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 
 

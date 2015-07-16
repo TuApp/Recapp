@@ -18,5 +18,7 @@
     <string name="tutorial">Tutorial</string>
     <string name="filter">Filter</string>
     <string name="add">Add</string>
+    <string name="title_activity_detail">Detail</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

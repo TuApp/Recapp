@@ -25,6 +25,7 @@ public class GooglePlus {
     public static final int STATE_DEFAULT = 0;
     public static final int STATE_SIGN_IN = 1;
     public static final int STATE_IN_PROGRESS = 2;
+    public static final int PROFILE_PIC_SIZE = 600;
 
 
 

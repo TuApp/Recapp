@@ -48,12 +48,12 @@ public class NavigationDrawer extends AppCompatActivity  {
     private Toolbar toolbar;
     private ViewPager viewPager;
     private GooglePlus mGooglePlus;
-    private static final int PROFILE_PIC_SIZE = 600;
     private View root;
     private ActionBarDrawerToggle drawerToggle;
     private Button add;
     private final String TAG = NavigationDrawer.class.getSimpleName();
     private final String FILE = "filters.txt";
+    public static boolean animation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +62,14 @@ public class NavigationDrawer extends AppCompatActivity  {
         setContentView(root);
         totalFilter = 0;
         mGooglePlus = GooglePlus.getInstance(this, null, null);
+
         if(mGooglePlus.mGoogleApiClient.isConnected()){
             Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGooglePlus.mGoogleApiClient);
             Account account = Plus.AccountApi;
             String personPhotoUrl = currentPerson.getImage().getUrl();
 
             //We try to request a image with major size, the new image will be of 600*600 pixels
-            personPhotoUrl = personPhotoUrl.substring(0,personPhotoUrl.length()-2) + PROFILE_PIC_SIZE;
+            personPhotoUrl = personPhotoUrl.substring(0,personPhotoUrl.length()-2) + mGooglePlus.PROFILE_PIC_SIZE;
 
             TextView name = (TextView) findViewById(R.id.user_name);
             name.setText(currentPerson.getDisplayName());
@@ -102,8 +103,6 @@ public class NavigationDrawer extends AppCompatActivity  {
         setUpToolbar();
         setUpViewPager();
         setUpTabLayout();
-
-
         navigationDrawer = (DrawerLayout) findViewById(R.id.navigation_drawer);
         navDrawer = (NavigationView) findViewById(R.id.nav_drawer);
         drawerToggle = new ActionBarDrawerToggle(this,navigationDrawer,toolbar,R.string.drawer_open,R.string.drawer_close){
@@ -153,6 +152,8 @@ public class NavigationDrawer extends AppCompatActivity  {
                             mGooglePlus.mGoogleApiClient.disconnect();
                             Intent intent = new Intent(NavigationDrawer.this, Recapp.class);
                             startActivity(intent);
+                            animation = false;
+
                         }
                         break;
                     case R.id.disconnect:
@@ -162,6 +163,8 @@ public class NavigationDrawer extends AppCompatActivity  {
                             mGooglePlus.mGoogleApiClient.disconnect();
                             Intent intent = new Intent(NavigationDrawer.this, Recapp.class);
                             startActivity(intent);
+                            animation = false;
+
                         }
                         break;
                 }
@@ -224,6 +227,14 @@ public class NavigationDrawer extends AppCompatActivity  {
     public void onPause(){
         super.onPause();
         saveFilters();
+        if(animation == false) {
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        }else{
+            animation = false;
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+
+        }
+
     }
     @Override
     public void onResume(){
@@ -262,7 +273,7 @@ public class NavigationDrawer extends AppCompatActivity  {
             Menu menu = navFilterDrawer.getMenu();
 
             for(int i=0; i<menu.size(); i++){
-                output.write(String.valueOf(menu.getItem(i))+"-"+menu.getItem(i).getItemId());
+                output.write(String.valueOf(menu.getItem(i)));
                 output.newLine();
             }
 
@@ -280,18 +291,20 @@ public class NavigationDrawer extends AppCompatActivity  {
             Menu menu = navFilterDrawer.getMenu();
             menu.clear();
             while((text=input.readLine())!=null){
-                String values [] = text.split("-");
+                menu.add(0,totalFilter,Menu.NONE,text);
                 totalFilter++;
-                menu.add(0,Integer.parseInt(values[1]),Menu.NONE,values[0]);
 
             }
             input.close();
-            totalFilter--;
-            File dir = this.getFilesDir();
-            File file = new File(dir,FILE);
-            file.delete();
+            deleteFile(FILE);
         }catch (Exception e){}
 
+    }
+    public Toolbar getToolbar(){
+        return toolbar;
+    }
+    @Override
+    public void onBackPressed() {
     }
 
 

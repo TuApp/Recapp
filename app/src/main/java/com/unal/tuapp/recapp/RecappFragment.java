@@ -129,8 +129,9 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
     @Override
     public void onPause(){
         super.onPause();
-        getActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        //getActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
+
 
 
 }

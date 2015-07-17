@@ -1,6 +1,7 @@
 package com.unal.tuapp.recapp;
 
 import android.content.Intent;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +20,13 @@ public class RecyclePlaceAdapter extends RecyclerView.Adapter<RecyclePlaceAdapte
 
     public static class  PlaceViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private TextView name;
+        private CardView cardView;
 
         public PlaceViewHolder(View itemView){
             super(itemView);
+            cardView = (CardView) itemView.findViewById(R.id.place_card);
             name = (TextView) itemView.findViewById(R.id.place_item);
+
             itemView.setOnClickListener(this);
         }
         @Override

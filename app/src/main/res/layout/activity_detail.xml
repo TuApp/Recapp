@@ -3,30 +3,27 @@
     android:id="@+id/detail"
     android:layout_width="match_parent" android:layout_height="match_parent" >
 
-    <android.support.design.widget.CoordinatorLayout
-        android:id="@+id/detail_coordination"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.design.widget.AppBarLayout
-            android:layout_height="wrap_content"
+        <android.support.design.widget.AppBarLayout android:id="@+id/app_bar_navigation"
             android:layout_width="match_parent"
-            android:id="@+id/detail_app_bar">
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true">
 
             <include layout="@layout/toolbar" />
 
-
         </android.support.design.widget.AppBarLayout>
-
 
         <FrameLayout
             android:id="@+id/detail_container"
+            android:layout_below="@+id/app_bar_navigation"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:layout_height="match_parent" />
 
+    </RelativeLayout>
 
-    </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_drawer"
@@ -34,8 +31,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="left"
         app:headerLayout="@layout/drawer_header"
-        app:menu="@menu/drawer"
-        app:itemTextColor="@color/navigation_item"/>
-
+        app:menu="@menu/drawer" />
 
 </android.support.v4.widget.DrawerLayout>

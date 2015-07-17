@@ -16,8 +16,7 @@
             android:fitsSystemWindows="true">
 
             <include layout="@layout/toolbar" />
-            <!-- We use this to show the main content it can be a fragment
-            that we can change dynamically'-->
+
             <android.support.design.widget.TabLayout
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
@@ -27,6 +26,8 @@
 
         </android.support.design.widget.AppBarLayout>
 
+        <!-- We use this to show the main content it can be a fragment
+        that we can change dynamically'-->
         <android.support.v4.view.ViewPager
             android:id="@+id/view_pager"
             android:layout_height="match_parent"
@@ -43,8 +44,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="left"
         app:headerLayout="@layout/drawer_header"
-        app:menu="@menu/drawer"
-        app:itemTextColor="@color/navigation_item"/>
+        app:menu="@menu/drawer" />
 
     <android.support.design.widget.NavigationView
         android:id="@+id/filter_nav_drawer"
@@ -52,8 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_gravity="right"
         app:headerLayout="@layout/filter_header"
-        app:menu="@menu/filter"
-        app:itemTextColor="@color/navigation_item"/>
+        app:menu="@menu/filter" />
 
 
 </android.support.v4.widget.DrawerLayout>

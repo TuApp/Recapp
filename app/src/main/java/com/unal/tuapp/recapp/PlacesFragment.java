@@ -58,7 +58,6 @@ public class PlacesFragment extends Fragment {
         AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(recyclePlaceAdapter);
         alphaAdapter.setDuration(1000);
         recyclerView.setAdapter(new SlideInRightAnimationAdapter(alphaAdapter));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.divider_item), true, true));
 
 
         return root;

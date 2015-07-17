@@ -82,7 +82,8 @@ public class Detail extends AppCompatActivity {
     @Override
     protected void onPause(){
         super.onPause();
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+
+        //overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
 

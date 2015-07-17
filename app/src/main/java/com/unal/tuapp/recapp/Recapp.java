@@ -44,7 +44,11 @@ public class Recapp extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {}
+    public void onBackPressed() {
+        moveTaskToBack(true);
+
+    }
+
 
 
 

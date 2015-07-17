@@ -152,7 +152,7 @@ public class NavigationDrawer extends AppCompatActivity  {
                             mGooglePlus.mGoogleApiClient.disconnect();
                             Intent intent = new Intent(NavigationDrawer.this, Recapp.class);
                             startActivity(intent);
-                            animation = false;
+                            //animation = false;
 
                         }
                         break;
@@ -163,7 +163,7 @@ public class NavigationDrawer extends AppCompatActivity  {
                             mGooglePlus.mGoogleApiClient.disconnect();
                             Intent intent = new Intent(NavigationDrawer.this, Recapp.class);
                             startActivity(intent);
-                            animation = false;
+                            //animation = false;
 
                         }
                         break;
@@ -227,13 +227,13 @@ public class NavigationDrawer extends AppCompatActivity  {
     public void onPause(){
         super.onPause();
         saveFilters();
-        if(animation == false) {
+        /*if(animation == false) {
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         }else{
             animation = false;
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
 
-        }
+        }*/
 
     }
     @Override

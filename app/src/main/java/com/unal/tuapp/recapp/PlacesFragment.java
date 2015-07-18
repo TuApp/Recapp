@@ -47,8 +47,8 @@ public class PlacesFragment extends Fragment {
         recyclePlaceAdapter.setOnItemClickListener(new RecyclePlaceAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                TextView name = (TextView) view.findViewById(R.id.place_item);
-                Log.e("algo", "" + position + " " + name.getText().toString());
+                //TextView name = (TextView) view.findViewById(R.id.place_item);
+                //Log.e("algo", "" + position + " " + name.getText().toString());
                 Intent intent = new Intent(getActivity(),Detail.class);
                 getActivity().startActivity(intent);
                 NavigationDrawer.animation = true;

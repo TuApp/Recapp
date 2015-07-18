@@ -1,32 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/place_layout"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:minHeight="?android:attr/listPreferredItemHeight"
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/place_card"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:clickable="true"
-    android:focusable="true">
+    android:layout_gravity="center"
+    android:layout_margin="4dp"
+    android:foreground="?android:attr/selectableItemBackground"
+    card_view:cardCornerRadius="4dp">
 
-    <android.support.v7.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/place_card"
-        android:layout_width="match_parent"
+    <!--this is the layout the we will use to inflate each row of our recycleview -->
+    <TextView android:id="@+id/place_item"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="4dp"
-        android:foreground="?android:attr/selectableItemBackground"
-        card_view:cardCornerRadius="4dp">
-
-        <!--this is the layout the we will use to inflate each row of our recycleview -->
-        <TextView android:id="@+id/place_item"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_margin="16dp"
-            android:textSize="25dp"
-            />
-
-    </android.support.v7.widget.CardView>
+        android:layout_width="wrap_content"
+        android:layout_margin="16dp"
+        android:textSize="25dp" />
+</android.support.v7.widget.CardView>
 
 
 
-</LinearLayout>

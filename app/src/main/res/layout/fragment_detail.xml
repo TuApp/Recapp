@@ -19,8 +19,9 @@
                 android:id="@+id/card_detail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:layout_gravity="top"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
                 card_view:cardCornerRadius="4dp"
                 android:minHeight="200dp">
 
@@ -30,16 +31,10 @@
                     android:layout_height="match_parent"
                     android:layout_margin="4dp">
 
-                    <ImageView
-                        android:id="@+id/card_image"
-                        android:layout_alignParentLeft="true"
-                        android:layout_height="150dp"
-                        android:layout_width="match_parent"
-                        android:src="@drawable/ic_calendar"/>
 
                     <TextView
+                        android:layout_alignParentLeft="true"
                         android:id="@+id/card_title"
-                        android:layout_below="@+id/card_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="25sp"
@@ -80,46 +75,50 @@
                 </RelativeLayout>
 
             </android.support.v7.widget.CardView>
-            <TextView
+            <android.support.design.widget.TextInputLayout  android:id="@+id/comment_text_detail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="hola"/>
-            <TextView
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp">
+                <EditText
+                    android:id="@+id/comment_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lines="5"
+                    android:inputType="textMultiLine"
+                    android:padding="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:maxLength="150"
+                    android:hint="@string/my_comments"
+                />
+            </android.support.design.widget.TextInputLayout>
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="hola"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="hola"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="hola"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="hola"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="hola"/>
+                android:orientation="horizontal"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="100dp">
+                <RatingBar
+                    android:id="@+id/comment_rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="4"
+                    android:stepSize="0.5"
+                    android:rating="0.0"/>
+                <Button
+                    android:id="@+id/comment_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="algo"
+                    android:layout_alignParentRight="true"/>
+            </RelativeLayout>
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>
 
-
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/reminder"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        android:src="@android:drawable/ic_menu_edit"
-        app:fabSize="normal"
-        android:layout_gravity="bottom|right"
-        app:layout_anchorGravity="bottom|right|end"/>
 
 
 

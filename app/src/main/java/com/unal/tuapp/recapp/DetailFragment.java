@@ -56,7 +56,7 @@ public class DetailFragment extends Fragment {
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(root,"algo",Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(getActivity().findViewById(R.id.detail_coordination),"algo",Snackbar.LENGTH_SHORT).show();
             }
         });
         return root;

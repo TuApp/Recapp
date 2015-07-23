@@ -36,6 +36,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
     private static View view;
     private AppBarLayout appBarLayout;
     private ViewPager viewPager;
+    public static onMapListener mOnMapListener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -69,9 +70,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
             map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                 @Override
                 public void onInfoWindowClick(Marker marker) {
-                    Intent intent = new Intent(getActivity(), Detail.class);
-                    startActivity(intent);
-                    NavigationDrawer.animation = true;
+                    mOnMapListener.onMap(marker);
+
                 }
             });
 
@@ -112,7 +112,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
         googleMap.getUiSettings().setMapToolbarEnabled(true);
         map.setPadding(0, 0, 0, 100 + (int) appBarLayout.getY());
 
+    }
 
-
+    public interface onMapListener{
+        void onMap(Marker marker);
+    }
+    public void setOnMapListener(final onMapListener mOnMapListener){
+        this.mOnMapListener = mOnMapListener;
     }
 }

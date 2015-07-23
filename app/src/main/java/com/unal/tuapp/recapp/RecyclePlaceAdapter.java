@@ -122,8 +122,5 @@ public class RecyclePlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 break;
         }
     }
-    @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView){
-        super.onAttachedToRecyclerView(recyclerView);
-    }
+
 }

@@ -1,10 +1,12 @@
 package com.unal.tuapp.recapp;
 
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -16,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -89,7 +92,7 @@ public class Detail extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         DetailFragment detailFragment = new DetailFragment();
 
-        fragmentTransaction.replace(R.id.detail_container,detailFragment);
+        fragmentTransaction.replace(R.id.detail_container,detailFragment,"algo");
         fragmentTransaction.commit();
 
     }
@@ -124,6 +127,7 @@ public class Detail extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
+
     }
 
 

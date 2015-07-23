@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
@@ -53,7 +54,6 @@ public class NavigationDrawer extends AppCompatActivity  {
     private Button add;
     private final String TAG = NavigationDrawer.class.getSimpleName();
     private final String FILE = "filters.txt";
-    public static boolean animation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,13 +117,13 @@ public class NavigationDrawer extends AppCompatActivity  {
                         ViewPagerAdapter viewPagerAdapter = (ViewPagerAdapter)viewPager.getAdapter();
                         Fragment fragment = viewPagerAdapter.getItem(viewPager.getCurrentItem());
 
-                        if(slideOffset==0.0) {
+                        /*if(slideOffset==0.0) {
                             getSupportFragmentManager()
                                     .beginTransaction()
                                     .detach(fragment)
                                     .attach(fragment)
                                     .commit();
-                        }
+                        }*/
                     }
 
                 }
@@ -227,13 +227,7 @@ public class NavigationDrawer extends AppCompatActivity  {
     public void onPause(){
         super.onPause();
         saveFilters();
-        /*if(animation == false) {
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-        }else{
-            animation = false;
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
 
-        }*/
 
     }
     @Override
@@ -259,8 +253,24 @@ public class NavigationDrawer extends AppCompatActivity  {
     }
     public void setUpViewPager(){
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        viewPagerAdapter.addFragment(new PlacesFragment(), getResources().getString(R.string.places));
-        viewPagerAdapter.addFragment(new MapFragment(), getResources().getString(R.string.map));
+        PlacesFragment placesFragment = new PlacesFragment();
+        placesFragment.setOnPlaceListener(new PlacesFragment.onPlaceListener() {
+            @Override
+            public void onPlace(View view, int positon) {
+                Intent intent = new Intent(NavigationDrawer.this, Detail.class);
+                startActivity(intent);
+            }
+        });
+        MapFragment mapFragment = new MapFragment();
+        mapFragment.setOnMapListener(new MapFragment.onMapListener() {
+            @Override
+            public void onMap(Marker marker) {
+                Intent intent = new Intent(NavigationDrawer.this, Detail.class);
+                startActivity(intent);
+            }
+        });
+        viewPagerAdapter.addFragment(placesFragment, getResources().getString(R.string.places));
+        viewPagerAdapter.addFragment(mapFragment, getResources().getString(R.string.map));
         viewPagerAdapter.addFragment(new EventsFragment(), getResources().getString(R.string.events));
         viewPagerAdapter.addFragment(new TutorialFragment(), getResources().getString(R.string.tutorial));
         viewPager.setAdapter(viewPagerAdapter);

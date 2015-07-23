@@ -26,6 +26,8 @@ import jp.wasabeef.recyclerview.animators.adapters.SlideInRightAnimationAdapter;
 public class PlacesFragment extends Fragment {
     private RecyclerView recyclerView;
     private View root;
+    public static onPlaceListener mOnPlaceListener;
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         root = inflater.inflate(R.layout.fragment_places,container,false);
@@ -49,9 +51,9 @@ public class PlacesFragment extends Fragment {
             public void onItemClick(View view, int position) {
                 //TextView name = (TextView) view.findViewById(R.id.place_item);
                 //Log.e("algo", "" + position + " " + name.getText().toString());
-                Intent intent = new Intent(getActivity(),Detail.class);
-                getActivity().startActivity(intent);
-                NavigationDrawer.animation = true;
+                if(mOnPlaceListener!=null){
+                    mOnPlaceListener.onPlace(view,position);
+                }
 
             }
         });
@@ -61,6 +63,14 @@ public class PlacesFragment extends Fragment {
 
 
         return root;
+    }
+
+    public interface onPlaceListener{
+        void onPlace(View view,int position);
+    }
+
+    public void setOnPlaceListener(final onPlaceListener mOnPlaceListener){
+        this.mOnPlaceListener= mOnPlaceListener;
     }
 
 }

@@ -38,11 +38,13 @@
         </activity>
         <activity
             android:name=".NavigationDrawer"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan"/>
         <activity
             android:name=".Detail"
             android:label="@string/title_activity_detail"
-            android:parentActivityName=".NavigationDrawer" >
+            android:parentActivityName=".NavigationDrawer"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.unal.tuapp.recapp.NavigationDrawer" />

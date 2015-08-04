@@ -4,8 +4,10 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+
 import com.unal.tuapp.recapp.data.RecappContract.*;
 
 /**
@@ -17,24 +19,33 @@ public class RecappProvider extends ContentProvider {
     private RecappDBHelper recappDBHelper;
 
     static final int USER = 100;
-    static final int USER_BY_EMAIL = 110;
+    static final int USER_WITH_EMAIL = 110;
+    static final int USER_WITH_ID = 120;
     static final int PLACE = 200;
+    static final int PLACE_WITH_ID = 210;
     static final int REMINDER = 300;
     static final int REMINDER_WITH_USER = 310;
     static final int REMINDER_WITH_PLACE = 320;
+    static final int REMINDER_WITH_ID = 330;
     static final int COMMENT = 400;
     static final int COMMENT_WITH_USER = 410;
     static final int COMMENT_WITH_PLACE = 420;
+    static final int COMMENT_WITH_ID = 430;
     static final int CATEGORY = 500;
+    static final int CATEGORY_WITH_ID = 510;
     static final int TUTORIAL = 600;
+    static final int TUTORIAL_WITH_ID = 610;
     static final int PLACE_IMAGE= 700;
     static final int PLACE_IMAGE_WITH_PLACE = 710;
+    static final int PLACE_IMAGE_WITH_ID = 720;
     static final int TUTORIAL_IMAGE = 800;
     static final int TUTORIAL_IMAGE_WITH_TUTORIAL= 810;
+    static final int TUTORIAL_IMAGE_WITH_ID = 820;
     static final int SUB_CATEGORY = 900;
     static final int SUB_CATEGORY_WITH_CATEGORY = 910;
     static final int SUB_CATEGORY_WITH_TUTORIAL = 920;
     static final int SUB_CATEGORY_WITH_PLACE = 930;
+    static final int SUB_CATEGORY_WITH_ID = 940;
 
     private static final SQLiteQueryBuilder reminderByUser;
     private static final SQLiteQueryBuilder reminderByPlace;
@@ -47,6 +58,7 @@ public class RecappProvider extends ContentProvider {
     private static final SQLiteQueryBuilder subCategoryTutorial;
 
     static {
+
         reminderByUser = new SQLiteQueryBuilder();
         reminderByUser.setTables(
                 ReminderEntry.TABLE_NAME + " INNER JOIN " +
@@ -117,7 +129,56 @@ public class RecappProvider extends ContentProvider {
 
 
     static UriMatcher buildMatcher(){
-        return null;
+        final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+        final String authority = RecappContract.CONTENT_AUTHORITY;
+
+        //Matchers for user
+        matcher.addURI(authority, RecappContract.PATH_USER,USER);
+        matcher.addURI(authority, RecappContract.PATH_USER+"/*",USER_WITH_EMAIL);
+        matcher.addURI(authority,RecappContract.PATH_USER+"/#",USER_WITH_ID);
+
+        //Matchers for place
+        matcher.addURI(authority,RecappContract.PATH_PLACE,PLACE);
+        matcher.addURI(authority,RecappContract.PATH_PLACE+"/#",PLACE_WITH_ID);
+
+        //Matchers for reminder
+        matcher.addURI(authority,RecappContract.PATH_REMINDER,REMINDER);
+        matcher.addURI(authority,RecappContract.PATH_REMINDER+"/"+RecappContract.PATH_USER+"/*",REMINDER_WITH_USER);
+        matcher.addURI(authority,RecappContract.PATH_REMINDER+"/"+RecappContract.PATH_PLACE+"/#",REMINDER_WITH_PLACE);
+        matcher.addURI(authority,RecappContract.PATH_REMINDER+"/#",REMINDER_WITH_ID);
+
+        //Matchers for comment
+        matcher.addURI(authority,RecappContract.PATH_COMMENT,COMMENT);
+        matcher.addURI(authority,RecappContract.PATH_COMMENT+"/"+RecappContract.PATH_USER+"/*",COMMENT_WITH_USER);
+        matcher.addURI(authority,RecappContract.PATH_COMMENT+"/"+RecappContract.PATH_PLACE+"/#",COMMENT_WITH_PLACE);
+        matcher.addURI(authority,RecappContract.PATH_COMMENT+"/#",COMMENT_WITH_ID);
+
+        //Mathcer for category
+        matcher.addURI(authority,RecappContract.PATH_CATEGORY,CATEGORY);
+        matcher.addURI(authority,RecappContract.PATH_CATEGORY+"/#",CATEGORY_WITH_ID);
+
+        //Mathcers for tutorial
+        matcher.addURI(authority,RecappContract.PATH_TUTORIAL,TUTORIAL);
+        matcher.addURI(authority,RecappContract.PATH_TUTORIAL+"/#",TUTORIAL_WITH_ID);
+
+        //Mathcers for place with image
+        matcher.addURI(authority,RecappContract.PATH_PLACEIMAGE,PLACE_IMAGE);
+        matcher.addURI(authority,RecappContract.PATH_PLACEIMAGE+RecappContract.PATH_PLACE+"/#",PLACE_IMAGE_WITH_PLACE);
+        matcher.addURI(authority,RecappContract.PATH_PLACEIMAGE+"/#",PLACE_IMAGE_WITH_ID);
+
+        //Mathcers for tutorial with image
+        matcher.addURI(authority,RecappContract.PATH_TUTORIALIAMGE,TUTORIAL_IMAGE);
+        matcher.addURI(authority,RecappContract.PATH_TUTORIALIAMGE+RecappContract.PATH_TUTORIAL+"/#",TUTORIAL_IMAGE_WITH_TUTORIAL);
+        matcher.addURI(authority,RecappContract.PATH_TUTORIALIAMGE+"/#",TUTORIAL_IMAGE_WITH_ID);
+
+        //Mathcers for sub category
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY,SUB_CATEGORY);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_CATEGORY+"/#",SUB_CATEGORY_WITH_CATEGORY);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_TUTORIAL+"/#",SUB_CATEGORY_WITH_TUTORIAL);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_PLACE+"/#",SUB_CATEGORY_WITH_PLACE);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/#",SUB_CATEGORY_WITH_ID);
+
+        return matcher;
 
     }
 
@@ -132,111 +193,434 @@ public class RecappProvider extends ContentProvider {
         final int match = uriMatcher.match(uri);
         switch (match){
             case USER:
-                break;
-            case USER_BY_EMAIL:
-                break;
+                return UserEntry.CONTENT_TYPE;
+            case USER_WITH_EMAIL:
+                return UserEntry.CONTENT_ITEM_TYPE;
+            case USER_WITH_ID:
+                return UserEntry.CONTENT_ITEM_TYPE;
             case PLACE:
-                break;
+                return PlaceEntry.CONTENT_TYPE;
+            case PLACE_WITH_ID:
+                return PlaceEntry.CONTENT_ITEM_TYPE;
             case REMINDER:
-                break;
+                return ReminderEntry.CONTENT_TYPE;
             case REMINDER_WITH_USER:
-                break;
+                return ReminderEntry.CONTENT_TYPE;
             case REMINDER_WITH_PLACE:
-                break;
+                return ReminderEntry.CONTENT_TYPE;
+            case REMINDER_WITH_ID:
+                return ReminderEntry.CONTENT_ITEM_TYPE;
             case COMMENT:
-                break;
+                return CommentEntry.CONTENT_TYPE;
             case COMMENT_WITH_USER:
-                break;
+                return CommentEntry.CONTENT_TYPE;
             case COMMENT_WITH_PLACE:
-                break;
+                return CommentEntry.CONTENT_TYPE;
+            case COMMENT_WITH_ID:
+                return CommentEntry.CONTENT_ITEM_TYPE;
             case CATEGORY:
-                break;
+                return CategoryEntry.CONTENT_TYPE;
+            case CATEGORY_WITH_ID:
+                return CategoryEntry.CONTENT_ITEM_TYPE;
             case TUTORIAL:
-                break;
+                return TutorialEntry.CONTENT_TYPE;
+            case TUTORIAL_WITH_ID:
+                return TutorialEntry.CONTENT_ITEM_TYPE;
             case PLACE_IMAGE:
-                break;
+                return PlaceImageEntry.CONTENT_TYPE;
             case PLACE_IMAGE_WITH_PLACE:
-                break;
+                return PlaceImageEntry.CONTENT_TYPE;
+            case PLACE_IMAGE_WITH_ID:
+                return PlaceImageEntry.CONTENT_ITEM_TYPE;
             case TUTORIAL_IMAGE:
-                break;
+                return TutorialImageEntry.CONTENT_TYPE;
             case TUTORIAL_IMAGE_WITH_TUTORIAL:
-                break;
+                return TutorialImageEntry.CONTENT_TYPE;
+            case TUTORIAL_IMAGE_WITH_ID:
+                return TutorialImageEntry.CONTENT_ITEM_TYPE;
             case SUB_CATEGORY:
-                break;
+                return SubCategoryEntry.CONTENT_TYPE;
             case SUB_CATEGORY_WITH_CATEGORY:
-                break;
+                return SubCategoryEntry.CONTENT_TYPE;
             case SUB_CATEGORY_WITH_TUTORIAL:
-                break;
+                return SubCategoryEntry.CONTENT_TYPE;
             case SUB_CATEGORY_WITH_PLACE:
-                break;
+                return SubCategoryEntry.CONTENT_TYPE;
+            case SUB_CATEGORY_WITH_ID:
+                return SubCategoryEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
         }
-        return "";
+
 
     }
-
     @Override
      public Cursor query(Uri uri,String [] projection,String selection,String[] selectionArgs,
                          String sortOrder){
         Cursor retCursor = null;
         switch (uriMatcher.match(uri)){
             case USER:
-                retCursor = null;
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        UserEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
-            case USER_BY_EMAIL:
-                retCursor = null;
+            case USER_WITH_EMAIL:
+                String email = UserEntry.getEmailFromUri(uri);
+                //Like the email is unique we can forget the selection that we received
+                String selectionEmail = UserEntry.COLUMN_EMAIL + " = ? ";
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        UserEntry.TABLE_NAME,
+                        projection,
+                        selectionEmail,
+                        new String[]{email.trim()},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case USER_WITH_ID:
+                long userId = UserEntry.getIdFromUri(uri);
+                String selectionUserId = UserEntry._ID + " = ? ";
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        UserEntry.TABLE_NAME,
+                        projection,
+                        selectionUserId,
+                        new String[]{"" + userId},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case PLACE:
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        PlaceEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case PLACE_WITH_ID:
+                long placeId = PlaceEntry.getIdFromUri(uri);
+                String selectionPlaceId = PlaceEntry._ID + " = ? ";
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        PlaceEntry.TABLE_NAME,
+                        projection,
+                        selectionPlaceId,
+                        new String[]{""+placeId},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case REMINDER:
-                retCursor = null;
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        ReminderEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case REMINDER_WITH_USER:
-                retCursor = null;
+                //We expect that the string will be the user's email
+                email = ReminderEntry.getUserFromUri(uri);
+                selection = UserEntry.COLUMN_EMAIL + " = ? ";
+                retCursor = reminderByUser.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{email},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case REMINDER_WITH_PLACE:
-                retCursor = null;
+                //We expect a number which will be the place id
+                placeId = ReminderEntry.getPlaceFromUri(uri);
+                selection = ReminderEntry._ID + " = ? ";
+                retCursor = reminderByPlace.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{""+placeId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case REMINDER_WITH_ID:
+                long reminderId = ReminderEntry.getIdFromUri(uri);
+                selection = ReminderEntry._ID + " = ? ";
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        ReminderEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        new String[]{""+reminderId},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case COMMENT:
-                retCursor = null;
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        CommentEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case COMMENT_WITH_USER:
-                retCursor = null;
+                email = CommentEntry.getUserFromUri(uri);
+                selection = UserEntry.COLUMN_EMAIL + " = ? ";
+                retCursor = commentByUser.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{email},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case COMMENT_WITH_PLACE:
-                retCursor = null;
+                placeId = CommentEntry.getPlaceFromUri(uri);
+                if(placeId==-1){//Different query
+                    //we try to get the average of rating of all places
+                    retCursor = commentByPlace.query(
+                            recappDBHelper.getReadableDatabase(),
+                            projection,
+                            selection,
+                            selectionArgs,
+                            PlaceEntry._ID,//This is group by
+                            null,
+                            sortOrder
+                    );
+                }else {
+                    selection = PlaceEntry._ID + " = ? ";
+                    retCursor = commentByPlace.query(
+                            recappDBHelper.getReadableDatabase(),
+                            projection,
+                            selection,
+                            new String[]{"" + placeId},
+                            null,
+                            null,
+                            sortOrder
+                    );
+                }
+                break;
+            case COMMENT_WITH_ID:
+                long commentId = CommentEntry.getIdFromUri(uri);
+                selection = CommentEntry._ID + " = ? ";
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        CommentEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        new String[]{""+commentId},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case CATEGORY:
-                retCursor = null;
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        CategoryEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case CATEGORY_WITH_ID:
+                long categoryId = CategoryEntry.getIdFromUri(uri);
+                selection = CategoryEntry._ID + " = ? ";
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        CategoryEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        new String[]{""+categoryId},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case TUTORIAL:
-                retCursor = null;
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        TutorialEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case TUTORIAL_WITH_ID:
+                long tutorialId = TutorialEntry.getIdFromUri(uri);
+                selection = TutorialEntry._ID + " = ? ";
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        TutorialEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        new String[]{""+tutorialId},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case PLACE_IMAGE:
-                retCursor = null;
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        PlaceImageEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case PLACE_IMAGE_WITH_PLACE:
-                retCursor = null;
+                placeId = PlaceImageEntry.getPlaceFromUri(uri);
+                selection = PlaceEntry._ID + " = ?";
+                retCursor = placeImagePlace.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{""+placeId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case PLACE_IMAGE_WITH_ID:
+                long placeImageId = PlaceImageEntry.getIdFromUri(uri);
+                selection = PlaceEntry._ID + " = ? ";
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        PlaceImageEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        new String[]{""+ placeImageId},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case TUTORIAL_IMAGE:
-                retCursor = null;
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        TutorialEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case TUTORIAL_IMAGE_WITH_TUTORIAL:
-                retCursor = null;
+                tutorialId = TutorialImageEntry.getTutorialFromUri(uri);
+                selection = TutorialEntry._ID + " = ? ";
+                retCursor = tutorialImageTutorial.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{""+tutorialId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case TUTORIAL_IMAGE_WITH_ID:
+                long tutorialImageId = TutorialImageEntry.getIdFromUri(uri);
+                selection = TutorialImageEntry._ID + " = ? ";
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        TutorialImageEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        new String[]{""+tutorialImageId},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case SUB_CATEGORY:
-                retCursor = null;
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        SubCategoryEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case SUB_CATEGORY_WITH_CATEGORY:
-                retCursor = null;
+                categoryId = SubCategoryEntry.getCategoryFromUri(uri);
+                selection = CategoryEntry._ID + " = ? ";
+                retCursor = subCategoryCategory.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{""+categoryId},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case SUB_CATEGORY_WITH_TUTORIAL:
-                retCursor = null;
+                tutorialId = SubCategoryEntry.getTutorialFromUri(uri);
+                selection = TutorialEntry._ID + " = ? ";
+                retCursor = subCategoryCategory.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{""+tutorialId},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case SUB_CATEGORY_WITH_PLACE:
-                retCursor = null;
+                placeId = SubCategoryEntry.getPlaceFromUri(uri);
+                selection = PlaceEntry._ID + " = ? ";
+                retCursor = subCategoryPlace.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{""+placeId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case SUB_CATEGORY_WITH_ID:
+                long subCategoryId = SubCategoryEntry.getIdFromUri(uri);
+                selection = SubCategoryEntry._ID + " = ? ";
+                retCursor= recappDBHelper.getReadableDatabase().query(
+                        SubCategoryEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        new String[]{""+subCategoryId},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -249,68 +633,348 @@ public class RecappProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri,ContentValues values){
         Uri returnUri = null;
+        final SQLiteDatabase db = recappDBHelper.getWritableDatabase();
+        long id;
         switch (uriMatcher.match(uri)){
             case USER:
-                break;
-            case USER_BY_EMAIL:
+                id = db.insert(UserEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    returnUri = UserEntry.buildUserUri(id);
+                }else{
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
                 break;
             case PLACE:
+                id = db.insert(PlaceEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    returnUri = PlaceEntry.buildPlaceUri(id);
+                }else{
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
                 break;
             case REMINDER:
-                break;
-            case REMINDER_WITH_USER:
-                break;
-            case REMINDER_WITH_PLACE:
+                id = db.insert(ReminderEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    returnUri = ReminderEntry.buildReminderUri(id);
+                }else{
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
                 break;
             case COMMENT:
-                break;
-            case COMMENT_WITH_USER:
-                break;
-            case COMMENT_WITH_PLACE:
+                id = db.insert(CommentEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    returnUri = CommentEntry.buildCommentUri(id);
+                }else{
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
                 break;
             case CATEGORY:
+                id = db.insert(CategoryEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    returnUri = CategoryEntry.buildCategoryUri(id);
+                }else{
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
                 break;
             case TUTORIAL:
+                id = db.insert(TutorialEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    returnUri = TutorialEntry.buildTutorialUri(id);
+                }else{
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
                 break;
             case PLACE_IMAGE:
+                id = db.insert(PlaceImageEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    returnUri = PlaceImageEntry.buildPlaceImageUri(id);
+                }else{
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
                 break;
-            case PLACE_IMAGE_WITH_PLACE:
-                break;
+
             case TUTORIAL_IMAGE:
+                id = db.insert(TutorialImageEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    returnUri = TutorialImageEntry.buildTutorialImageUri(id);
+                }else{
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
                 break;
-            case TUTORIAL_IMAGE_WITH_TUTORIAL:
-                break;
+
             case SUB_CATEGORY:
+                id = db.insert(SubCategoryEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    returnUri = SubCategoryEntry.buildSubCategoryUri(id);
+                }else{
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
                 break;
-            case SUB_CATEGORY_WITH_CATEGORY:
-                break;
-            case SUB_CATEGORY_WITH_TUTORIAL:
-                break;
-            case SUB_CATEGORY_WITH_PLACE:
-                break;
+
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
         }
-        getContext().getContentResolver().notifyChange(uri,null);
+        getContext().getContentResolver().notifyChange(uri, null);
         return returnUri;
 
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
+        int rowsDeleted=0;
+        final SQLiteDatabase db = recappDBHelper.getWritableDatabase();
+        if ( null == selection ) selection = "1";
+        switch (uriMatcher.match(uri)){
+            case USER:
+                rowsDeleted = db.delete(UserEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            case PLACE:
+                rowsDeleted = db.delete(PlaceEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            case REMINDER:
+                rowsDeleted = db.delete(ReminderEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            case COMMENT:
+                rowsDeleted = db.delete(CommentEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            case CATEGORY:
+                rowsDeleted = db.delete(CategoryEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            case TUTORIAL:
+                rowsDeleted = db.delete(TutorialEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            case PLACE_IMAGE:
+                rowsDeleted = db.delete(PlaceImageEntry.TABLE_NAME,selection,selectionArgs);
+                break;
 
-        return 0;
+            case TUTORIAL_IMAGE:
+                rowsDeleted = db.delete(TutorialImageEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+
+            case SUB_CATEGORY:
+                rowsDeleted = db.delete(SubCategoryEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+
+        }
+        if(rowsDeleted!=0){
+            getContext().getContentResolver().notifyChange(uri,null);
+        }
+        return rowsDeleted;
+
     }
     @Override
     public int update(
             Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        final SQLiteDatabase db = recappDBHelper.getWritableDatabase();
+        int rowUpdated = 0;
+        switch (uriMatcher.match(uri)){
+            case USER:
+                rowUpdated = db.update(UserEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case PLACE:
+                rowUpdated = db.update(PlaceEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case REMINDER:
+                rowUpdated = db.update(ReminderEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case COMMENT:
+                rowUpdated = db.update(CommentEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case CATEGORY:
+                rowUpdated = db.update(CategoryEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case TUTORIAL:
+                rowUpdated = db.update(TutorialEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case PLACE_IMAGE:
+                rowUpdated = db.update(PlaceImageEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
 
-        return 0;
+            case TUTORIAL_IMAGE:
+                rowUpdated = db.update(TutorialImageEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+
+            case SUB_CATEGORY:
+                rowUpdated = db.update(SubCategoryEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+
+        }
+        if(rowUpdated!=0){
+            getContext().getContentResolver().notifyChange(uri,null);
+        }
+
+        return rowUpdated;
     }
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
-        return 0;
+        final SQLiteDatabase db = recappDBHelper.getWritableDatabase();
+        int returnCount = 0;
+        switch (uriMatcher.match(uri)){
+            case USER:
+                db.beginTransaction();
+                returnCount = 0;
+                try{
+                    for(ContentValues value:values){
+                        long id = db.insert(UserEntry.TABLE_NAME,null,value);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
+            case PLACE:
+                db.beginTransaction();
+                returnCount = 0;
+                try{
+                    for(ContentValues value:values){
+                        long id = db.insert(PlaceEntry.TABLE_NAME,null,value);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
+            case REMINDER:
+                db.beginTransaction();
+                returnCount = 0;
+                try{
+                    for(ContentValues value:values){
+                        long id = db.insert(ReminderEntry.TABLE_NAME,null,value);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
+            case COMMENT:
+                db.beginTransaction();
+                returnCount = 0;
+                try{
+                    for(ContentValues value:values){
+                        long id = db.insert(CommentEntry.TABLE_NAME,null,value);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
+            case CATEGORY:
+                db.beginTransaction();
+                returnCount = 0;
+                try{
+                    for(ContentValues value:values){
+                        long id = db.insert(CategoryEntry.TABLE_NAME,null,value);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
+            case TUTORIAL:
+                db.beginTransaction();
+                returnCount = 0;
+                try{
+                    for(ContentValues value:values){
+                        long id = db.insert(TutorialEntry.TABLE_NAME,null,value);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
+            case PLACE_IMAGE:
+                db.beginTransaction();
+                returnCount = 0;
+                try{
+                    for(ContentValues value:values){
+                        long id = db.insert(PlaceImageEntry.TABLE_NAME,null,value);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
+            case TUTORIAL_IMAGE:
+                db.beginTransaction();
+                returnCount = 0;
+                try{
+                    for(ContentValues value:values){
+                        long id = db.insert(TutorialImageEntry.TABLE_NAME,null,value);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
+            case SUB_CATEGORY:
+                db.beginTransaction();
+                returnCount = 0;
+                try{
+                    for(ContentValues value:values){
+                        long id = db.insert(SubCategoryEntry.TABLE_NAME,null,value);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
+            default:
+                return super.bulkInsert(uri,values);
+
+        }
+
     }
 
 }

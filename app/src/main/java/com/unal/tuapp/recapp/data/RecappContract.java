@@ -45,12 +45,14 @@ public class RecappContract {
         }
         public static Uri buildUserEmail(String email){
             return CONTENT_URI.buildUpon().
-                    appendQueryParameter(COLUMN_EMAIL,email).build();
+                    appendPath(email).build();
         }
 
         public static String getEmailFromUri(Uri uri){
-            String email = uri.getQueryParameter(COLUMN_EMAIL);
-            return email;
+            return uri.getPathSegments().get(1);
+        }
+        public static long getIdFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(1));
         }
 
 
@@ -73,6 +75,9 @@ public class RecappContract {
         public static  Uri buildPlaceUri(long id){
             return  ContentUris.withAppendedId(CONTENT_URI,id);
 
+        }
+        public static long getIdFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(1));
         }
 
     }
@@ -98,17 +103,22 @@ public class RecappContract {
         }
         public static Uri buildReminderUserUri(String user){
             return CONTENT_URI.buildUpon().
+                    appendPath(PATH_USER).
                     appendPath(user).build();
         }
-        public static Uri buildReminderPlaceUri(String place){
+        public static Uri buildReminderPlaceUri(long place){
             return CONTENT_URI.buildUpon()
-                    .appendPath(place).build();
+                    .appendPath(PATH_PLACE)
+                    .appendPath(""+place).build();
         }
         public static String getUserFromUri(Uri uri){
-            return uri.getPathSegments().get(1);
+            return uri.getPathSegments().get(2);
         }
-        public static String getPlaceFromUri(Uri uri){
-            return uri.getPathSegments().get(1);
+        public static long getPlaceFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
+        public static long getIdFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(1));
         }
     }
 
@@ -132,18 +142,23 @@ public class RecappContract {
         }
         public static Uri buildCommentUserUri(String user){
             return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_USER)
                     .appendPath(user).build();
         }
-        public static Uri buildCommentPlaceUri(String place){
+        public static Uri buildCommentPlaceUri(long place){
             return CONTENT_URI.buildUpon()
-                    .appendPath(place).build();
+                    .appendPath(PATH_PLACE)
+                    .appendPath(""+place).build();
         }
 
         public static String getUserFromUri(Uri uri){
-            return uri.getPathSegments().get(1);
+            return uri.getPathSegments().get(2);
         }
-        public static String getPlaceFromUri(Uri uri){
-            return uri.getPathSegments().get(1);
+        public static long getPlaceFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
+        public static long getIdFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(1));
         }
     }
 
@@ -163,13 +178,17 @@ public class RecappContract {
         public static Uri buildPlaceImageUri(long id){
             return ContentUris.withAppendedId(CONTENT_URI,id);
         }
-        public static Uri buildPlaceImagePlaceUri(String place){
+        public static Uri buildPlaceImagePlaceUri(long place){
             return CONTENT_URI.buildUpon()
-                    .appendPath(place).build();
+                    .appendPath(PATH_PLACE)
+                    .appendPath(""+place).build();
         }
 
-        public static String getPlaceFromUri(Uri uri){
-            return uri.getPathSegments().get(1);
+        public static long getPlaceFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
+        public static long getIdFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(1));
         }
     }
     public static class TutorialEntry  implements BaseColumns{
@@ -187,6 +206,9 @@ public class RecappContract {
 
         public static Uri buildTutorialUri(long id){
             return ContentUris.withAppendedId(CONTENT_URI,id);
+        }
+        public static long getIdFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(1));
         }
     }
     public static class TutorialImageEntry implements BaseColumns{
@@ -206,13 +228,17 @@ public class RecappContract {
             return ContentUris.withAppendedId(CONTENT_URI,id);
         }
 
-        public static Uri buildTutorialImageTutorialUri(String tutorial){
+        public static Uri buildTutorialImageTutorialUri(long tutorial){
             return CONTENT_URI.buildUpon()
-                    .appendPath(tutorial).build();
+                    .appendPath(PATH_TUTORIAL)
+                    .appendPath(""+tutorial).build();
         }
 
-        public static String getTutorialFromUri(Uri uri){
-            return uri.getPathSegments().get(1);
+        public static long getTutorialFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
+        public static long getIdFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(1));
         }
     }
     public static class CategoryEntry implements BaseColumns{
@@ -230,6 +256,9 @@ public class RecappContract {
         public static Uri buildCategoryUri(long id){
             return ContentUris.withAppendedId(CONTENT_URI,id);
         }
+        public static long getIdFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(1));
+        }
     }
     public static class SubCategoryEntry implements BaseColumns{
         public static final String TABLE_NAME = "SubCategory";
@@ -246,30 +275,36 @@ public class RecappContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SUBCATEGORY;
 
-        public static Uri buildSubCategoryUir(long id){
+        public static Uri buildSubCategoryUri(long id){
             return ContentUris.withAppendedId(CONTENT_URI,id);
         }
-        public static Uri buildSubCategoryCategoryUri(String category){
+        public static Uri buildSubCategoryCategoryUri(long category){
             return CONTENT_URI.buildUpon()
-                    .appendPath(category).build();
+                    .appendPath(PATH_CATEGORY)
+                    .appendPath(""+category).build();
         }
-        public static Uri buildSubCategoryTutorialUri(String tutorial){
+        public static Uri buildSubCategoryTutorialUri(long tutorial){
             return CONTENT_URI.buildUpon()
-                    .appendPath(tutorial).build();
+                    .appendPath(PATH_TUTORIAL)
+                    .appendPath(""+tutorial).build();
         }
-        public static Uri buildSubCategoryPlaceUri(String place){
+        public static Uri buildSubCategoryPlaceUri(long place){
             return CONTENT_URI.buildUpon()
-                    .appendPath(place).build();
+                    .appendPath(PATH_PLACE)
+                    .appendPath(""+place).build();
         }
 
-        public static String getCategoryFromUri(Uri uri){
-            return uri.getPathSegments().get(1);
+        public static long getCategoryFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
         }
-        public static String getTutorialFromUri(Uri uri){
-            return uri.getPathSegments().get(1);
+        public static long getTutorialFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
         }
-        public static String getPlaceFromUri(Uri uri){
-            return uri.getPathSegments().get(1);
+        public static long getPlaceFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
+        public static long getIdFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(1));
         }
     }
 }

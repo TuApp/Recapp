@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.unal.tuapp.recapp.data.RecappDBHelper;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -54,12 +55,14 @@ public class NavigationDrawer extends AppCompatActivity  {
     private Button add;
     private final String TAG = NavigationDrawer.class.getSimpleName();
     private final String FILE = "filters.txt";
+    private RecappDBHelper recappDBHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         root = getLayoutInflater().inflate(R.layout.activity_navigation_drawer, null);
         setContentView(root);
+        recappDBHelper = RecappDBHelper.getInstance(getApplicationContext());
         totalFilter = 0;
         mGooglePlus = GooglePlus.getInstance(this, null, null);
 
@@ -114,8 +117,8 @@ public class NavigationDrawer extends AppCompatActivity  {
                     InputMethodManager inputManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                     if(inputManager.isAcceptingText()){
                         inputManager.hideSoftInputFromWindow(temp.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                        ViewPagerAdapter viewPagerAdapter = (ViewPagerAdapter)viewPager.getAdapter();
-                        Fragment fragment = viewPagerAdapter.getItem(viewPager.getCurrentItem());
+                        //ViewPagerAdapter viewPagerAdapter = (ViewPagerAdapter)viewPager.getAdapter();
+                        //Fragment fragment = viewPagerAdapter.getItem(viewPager.getCurrentItem());
 
                         /*if(slideOffset==0.0) {
                             getSupportFragmentManager()

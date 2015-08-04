@@ -37,10 +37,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
     private AppBarLayout appBarLayout;
     private ViewPager viewPager;
     public static onMapListener mOnMapListener;
+    float scale;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        scale = getActivity().getResources().getDisplayMetrics().density;
         if(view != null){
             ViewGroup parent = (ViewGroup) view.getParent();
             if(parent !=null ){
@@ -90,7 +91,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
 
             @Override
             public void onPageSelected(int position) {
-                map.setPadding(0,0,0,100+(int)appBarLayout.getY());
+                int dp = 60;
+                map.setPadding(0,0,0, (int)(dp *  scale + 0.5f) + (int)appBarLayout.getY());
             }
 
             @Override
@@ -110,7 +112,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         googleMap.getUiSettings().setAllGesturesEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(true);
-        map.setPadding(0, 0, 0, 100 + (int) appBarLayout.getY());
+        int dp = 60;
+        map.setPadding(0,0,0, (int)(dp *  scale + 0.5f) + (int)appBarLayout.getY());
 
     }
 

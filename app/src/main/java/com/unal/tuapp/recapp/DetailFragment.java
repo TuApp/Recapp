@@ -43,21 +43,23 @@ public class DetailFragment extends Fragment {
     private Button commentButton;
     private EditText commentText;
     private RatingBar commentRating;
+    public static int count;
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_detail, container, false);
+        count = 0;
         favorite = (ImageView) root.findViewById(R.id.card_favorite);
         favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Drawable drawable = favorite.getDrawable();
-                if (drawable.getConstantState().equals(getActivity().getResources()
-                        .getDrawable(R.drawable.ic_favorites).getConstantState())) {
-                    favorite.setImageResource(R.drawable.ic_favorites_color);
 
+                if (count %2 ==0) {
+                    favorite.setImageResource(R.drawable.ic_favorites_color);
+                    count++;
                 } else {
                     favorite.setImageResource(R.drawable.ic_favorites);
+                    count++;
                 }
                 favorite.invalidate();
             }

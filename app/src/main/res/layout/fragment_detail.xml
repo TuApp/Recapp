@@ -4,8 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.unal.tuapp.recapp.DetailFragment"
+    android:focusableInTouchMode="true"
     android:descendantFocusability="beforeDescendants"
-    android:focusableInTouchMode="true">
+    >
     <android.support.v4.widget.NestedScrollView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -24,7 +25,9 @@
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
                 card_view:cardCornerRadius="4dp"
-                android:minHeight="200dp">
+                android:minHeight="200dp"
+
+                >
 
                 <RelativeLayout
                     android:id="@+id/card_detail_position"
@@ -101,20 +104,24 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp">
+                android:layout_marginRight="16dp"
+                >
                 <RatingBar
                     android:id="@+id/comment_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:numStars="4"
                     android:stepSize="0.5"
-                    android:rating="0.0"/>
+                    android:rating="0.0"
+                    />
                 <Button
                     android:id="@+id/comment_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="algo"
-                    android:layout_alignParentRight="true"/>
+                    android:text="@string/add"
+                    android:layout_alignParentRight="true"
+                    android:focusableInTouchMode="true"
+                    android:clickable="true"/>
             </RelativeLayout>
 
             <TextView
@@ -133,7 +140,7 @@
                 android:minHeight="100dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:scrollbars="vertical"/>
+                android:scrollbars="vertical" />
 
         </LinearLayout>
 

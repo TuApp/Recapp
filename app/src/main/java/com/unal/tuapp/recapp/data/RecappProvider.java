@@ -46,6 +46,10 @@ public class RecappProvider extends ContentProvider {
     static final int SUB_CATEGORY_WITH_TUTORIAL = 920;
     static final int SUB_CATEGORY_WITH_PLACE = 930;
     static final int SUB_CATEGORY_WITH_ID = 940;
+    static final int USER_BY_PLACE = 1000;
+    static final int USER_BY_PLACE_USER = 1010;
+    static final int USER_BY_PLACE_PLACE = 1020;
+    static final int USER_BY_PLACE_ID = 1030;
 
     private static final SQLiteQueryBuilder reminderByUser;
     private static final SQLiteQueryBuilder reminderByPlace;
@@ -56,6 +60,8 @@ public class RecappProvider extends ContentProvider {
     private static final SQLiteQueryBuilder subCategoryCategory;
     private static final SQLiteQueryBuilder subCategoryPlace;
     private static final SQLiteQueryBuilder subCategoryTutorial;
+    private static final SQLiteQueryBuilder userByPlaceUser;
+    private static final SQLiteQueryBuilder userByPlacePlace;
 
     static {
 
@@ -83,10 +89,11 @@ public class RecappProvider extends ContentProvider {
         commentByPlace = new SQLiteQueryBuilder();
         commentByPlace.setTables(
                 CommentEntry.TABLE_NAME + " INNER JOIN " +
-                        PlaceImageEntry.TABLE_NAME + " ON " +
+                        PlaceEntry.TABLE_NAME + " ON " +
                         CommentEntry.TABLE_NAME+"."+CommentEntry.COLUMN_PLACE_KEY +
                         " = " + PlaceEntry.TABLE_NAME+"."+PlaceEntry._ID
         );
+
         placeImagePlace = new SQLiteQueryBuilder();
         placeImagePlace.setTables(
                 PlaceImageEntry.TABLE_NAME + " INNER JOIN " +
@@ -121,6 +128,20 @@ public class RecappProvider extends ContentProvider {
                         PlaceEntry.TABLE_NAME + " ON " +
                         SubCategoryEntry.TABLE_NAME+"."+SubCategoryEntry.COLUMN_PLACE_KEY+
                         " = " + PlaceEntry.TABLE_NAME+"."+PlaceEntry._ID
+        );
+        userByPlaceUser = new SQLiteQueryBuilder();
+        userByPlaceUser.setTables(
+                UserByPlaceEntry.TABLE_NAME + " INNER JOIN " +
+                        UserEntry.TABLE_NAME + " ON "+
+                        UserByPlaceEntry.TABLE_NAME+"."+UserByPlaceEntry.COLUMN_USER_KEY+
+                        " = "+ UserEntry.TABLE_NAME+"."+UserEntry._ID
+        );
+        userByPlacePlace = new SQLiteQueryBuilder();
+        userByPlacePlace.setTables(
+                UserByPlaceEntry.TABLE_NAME + " INNER JOIN " +
+                        PlaceEntry.TABLE_NAME +" ON "+
+                        UserByPlaceEntry.TABLE_NAME+"."+UserByPlaceEntry.COLUMN_PLACE_KEY+
+                        " = "+ PlaceEntry.TABLE_NAME+"."+PlaceEntry._ID
         );
 
     }
@@ -163,12 +184,12 @@ public class RecappProvider extends ContentProvider {
 
         //Mathcers for place with image
         matcher.addURI(authority,RecappContract.PATH_PLACEIMAGE,PLACE_IMAGE);
-        matcher.addURI(authority,RecappContract.PATH_PLACEIMAGE+RecappContract.PATH_PLACE+"/#",PLACE_IMAGE_WITH_PLACE);
+        matcher.addURI(authority,RecappContract.PATH_PLACEIMAGE+"/"+RecappContract.PATH_PLACE+"/#",PLACE_IMAGE_WITH_PLACE);
         matcher.addURI(authority,RecappContract.PATH_PLACEIMAGE+"/#",PLACE_IMAGE_WITH_ID);
 
         //Mathcers for tutorial with image
         matcher.addURI(authority,RecappContract.PATH_TUTORIALIAMGE,TUTORIAL_IMAGE);
-        matcher.addURI(authority,RecappContract.PATH_TUTORIALIAMGE+RecappContract.PATH_TUTORIAL+"/#",TUTORIAL_IMAGE_WITH_TUTORIAL);
+        matcher.addURI(authority,RecappContract.PATH_TUTORIALIAMGE+"/"+RecappContract.PATH_TUTORIAL+"/#",TUTORIAL_IMAGE_WITH_TUTORIAL);
         matcher.addURI(authority,RecappContract.PATH_TUTORIALIAMGE+"/#",TUTORIAL_IMAGE_WITH_ID);
 
         //Mathcers for sub category
@@ -178,6 +199,11 @@ public class RecappProvider extends ContentProvider {
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_PLACE+"/#",SUB_CATEGORY_WITH_PLACE);
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/#",SUB_CATEGORY_WITH_ID);
 
+        //Matchers for user by place
+        matcher.addURI(authority,RecappContract.PATH_USERBYPLACE,USER_BY_PLACE);
+        matcher.addURI(authority,RecappContract.PATH_USERBYPLACE+"/"+RecappContract.PATH_USER+"/#",USER_BY_PLACE_USER);
+        matcher.addURI(authority,RecappContract.PATH_USERBYPLACE+"/"+RecappContract.PATH_PLACE+"/#",USER_BY_PLACE_PLACE);
+        matcher.addURI(authority,RecappContract.PATH_USERBYPLACE+"/#",USER_BY_PLACE_ID);
         return matcher;
 
     }
@@ -216,6 +242,7 @@ public class RecappProvider extends ContentProvider {
                 return CommentEntry.CONTENT_TYPE;
             case COMMENT_WITH_PLACE:
                 return CommentEntry.CONTENT_TYPE;
+
             case COMMENT_WITH_ID:
                 return CommentEntry.CONTENT_ITEM_TYPE;
             case CATEGORY:
@@ -248,6 +275,14 @@ public class RecappProvider extends ContentProvider {
                 return SubCategoryEntry.CONTENT_TYPE;
             case SUB_CATEGORY_WITH_ID:
                 return SubCategoryEntry.CONTENT_ITEM_TYPE;
+            case USER_BY_PLACE:
+                return UserByPlaceEntry.CONTENT_TYPE;
+            case USER_BY_PLACE_USER:
+                return UserByPlaceEntry.CONTENT_TYPE;
+            case USER_BY_PLACE_PLACE:
+                return UserByPlaceEntry.CONTENT_TYPE;
+            case USER_BY_PLACE_ID:
+                return UserByPlaceEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
@@ -400,30 +435,21 @@ public class RecappProvider extends ContentProvider {
                 break;
             case COMMENT_WITH_PLACE:
                 placeId = CommentEntry.getPlaceFromUri(uri);
-                if(placeId==-1){//Different query
-                    //we try to get the average of rating of all places
-                    retCursor = commentByPlace.query(
-                            recappDBHelper.getReadableDatabase(),
-                            projection,
-                            selection,
-                            selectionArgs,
-                            PlaceEntry._ID,//This is group by
-                            null,
-                            sortOrder
-                    );
-                }else {
-                    selection = PlaceEntry._ID + " = ? ";
-                    retCursor = commentByPlace.query(
-                            recappDBHelper.getReadableDatabase(),
-                            projection,
-                            selection,
-                            new String[]{"" + placeId},
-                            null,
-                            null,
-                            sortOrder
-                    );
-                }
+                String groupBy = selection;
+                selection = PlaceEntry.TABLE_NAME+"."+PlaceEntry._ID + " = ? ";
+
+                retCursor = commentByPlace.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{"" + placeId},
+                        groupBy,
+                        null,
+                        sortOrder
+                );
+
                 break;
+
             case COMMENT_WITH_ID:
                 long commentId = CommentEntry.getIdFromUri(uri);
                 selection = CommentEntry._ID + " = ? ";
@@ -498,7 +524,7 @@ public class RecappProvider extends ContentProvider {
                 break;
             case PLACE_IMAGE_WITH_PLACE:
                 placeId = PlaceImageEntry.getPlaceFromUri(uri);
-                selection = PlaceEntry._ID + " = ?";
+                selection = PlaceImageEntry.COLUMN_PLACE_KEY + " = ?";
                 retCursor = placeImagePlace.query(
                         recappDBHelper.getReadableDatabase(),
                         projection,
@@ -511,7 +537,7 @@ public class RecappProvider extends ContentProvider {
                 break;
             case PLACE_IMAGE_WITH_ID:
                 long placeImageId = PlaceImageEntry.getIdFromUri(uri);
-                selection = PlaceEntry._ID + " = ? ";
+                selection = PlaceImageEntry._ID + " = ? ";
                 retCursor = recappDBHelper.getReadableDatabase().query(
                         PlaceImageEntry.TABLE_NAME,
                         projection,
@@ -535,7 +561,7 @@ public class RecappProvider extends ContentProvider {
                 break;
             case TUTORIAL_IMAGE_WITH_TUTORIAL:
                 tutorialId = TutorialImageEntry.getTutorialFromUri(uri);
-                selection = TutorialEntry._ID + " = ? ";
+                selection = TutorialImageEntry.COLUMN_TUTORIAL_KEY + " = ? ";
                 retCursor = tutorialImageTutorial.query(
                         recappDBHelper.getReadableDatabase(),
                         projection,
@@ -622,6 +648,56 @@ public class RecappProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
+            case USER_BY_PLACE:
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        UserByPlaceEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case USER_BY_PLACE_USER:
+                userId = UserByPlaceEntry.getUserFromUri(uri);
+                selection = UserByPlaceEntry.COLUMN_USER_KEY + " = ? ";
+                retCursor = userByPlaceUser.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new  String[]{""+userId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case USER_BY_PLACE_PLACE:
+                placeId = UserByPlaceEntry.getPlaceFromUri(uri);
+                selection = UserByPlaceEntry.COLUMN_PLACE_KEY + " = ? ";
+                retCursor = userByPlacePlace.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{""+placeId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case USER_BY_PLACE_ID:
+                long userByPlaceId = UserByPlaceEntry.getIdFromUri(uri);
+                selection = UserByPlaceEntry._ID + " = ? ";
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        UserByPlaceEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        new String[]{""+userByPlaceId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
@@ -661,6 +737,7 @@ public class RecappProvider extends ContentProvider {
                 }
                 break;
             case COMMENT:
+
                 id = db.insert(CommentEntry.TABLE_NAME,null,values);
                 if(id>0){
                     returnUri = CommentEntry.buildCommentUri(id);
@@ -710,7 +787,14 @@ public class RecappProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
                 break;
-
+            case USER_BY_PLACE:
+                id = db.insert(UserByPlaceEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    returnUri = UserByPlaceEntry.buildUserByPlaceUri(id);
+                }else{
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
@@ -755,7 +839,9 @@ public class RecappProvider extends ContentProvider {
             case SUB_CATEGORY:
                 rowsDeleted = db.delete(SubCategoryEntry.TABLE_NAME,selection,selectionArgs);
                 break;
-
+            case USER_BY_PLACE:
+                rowsDeleted = db.delete(UserByPlaceEntry.TABLE_NAME,selection,selectionArgs);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
@@ -800,6 +886,9 @@ public class RecappProvider extends ContentProvider {
 
             case SUB_CATEGORY:
                 rowUpdated = db.update(SubCategoryEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case USER_BY_PLACE:
+                rowUpdated = db.update(UserByPlaceEntry.TABLE_NAME,values,selection,selectionArgs);
                 break;
 
             default:
@@ -970,6 +1059,20 @@ public class RecappProvider extends ContentProvider {
                 }
                 getContext().getContentResolver().notifyChange(uri,null);
                 return returnCount;
+            case USER_BY_PLACE:
+                db.beginTransaction();
+                returnCount = 0;
+                try{
+                    for (ContentValues value:values){
+                        long id = db.insert(UserByPlaceEntry.TABLE_NAME,null,value);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                }finally {
+                    db.endTransaction();
+                }
             default:
                 return super.bulkInsert(uri,values);
 

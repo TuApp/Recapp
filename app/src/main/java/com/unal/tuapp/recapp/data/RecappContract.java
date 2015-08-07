@@ -3,6 +3,7 @@ package com.unal.tuapp.recapp.data;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
+
 import android.provider.BaseColumns;
 
 /**
@@ -11,7 +12,7 @@ import android.provider.BaseColumns;
 public class RecappContract {
 
     public static final String CONTENT_AUTHORITY = "com.unal.tuapp.recapp.app";
-    public static final Uri BASE_CONTENT_URI = Uri.parse("content://"+CONTENT_AUTHORITY);
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
     public static final String PATH_USER = "user";
     public static final String PATH_PLACE = "place";
@@ -22,67 +23,75 @@ public class RecappContract {
     public static final String PATH_TUTORIALIAMGE = "tutorialImage";
     public static final String PATH_CATEGORY = "category";
     public static final String PATH_SUBCATEGORY = "subCategory";
+    public static final String PATH_USERBYPLACE = "userByPlace";
 
-    public static class UserEntry implements BaseColumns{
-        public static final String TABLE_NAME= "User";
+    public static class UserEntry implements BaseColumns {
+        public static final String TABLE_NAME = "User";
 
         public static final String COLUMN_EMAIL = "email";
-        public static final String COLUMN_USER_NAME= "user_name";
+        public static final String COLUMN_USER_NAME = "user_name";
         public static final String COLUMN_USER_LASTNAME = "user_lastname";
         public static final String COLUMN_USER_IMAGE = "user_image";
-        public static final String COLUMN_LAT =  "lat";
+        public static final String COLUMN_LAT = "lat";
         public static final String COLUMN_LOG = "log";
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_USER).build();
 
         public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE+ "/" + CONTENT_AUTHORITY + "/" +PATH_USER;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" +CONTENT_AUTHORITY + "/" + PATH_USER;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
 
-        public static Uri buildUserUri(long id){
-            return ContentUris.withAppendedId(CONTENT_URI,id);
+        public static Uri buildUserUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-        public static Uri buildUserEmail(String email){
+
+        public static Uri buildUserEmail(String email) {
             return CONTENT_URI.buildUpon().
                     appendPath(email).build();
         }
 
-        public static String getEmailFromUri(Uri uri){
+        public static String getEmailFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }
-        public static long getIdFromUri(Uri uri){
+
+        public static long getIdFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(1));
         }
 
 
-
     }
-    public static class PlaceEntry implements BaseColumns{
+
+    public static class PlaceEntry implements BaseColumns {
         public static final String TABLE_NAME = "Place";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_LAT = "lat";
         public static final String COLUMN_LOG = "log";
         public static final String COLUMN_ADDRESS = "address";
         public static final String COLUMN_DESCRIPTION = "description";
+        public static final String COLUMN_RATING = "rating"; //We use it to sort the results
+        public static final String COLUMN_IMAGE_FAVORITE = "imageFavorite";
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_PLACE).build();
 
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PLACE;
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" +PATH_PLACE;
-        public static  Uri buildPlaceUri(long id){
-            return  ContentUris.withAppendedId(CONTENT_URI,id);
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PLACE;
+
+        public static Uri buildPlaceUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
 
         }
-        public static long getIdFromUri(Uri uri){
+
+        public static long getIdFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(1));
         }
 
     }
-    public static class ReminderEntry implements BaseColumns{
-        public static final String TABLE_NAME= "Reminder";
+
+    public static class ReminderEntry implements BaseColumns {
+        public static final String TABLE_NAME = "Reminder";
 
         public static final String COLUMN_START_DATE = "start_date";
         public static final String COLUMN_END_DATE = "end_date";
@@ -98,35 +107,42 @@ public class RecappContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REMINDER;
 
-        public static Uri buildReminderUri(long id){
-            return ContentUris.withAppendedId(CONTENT_URI,id);
+        public static Uri buildReminderUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-        public static Uri buildReminderUserUri(String user){
+
+        public static Uri buildReminderUserUri(String user) {
             return CONTENT_URI.buildUpon().
                     appendPath(PATH_USER).
                     appendPath(user).build();
         }
-        public static Uri buildReminderPlaceUri(long place){
+
+        public static Uri buildReminderPlaceUri(long place) {
             return CONTENT_URI.buildUpon()
                     .appendPath(PATH_PLACE)
-                    .appendPath(""+place).build();
+                    .appendPath("" + place).build();
         }
-        public static String getUserFromUri(Uri uri){
+
+        public static String getUserFromUri(Uri uri) {
             return uri.getPathSegments().get(2);
         }
-        public static long getPlaceFromUri(Uri uri){
+
+        public static long getPlaceFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(2));
         }
-        public static long getIdFromUri(Uri uri){
+
+        public static long getIdFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(1));
         }
     }
 
-    public static class CommentEntry implements BaseColumns{
+    public static class CommentEntry implements BaseColumns {
         public static final String TABLE_NAME = "Comment";
 
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_RATING = "rating";
+        public static final String COLUMN_IMAGE = "image";
+        public static final String COLUMN_DATE = "date";
         public static final String COLUMN_USER_KEY = "user_id";
         public static final String COLUMN_PLACE_KEY = "place_id";
 
@@ -137,61 +153,70 @@ public class RecappContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_COMMENT;
 
-        public static Uri buildCommentUri(long id){
-            return ContentUris.withAppendedId(CONTENT_URI,id);
+        public static Uri buildCommentUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-        public static Uri buildCommentUserUri(String user){
+
+        public static Uri buildCommentUserUri(String user) {
             return CONTENT_URI.buildUpon()
                     .appendPath(PATH_USER)
                     .appendPath(user).build();
         }
-        public static Uri buildCommentPlaceUri(long place){
+
+        public static Uri buildCommentPlaceUri(long place) {
             return CONTENT_URI.buildUpon()
                     .appendPath(PATH_PLACE)
-                    .appendPath(""+place).build();
+                    .appendPath("" + place).build();
         }
 
-        public static String getUserFromUri(Uri uri){
+        public static String getUserFromUri(Uri uri) {
             return uri.getPathSegments().get(2);
         }
-        public static long getPlaceFromUri(Uri uri){
+
+        public static long getPlaceFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(2));
         }
-        public static long getIdFromUri(Uri uri){
+
+        public static long getIdFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(1));
         }
+
     }
 
     public static class PlaceImageEntry implements BaseColumns {
         public static final String TABLE_NAME = "PlaceImage";
 
         public static final String COLUMN_IMAGE = "image";
+        public static final String COLUMN_WORTH = "worth";
         public static final String COLUMN_PLACE_KEY = "place_key";
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_PLACEIMAGE).build();
 
         public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE +"/" + CONTENT_AUTHORITY + "/" + PATH_PLACEIMAGE;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PLACEIMAGE;
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PLACEIMAGE;
 
-        public static Uri buildPlaceImageUri(long id){
-            return ContentUris.withAppendedId(CONTENT_URI,id);
-        }
-        public static Uri buildPlaceImagePlaceUri(long place){
-            return CONTENT_URI.buildUpon()
-                    .appendPath(PATH_PLACE)
-                    .appendPath(""+place).build();
+        public static Uri buildPlaceImageUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static long getPlaceFromUri(Uri uri){
+        public static Uri buildPlaceImagePlaceUri(long place) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_PLACE)
+                    .appendPath("" + place).build();
+        }
+
+        public static long getPlaceFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(2));
         }
-        public static long getIdFromUri(Uri uri){
+
+        public static long getIdFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(1));
         }
     }
-    public static class TutorialEntry  implements BaseColumns{
+
+    public static class TutorialEntry implements BaseColumns {
         public static final String TABLE_NAME = "Tutorial";
 
         public static final String COLUMN_NAME = "name";
@@ -204,44 +229,49 @@ public class RecappContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TUTORIAL;
 
-        public static Uri buildTutorialUri(long id){
-            return ContentUris.withAppendedId(CONTENT_URI,id);
+        public static Uri buildTutorialUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-        public static long getIdFromUri(Uri uri){
+
+        public static long getIdFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(1));
         }
     }
-    public static class TutorialImageEntry implements BaseColumns{
+
+    public static class TutorialImageEntry implements BaseColumns {
         public static final String TABLE_NAME = "TutorialImage";
 
         public static final String COLUMN_IMAGE = "image";
-        public static final String COLUMN_TUTORIAL_KEY ="tutorial_key";
+        public static final String COLUMN_WORTH = "worth";
+        public static final String COLUMN_TUTORIAL_KEY = "tutorial_key";
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_TUTORIALIAMGE).build();
 
         public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" +CONTENT_AUTHORITY + "/" + PATH_TUTORIALIAMGE;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TUTORIALIAMGE;
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TUTORIALIAMGE;
 
-        public static Uri buildTutorialImageUri(long id){
-            return ContentUris.withAppendedId(CONTENT_URI,id);
+        public static Uri buildTutorialImageUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Uri buildTutorialImageTutorialUri(long tutorial){
+        public static Uri buildTutorialImageTutorialUri(long tutorial) {
             return CONTENT_URI.buildUpon()
                     .appendPath(PATH_TUTORIAL)
-                    .appendPath(""+tutorial).build();
+                    .appendPath("" + tutorial).build();
         }
 
-        public static long getTutorialFromUri(Uri uri){
+        public static long getTutorialFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(2));
         }
-        public static long getIdFromUri(Uri uri){
+
+        public static long getIdFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(1));
         }
     }
-    public static class CategoryEntry implements BaseColumns{
+
+    public static class CategoryEntry implements BaseColumns {
         public static final String TABLE_NAME = "Category";
 
         public static final String COLUMN_NAME = "name";
@@ -251,16 +281,18 @@ public class RecappContract {
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CATEGORY;
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" +CONTENT_AUTHORITY + "/"+ PATH_CATEGORY;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CATEGORY;
 
-        public static Uri buildCategoryUri(long id){
-            return ContentUris.withAppendedId(CONTENT_URI,id);
+        public static Uri buildCategoryUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-        public static long getIdFromUri(Uri uri){
+
+        public static long getIdFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(1));
         }
     }
-    public static class SubCategoryEntry implements BaseColumns{
+
+    public static class SubCategoryEntry implements BaseColumns {
         public static final String TABLE_NAME = "SubCategory";
 
         public static final String COLUMN_NAME = "name";
@@ -271,40 +303,85 @@ public class RecappContract {
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_SUBCATEGORY).build();
 
         public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" +PATH_SUBCATEGORY;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SUBCATEGORY;
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SUBCATEGORY;
 
-        public static Uri buildSubCategoryUri(long id){
-            return ContentUris.withAppendedId(CONTENT_URI,id);
-        }
-        public static Uri buildSubCategoryCategoryUri(long category){
-            return CONTENT_URI.buildUpon()
-                    .appendPath(PATH_CATEGORY)
-                    .appendPath(""+category).build();
-        }
-        public static Uri buildSubCategoryTutorialUri(long tutorial){
-            return CONTENT_URI.buildUpon()
-                    .appendPath(PATH_TUTORIAL)
-                    .appendPath(""+tutorial).build();
-        }
-        public static Uri buildSubCategoryPlaceUri(long place){
-            return CONTENT_URI.buildUpon()
-                    .appendPath(PATH_PLACE)
-                    .appendPath(""+place).build();
+        public static Uri buildSubCategoryUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static long getCategoryFromUri(Uri uri){
+        public static Uri buildSubCategoryCategoryUri(long category) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_CATEGORY)
+                    .appendPath("" + category).build();
+        }
+
+        public static Uri buildSubCategoryTutorialUri(long tutorial) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_TUTORIAL)
+                    .appendPath("" + tutorial).build();
+        }
+
+        public static Uri buildSubCategoryPlaceUri(long place) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_PLACE)
+                    .appendPath("" + place).build();
+        }
+
+        public static long getCategoryFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(2));
         }
-        public static long getTutorialFromUri(Uri uri){
+
+        public static long getTutorialFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(2));
         }
+
+        public static long getPlaceFromUri(Uri uri) {
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
+
+        public static long getIdFromUri(Uri uri) {
+            return Long.parseLong(uri.getPathSegments().get(1));
+        }
+    }
+    public static class UserByPlaceEntry implements BaseColumns {
+        public static final String TABLE_NAME = "UserByPlace";
+
+        public static final String COLUMN_USER_KEY = "user_id";
+        public static final String COLUMN_PLACE_KEY = "place_id";
+
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_USERBYPLACE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USERBYPLACE;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USERBYPLACE;
+
+        public static Uri buildUserByPlaceUri(long id){
+            return ContentUris.withAppendedId(CONTENT_URI,id);
+        }
+        public static Uri buildUserByPlaceUserUri(long id){
+            return CONTENT_URI.buildUpon().
+                    appendPath(PATH_USER).
+                    appendPath(""+id).build();
+        }
+        public static Uri buildUserByPlacePlaceUri(long id){
+            return CONTENT_URI.buildUpon().
+                    appendPath(PATH_PLACE).
+                    appendPath(""+id).build();
+        }
+
         public static long getPlaceFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
+        public static long getUserFromUri(Uri uri){
             return Long.parseLong(uri.getPathSegments().get(2));
         }
         public static long getIdFromUri(Uri uri){
             return Long.parseLong(uri.getPathSegments().get(1));
         }
+
     }
 }
+

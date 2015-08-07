@@ -1,46 +1,58 @@
 package com.unal.tuapp.recapp;
 
 
-import android.content.Context;
-import android.content.res.Configuration;
-import android.support.design.widget.AppBarLayout;
+
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.data.User;
 
 
-public class Detail extends AppCompatActivity {
+public class Detail extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private Toolbar toolbar;
     private NavigationView navDrawer;
     private DrawerLayout navigationDrawer;
     private GooglePlus mGooglePlus;
     private View root;
     private ImageView detail;
-    private AppBarLayout appBarLayout;
+    private static final int PLACE = 5;
+    private User  user;
+    private long id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         root = getLayoutInflater().inflate(R.layout.activity_detail, null);
         setContentView(root);
+        Bundle extras = getIntent().getExtras();
+        if(extras!=null){
+            id = extras.getLong("id");
+            user = new User();
+            long userId = ((User)extras.getParcelable("user")).getId();
+            user.setId((userId));
+            user.setProfileImage(((User) extras.getParcelable("user")).getProfileImage());
+        }
+        getSupportLoaderManager().initLoader(PLACE,null,this);
         mGooglePlus = GooglePlus.getInstance(this, null, null);
 
         if(mGooglePlus.mGoogleApiClient.isConnected()){
@@ -63,8 +75,7 @@ public class Detail extends AppCompatActivity {
         }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        detail = (ImageView) findViewById(R.id.detail_image);
-        detail.setImageResource(R.drawable.background_material);
+
         final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle(getString(R.string.title_activity_detail));
         collapsingToolbarLayout.setExpandedTitleColor(
@@ -92,7 +103,7 @@ public class Detail extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         DetailFragment detailFragment = new DetailFragment();
 
-        fragmentTransaction.replace(R.id.detail_container,detailFragment,"algo");
+        fragmentTransaction.replace(R.id.detail_container,detailFragment);
         fragmentTransaction.commit();
 
     }
@@ -130,5 +141,30 @@ public class Detail extends AppCompatActivity {
 
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return  new CursorLoader(
+                this,
+                RecappContract.PlaceEntry.buildPlaceUri(this.id),
+                new String[]{RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE},
+                null,
+                null,
+                null
+        );
+    }
 
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        detail = (ImageView) findViewById(R.id.detail_image);
+        data.moveToFirst();
+        detail.setImageBitmap(BitmapFactory.decodeByteArray(
+                data.getBlob(0),0,data.getBlob(0).length
+        ));
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
 }

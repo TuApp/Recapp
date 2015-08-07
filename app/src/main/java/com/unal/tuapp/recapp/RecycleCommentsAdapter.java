@@ -1,25 +1,29 @@
 package com.unal.tuapp.recapp;
 
+import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RatingBar;
-import android.widget.Switch;
 import android.widget.TextView;
 
+import com.unal.tuapp.recapp.data.Comment;
+import com.unal.tuapp.recapp.data.RecappContract;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by andresgutierrez on 7/22/15.
  */
 public class RecycleCommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private ArrayList<Comment> comments;
+    private List<Comment> comments;
+    private Cursor commentCursor;
 
     public RecycleCommentsAdapter(ArrayList<Comment> comments) {
         this.comments = comments;
@@ -60,22 +64,28 @@ public class RecycleCommentsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         // We need to change it with the image which is stored in the database
         if(comment.getImageProfile()!=null){
             commentsViewHolder.imageView.setImageBitmap(
-                    BitmapFactory.decodeByteArray(comment.getImageProfile(),0,0));
+                    BitmapFactory.decodeByteArray(comment.getImageProfile(),0,comment.getImageProfile().length));
         }else {
             commentsViewHolder.imageView.setImageResource(R.drawable.background_material);
         }
         //We need to change the value, dynamically
-        commentsViewHolder.ratingBar.setRating(comment.getRating());
+        commentsViewHolder.ratingBar.setRating((float)comment.getRating());
         LayerDrawable stars = (LayerDrawable)  commentsViewHolder.ratingBar.getProgressDrawable();
         stars.getDrawable(0).setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_ATOP);
         stars.getDrawable(1).setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_ATOP);
         stars.getDrawable(2).setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
 
+    }
 
-
-
-
-
+    public void swapData(List<Comment> comments){
+        this.comments = comments;
+        notifyDataSetChanged();
+    }
+    public void setCommentCursor(Cursor cursor){
+        this.commentCursor = cursor;
+    }
+    public void closeCursor(){
+        commentCursor.close();
 
     }
 

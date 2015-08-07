@@ -1,8 +1,12 @@
 package com.unal.tuapp.recapp;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,13 +14,17 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.unal.tuapp.recapp.data.Place;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by andresgutierrez on 7/13/15.
  */
 public class RecyclePlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<String> places;
+    private Cursor placeCursor;
+    private static List<Place> places;
     public static OnItemClickListener mItemClickListener;
     public final int FAVORITE=0,NORMAL=1;
 
@@ -34,7 +42,8 @@ public class RecyclePlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         @Override
         public void onClick(View view){
             if(mItemClickListener!=null){
-                mItemClickListener.onItemClick(view,getAdapterPosition());
+                long id = places.get(getAdapterPosition()).getId();
+                mItemClickListener.onItemClick(view,id);
             }
         }
 
@@ -57,18 +66,19 @@ public class RecyclePlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         @Override
         public void onClick(View view){
             if(mItemClickListener!=null){
-                mItemClickListener.onItemClick(view,getAdapterPosition());
+                long id = places.get(getAdapterPosition()).getId();
+                mItemClickListener.onItemClick(view,id);
             }
         }
 
     }
     public interface OnItemClickListener{
-        void onItemClick(View view,int position);
+        void onItemClick(View view,long position);
     }
     public void setOnItemClickListener(final OnItemClickListener mItemClickListener){
         this.mItemClickListener = mItemClickListener;
     }
-    public RecyclePlaceAdapter(List<String> places){
+    public RecyclePlaceAdapter(List<Place> places){
 
         this.places = places;
     }
@@ -86,7 +96,13 @@ public class RecyclePlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
     }
 
+    public void setPlaceCursor(Cursor cursor){
+        placeCursor = cursor;
+    }
+    public void closeCursor(){
+        placeCursor.close();
 
+    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i){
@@ -113,14 +129,20 @@ public class RecyclePlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         switch (viewHolder.getItemViewType()){
             case FAVORITE:
                 PlaceViewHolderFavorite placeViewHolderFavorite = (PlaceViewHolderFavorite) viewHolder;
-                placeViewHolderFavorite.name.setText(places.get(i));
-                placeViewHolderFavorite.imageView.setImageResource(R.drawable.background_material);
+                placeViewHolderFavorite.name.setText(places.get(i).getName());
+                placeViewHolderFavorite.imageView.setImageBitmap(BitmapFactory.decodeByteArray(
+                        places.get(i).getImageFavorite(),0,places.get(i).getImageFavorite().length
+                ));
                 break;
             case NORMAL:
                 PlaceViewHolder placeViewHolder = (PlaceViewHolder) viewHolder;
-                placeViewHolder.name.setText(places.get(i));
+                placeViewHolder.name.setText(places.get(i).getName());
                 break;
         }
+    }
+    public void swapData(List<Place> newPlace){
+        places = newPlace;
+        notifyDataSetChanged();
     }
 
 }

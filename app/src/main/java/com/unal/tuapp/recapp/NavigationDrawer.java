@@ -1,9 +1,11 @@
 package com.unal.tuapp.recapp;
 
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -14,6 +16,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,7 +30,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.RecappDBHelper;
+import com.unal.tuapp.recapp.data.User;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -43,6 +48,7 @@ import java.io.PrintWriter;
  */
 public class NavigationDrawer extends AppCompatActivity  {
     private int totalFilter;
+    private String emailUser;
     private NavigationView navDrawer;
     private NavigationView navFilterDrawer;
     private TabLayout tabLayout;
@@ -78,11 +84,13 @@ public class NavigationDrawer extends AppCompatActivity  {
             name.setText(currentPerson.getDisplayName());
 
             TextView email = (TextView) findViewById(R.id.user_email);
-            email.setText(account.getAccountName(mGooglePlus.mGoogleApiClient));
+            emailUser = account.getAccountName(mGooglePlus.mGoogleApiClient);
+            email.setText(emailUser);
             de.hdodenhof.circleimageview.CircleImageView imageView;
             imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
-
-            new LoadProfileImage(root,imageView).execute(personPhotoUrl);
+            addUser(emailUser,
+                    currentPerson.getName().getGivenName(),currentPerson.getName().getFamilyName());
+            new LoadProfileImage(root,imageView).execute(personPhotoUrl,account.getAccountName(mGooglePlus.mGoogleApiClient));
         }
         add = (Button) root.findViewById(R.id.add);
         add.setOnClickListener(new View.OnClickListener() {
@@ -105,7 +113,7 @@ public class NavigationDrawer extends AppCompatActivity  {
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         setUpToolbar();
         setUpViewPager();
-        setUpTabLayout();
+        //setUpTabLayout();
         navigationDrawer = (DrawerLayout) findViewById(R.id.navigation_drawer);
         navDrawer = (NavigationView) findViewById(R.id.nav_drawer);
         drawerToggle = new ActionBarDrawerToggle(this,navigationDrawer,toolbar,R.string.drawer_open,R.string.drawer_close){
@@ -135,6 +143,7 @@ public class NavigationDrawer extends AppCompatActivity  {
 
             }
         };
+
         navigationDrawer.setDrawerListener(drawerToggle);
         navFilterDrawer = (NavigationView) findViewById(R.id.filter_nav_drawer);
         navDrawer.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -143,7 +152,19 @@ public class NavigationDrawer extends AppCompatActivity  {
                 switch (menuItem.getItemId()){
                     case R.id.favorites:
                         View view = root.findViewById(R.id.view_pager);
-                        Snackbar.make(view,"algo",Snackbar.LENGTH_LONG).show();
+                        Cursor user = getContentResolver().query(
+                                RecappContract.UserEntry.buildUserEmail("agutierrezt930410@gmail.com"),
+                                null,
+                                null,
+                                null,
+                                null
+                        );
+                        if(user.moveToFirst()) {
+                            Snackbar.make(view, user.getString(user.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_NAME))
+                                    , Snackbar.LENGTH_LONG).show();
+                            //Log.e("algo",""+user.getBlob(user.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_IMAGE)));
+                        }
+                        user.close();
                         break;
                     case R.id.appointments:
                         break;
@@ -202,10 +223,11 @@ public class NavigationDrawer extends AppCompatActivity  {
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             View view = root.findViewById(R.id.view_pager);
-            Snackbar.make(view,"algo",Snackbar.LENGTH_LONG).show();
+
+
+            Snackbar.make(view, "algo", Snackbar.LENGTH_LONG).show();
         }
         if(id == R.id.action_navigation){
             navigationDrawer.openDrawer(navFilterDrawer);
@@ -245,22 +267,39 @@ public class NavigationDrawer extends AppCompatActivity  {
         //getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
-    public void setUpTabLayout(){
+
+    public void setUpViewPager(){
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.places)));
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.map)));
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.events)));
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.tutorial)));
-        tabLayout.setupWithViewPager(viewPager);
-    }
-    public void setUpViewPager(){
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        final ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         PlacesFragment placesFragment = new PlacesFragment();
         placesFragment.setOnPlaceListener(new PlacesFragment.onPlaceListener() {
             @Override
-            public void onPlace(View view, int positon) {
+            public void onPlace(View view, long positon) {
+                //Log.e("algo",""+positon);
+                Cursor userCursor = getContentResolver().query(
+                        RecappContract.UserEntry.buildUserEmail(emailUser),
+                        new String[]{RecappContract.UserEntry._ID, RecappContract.UserEntry.COLUMN_USER_IMAGE},
+                        null,
+                        null,
+                        null
+                );
+                User user = new User();
+                if (userCursor.moveToFirst()) {
+
+                    user.setProfileImage(userCursor.getBlob(userCursor.
+                            getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_IMAGE)));
+                }
+
                 Intent intent = new Intent(NavigationDrawer.this, Detail.class);
+                intent.putExtra("id", positon);
+                intent.putExtra("user", user);
+
                 startActivity(intent);
             }
         });
@@ -272,11 +311,15 @@ public class NavigationDrawer extends AppCompatActivity  {
                 startActivity(intent);
             }
         });
+
         viewPagerAdapter.addFragment(placesFragment, getResources().getString(R.string.places));
         viewPagerAdapter.addFragment(mapFragment, getResources().getString(R.string.map));
         viewPagerAdapter.addFragment(new EventsFragment(), getResources().getString(R.string.events));
         viewPagerAdapter.addFragment(new TutorialFragment(), getResources().getString(R.string.tutorial));
+        viewPager.setOffscreenPageLimit(4);
         viewPager.setAdapter(viewPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
+
     }
 
     public void saveFilters(){
@@ -318,6 +361,27 @@ public class NavigationDrawer extends AppCompatActivity  {
     }
     @Override
     public void onBackPressed() {
+    }
+
+    public void addUser(String email,String name, String lastname){
+        Cursor userCursor = getContentResolver().query(
+                RecappContract.UserEntry.buildUserEmail(email),
+                new String[]{RecappContract.UserEntry._ID},
+                null,
+                null,
+                null
+        );
+        if(!userCursor.moveToFirst()){ //New User so we can add him/her
+            ContentValues values = new ContentValues();
+            values.put(RecappContract.UserEntry.COLUMN_EMAIL,email);
+            values.put(RecappContract.UserEntry.COLUMN_USER_NAME,name);
+            values.put(RecappContract.UserEntry.COLUMN_USER_LASTNAME,lastname);
+            getContentResolver().insert(RecappContract.UserEntry.CONTENT_URI,values);
+            //Log.e("We do it", "add person");
+        }
+        userCursor.close();
+
+
     }
 
 

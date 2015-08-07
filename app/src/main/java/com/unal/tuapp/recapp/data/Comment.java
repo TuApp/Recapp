@@ -1,15 +1,20 @@
-package com.unal.tuapp.recapp;
+package com.unal.tuapp.recapp.data;
 
+/**
+ * Created by andresgutierrez on 8/5/15.
+ */
+
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by andresgutierrez on 7/22/15.
- */
+import java.util.ArrayList;
+
+
 public class Comment  implements Parcelable {
     private byte[] imageProfile;
     private String comment;
-    private float rating;
+    private double rating;
 
     public Comment(){}
 
@@ -30,11 +35,11 @@ public class Comment  implements Parcelable {
         this.imageProfile = imageProfile;
     }
 
-    public float getRating() {
+    public double getRating() {
         return rating;
     }
 
-    public void setRating(float rating) {
+    public void setRating(double rating) {
         this.rating = rating;
     }
 
@@ -48,7 +53,7 @@ public class Comment  implements Parcelable {
         parcel.writeInt(imageProfile.length);
         parcel.writeByteArray(imageProfile);
         parcel.writeString(comment);
-        parcel.writeFloat(rating);
+        parcel.writeDouble(rating);
     }
     private Comment (Parcel parcel){
         int size = parcel.readInt();
@@ -58,8 +63,8 @@ public class Comment  implements Parcelable {
         rating = parcel.readFloat();
 
     }
-    public static final Parcelable.Creator<Comment> CREATOR
-            = new Parcelable.Creator<Comment>(){
+    public static final Creator<Comment> CREATOR
+            = new Creator<Comment>(){
         @Override
         public Comment createFromParcel(Parcel parcel) {
             return new Comment(parcel);
@@ -70,4 +75,18 @@ public class Comment  implements Parcelable {
             return new Comment[i];
         }
     };
+    public static ArrayList<Comment> allComment(Cursor cursor){
+        ArrayList<Comment> comments = new ArrayList<>();
+        while (cursor.moveToNext()){
+            Comment comment = new Comment();
+            comment.setComment(cursor.getString(cursor.getColumnIndexOrThrow(RecappContract.CommentEntry.COLUMN_DESCRIPTION)));
+            comment.setRating(cursor.getDouble(cursor.getColumnIndexOrThrow(RecappContract.CommentEntry.COLUMN_RATING)));
+            comment.setImageProfile(cursor.getBlob(
+                    cursor.getColumnIndexOrThrow(RecappContract.CommentEntry.COLUMN_IMAGE)
+            ));
+            comments.add(comment);
+        }
+        return comments;
+    }
 }
+

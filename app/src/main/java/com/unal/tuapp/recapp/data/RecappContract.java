@@ -111,20 +111,20 @@ public class RecappContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Uri buildReminderUserUri(String user) {
+        public static Uri buildReminderUserUri(long user) {
             return CONTENT_URI.buildUpon().
-                    appendPath(PATH_USER).
-                    appendPath(user).build();
+                    appendPath(PATH_PLACE).
+                    appendPath(""+user).build();
         }
 
         public static Uri buildReminderPlaceUri(long place) {
             return CONTENT_URI.buildUpon()
-                    .appendPath(PATH_PLACE)
+                    .appendPath(PATH_USER)
                     .appendPath("" + place).build();
         }
 
-        public static String getUserFromUri(Uri uri) {
-            return uri.getPathSegments().get(2);
+        public static long getUserFromUri(Uri uri) {
+            return Long.parseLong(uri.getPathSegments().get(2));
         }
 
         public static long getPlaceFromUri(Uri uri) {
@@ -141,7 +141,6 @@ public class RecappContract {
 
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_RATING = "rating";
-        public static final String COLUMN_IMAGE = "image";
         public static final String COLUMN_DATE = "date";
         public static final String COLUMN_USER_KEY = "user_id";
         public static final String COLUMN_PLACE_KEY = "place_id";
@@ -157,10 +156,10 @@ public class RecappContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Uri buildCommentUserUri(String user) {
+        public static Uri buildCommentUserUri(long user) {
             return CONTENT_URI.buildUpon()
                     .appendPath(PATH_USER)
-                    .appendPath(user).build();
+                    .appendPath(""+user).build();
         }
 
         public static Uri buildCommentPlaceUri(long place) {
@@ -168,14 +167,23 @@ public class RecappContract {
                     .appendPath(PATH_PLACE)
                     .appendPath("" + place).build();
         }
-
-        public static String getUserFromUri(Uri uri) {
-            return uri.getPathSegments().get(2);
+        public static Uri buildCommentPlaceUserUri(long place){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_PLACE)
+                    .appendPath(PATH_USER)
+                    .appendPath(""+place).build();
         }
 
+        public static long getUserFromUri(Uri uri) {
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
         public static long getPlaceFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(2));
         }
+        public static long getPlaceUserFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(3));
+        }
+
 
         public static long getIdFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(1));

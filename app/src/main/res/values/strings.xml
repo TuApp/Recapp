@@ -21,5 +21,6 @@
     <string name="title_activity_detail">Detail</string>
     <string name="hello_world">Hello world!</string>
     <string name="comments">Comments</string>
+    <string name="title_activity_user_detail">UserDetail</string>
 
 </resources>

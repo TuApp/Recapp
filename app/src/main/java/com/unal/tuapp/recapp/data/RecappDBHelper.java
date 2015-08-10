@@ -65,7 +65,6 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 CommentEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 CommentEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, "+
                 CommentEntry.COLUMN_RATING + " REAL NOT NULL," +
-                CommentEntry.COLUMN_IMAGE + " BLOB NOT NULL, " +
                 CommentEntry.COLUMN_DATE + " INTEGER NOT NULL, " +
                 CommentEntry.COLUMN_USER_KEY + " INTEGER, "+
                 CommentEntry.COLUMN_PLACE_KEY + " INTEGER, " +

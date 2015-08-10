@@ -38,13 +38,7 @@
 
 
 
-    <android.support.design.widget.NavigationView
-        android:id="@+id/nav_drawer"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="left"
-        app:headerLayout="@layout/drawer_header"
-        app:menu="@menu/drawer" />
+    <include layout="@layout/navigation_drawer" />
 
     <android.support.design.widget.NavigationView
         android:id="@+id/filter_nav_drawer"

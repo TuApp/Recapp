@@ -1,5 +1,6 @@
 package com.unal.tuapp.recapp.data;
 
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -14,9 +15,11 @@ public class User implements Parcelable {
     private String name;
     private String lastName;
     private byte[] profileImage;
+    private Cursor cursor;
 
     public User() {
     }
+
 
     public String getEmail() {
         return email;

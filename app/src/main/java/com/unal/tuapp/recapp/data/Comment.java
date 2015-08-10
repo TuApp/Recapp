@@ -7,6 +7,7 @@ package com.unal.tuapp.recapp.data;
 import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -82,8 +83,10 @@ public class Comment  implements Parcelable {
             comment.setComment(cursor.getString(cursor.getColumnIndexOrThrow(RecappContract.CommentEntry.COLUMN_DESCRIPTION)));
             comment.setRating(cursor.getDouble(cursor.getColumnIndexOrThrow(RecappContract.CommentEntry.COLUMN_RATING)));
             comment.setImageProfile(cursor.getBlob(
-                    cursor.getColumnIndexOrThrow(RecappContract.CommentEntry.COLUMN_IMAGE)
+                    cursor.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_IMAGE)
             ));
+
+
             comments.add(comment);
         }
         return comments;

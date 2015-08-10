@@ -38,7 +38,6 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
     private View root;
     public static onPlaceListener mOnPlaceListener;
     public static final int PLACES_LOADER = 0;
-    private ViewPager viewPager;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
@@ -67,15 +66,20 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
         AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(recyclePlaceAdapter);
         alphaAdapter.setDuration(1000);
         recyclerView.setAdapter(new SlideInRightAnimationAdapter(alphaAdapter));
-        getLoaderManager().initLoader(PLACES_LOADER, null, this);
 
         return root;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
-
         super.onActivityCreated(savedInstanceState);
+        //getLoaderManager().initLoader(PLACES_LOADER,null,this);
+        if(getLoaderManager().getLoader(PLACES_LOADER)==null){
+            getLoaderManager().initLoader(PLACES_LOADER,null,this);
+        }else{
+            getLoaderManager().restartLoader(PLACES_LOADER,null,this);
+        }
+
     }
     public interface onPlaceListener{
         void onPlace(View view,long position);
@@ -99,7 +103,7 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        Log.w("algo", "algo");
+        //Log.w("algo", "algo");
         List<Place> places =Place.allPlaces(cursor);
         recyclePlaceAdapter.swapData(places);
         recyclePlaceAdapter.setPlaceCursor(cursor);

@@ -73,10 +73,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Bundle extras = getActivity().getIntent().getExtras();
         if(extras!=null){
             id = extras.getLong("id");
-            user = new User();
-            long userId = ((User)extras.getParcelable("user")).getId();
-            user.setId((userId));
-            user.setProfileImage(((User) extras.getParcelable("user")).getProfileImage());
+            user = extras.getParcelable("user");
         }
         favorite = (ImageView) root.findViewById(R.id.card_favorite);
         favorite.setOnClickListener(new View.OnClickListener() {
@@ -84,7 +81,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             public void onClick(View view) {
 
                 if (count % 2 == 0) {
-                    favorite.setImageResource(R.drawable.ic_favorites_color);
+                    //favorite.setImageResource(R.drawable.ic_favorites_color);
                     ContentValues userByPlace = new ContentValues();
                     userByPlace.put(RecappContract.UserByPlaceEntry.COLUMN_USER_KEY,user.getId());
                     userByPlace.put(RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY,id);
@@ -93,7 +90,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                             userByPlace
                     );
                 } else {
-                    favorite.setImageResource(R.drawable.ic_favorites);
+                    //favorite.setImageResource(R.drawable.ic_favorites);
                     String selection = RecappContract.UserByPlaceEntry.COLUMN_USER_KEY+" = ? AND " +
                             RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY+" = ? ";
                     getActivity().getContentResolver().delete(
@@ -102,7 +99,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                             new String[]{"" + user.getId(), "" + id}
                     );
                 }
-                favorite.invalidate();
+                //favorite.invalidate();
             }
         });
 
@@ -149,7 +146,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     ContentValues values = new ContentValues();
                     values.put(RecappContract.CommentEntry.COLUMN_DESCRIPTION, commentText.getText().toString());
                     values.put(RecappContract.CommentEntry.COLUMN_RATING, commentRating.getRating());
-                    values.put(RecappContract.CommentEntry.COLUMN_IMAGE, user.getProfileImage());
                     values.put(RecappContract.CommentEntry.COLUMN_DATE,System.currentTimeMillis());
                     values.put(RecappContract.CommentEntry.COLUMN_USER_KEY, user.getId());
                     values.put(RecappContract.CommentEntry.COLUMN_PLACE_KEY, id);
@@ -211,10 +207,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 String sortOrderComment = RecappContract.CommentEntry.COLUMN_DATE + " DESC ";
                 return  new CursorLoader(
                     getActivity(),
-                    RecappContract.CommentEntry.buildCommentPlaceUri(this.id),
+                    RecappContract.CommentEntry.buildCommentPlaceUserUri(this.id),
                     new String[]{RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_DESCRIPTION,
                             RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_RATING,
-                            RecappContract.CommentEntry.TABLE_NAME+"."+ RecappContract.CommentEntry.COLUMN_IMAGE},
+                            RecappContract.UserEntry.COLUMN_USER_IMAGE},
                     null,
                     null,
                     sortOrderComment

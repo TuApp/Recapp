@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
 
 import com.unal.tuapp.recapp.data.RecappContract.*;
 
@@ -30,7 +31,8 @@ public class RecappProvider extends ContentProvider {
     static final int COMMENT = 400;
     static final int COMMENT_WITH_USER = 410;
     static final int COMMENT_WITH_PLACE = 420;
-    static final int COMMENT_WITH_ID = 430;
+    static final int COMMENT_WITH_PLACE_USER = 430;
+    static final int COMMENT_WITH_ID = 440;
     static final int CATEGORY = 500;
     static final int CATEGORY_WITH_ID = 510;
     static final int TUTORIAL = 600;
@@ -164,14 +166,16 @@ public class RecappProvider extends ContentProvider {
 
         //Matchers for reminder
         matcher.addURI(authority,RecappContract.PATH_REMINDER,REMINDER);
-        matcher.addURI(authority,RecappContract.PATH_REMINDER+"/"+RecappContract.PATH_USER+"/*",REMINDER_WITH_USER);
+        matcher.addURI(authority,RecappContract.PATH_REMINDER+"/"+RecappContract.PATH_USER+"/#",REMINDER_WITH_USER);
         matcher.addURI(authority,RecappContract.PATH_REMINDER+"/"+RecappContract.PATH_PLACE+"/#",REMINDER_WITH_PLACE);
         matcher.addURI(authority,RecappContract.PATH_REMINDER+"/#",REMINDER_WITH_ID);
 
         //Matchers for comment
         matcher.addURI(authority,RecappContract.PATH_COMMENT,COMMENT);
-        matcher.addURI(authority,RecappContract.PATH_COMMENT+"/"+RecappContract.PATH_USER+"/*",COMMENT_WITH_USER);
+        matcher.addURI(authority,RecappContract.PATH_COMMENT+"/"+RecappContract.PATH_USER+"/#",COMMENT_WITH_USER);
         matcher.addURI(authority,RecappContract.PATH_COMMENT+"/"+RecappContract.PATH_PLACE+"/#",COMMENT_WITH_PLACE);
+        matcher.addURI(authority,RecappContract.PATH_COMMENT+"/"+RecappContract.PATH_PLACE+"/"+
+        RecappContract.PATH_USER+"/#",COMMENT_WITH_PLACE_USER);
         matcher.addURI(authority,RecappContract.PATH_COMMENT+"/#",COMMENT_WITH_ID);
 
         //Mathcer for category
@@ -242,7 +246,8 @@ public class RecappProvider extends ContentProvider {
                 return CommentEntry.CONTENT_TYPE;
             case COMMENT_WITH_PLACE:
                 return CommentEntry.CONTENT_TYPE;
-
+            case COMMENT_WITH_PLACE_USER:
+                return CommentEntry.CONTENT_TYPE;
             case COMMENT_WITH_ID:
                 return CommentEntry.CONTENT_ITEM_TYPE;
             case CATEGORY:
@@ -370,13 +375,13 @@ public class RecappProvider extends ContentProvider {
                 break;
             case REMINDER_WITH_USER:
                 //We expect that the string will be the user's email
-                email = ReminderEntry.getUserFromUri(uri);
-                selection = UserEntry.COLUMN_EMAIL + " = ? ";
+                placeId = ReminderEntry.getPlaceFromUri(uri);
+                selection = ReminderEntry.COLUMN_PLACE_KEY + " = ? ";
                 retCursor = reminderByUser.query(
                         recappDBHelper.getReadableDatabase(),
                         projection,
                         selection,
-                        new String[]{email},
+                        new String[]{""+placeId},
                         null,
                         null,
                         sortOrder
@@ -384,13 +389,13 @@ public class RecappProvider extends ContentProvider {
                 break;
             case REMINDER_WITH_PLACE:
                 //We expect a number which will be the place id
-                placeId = ReminderEntry.getPlaceFromUri(uri);
-                selection = ReminderEntry._ID + " = ? ";
+                userId = ReminderEntry.getUserFromUri(uri);
+                selection = ReminderEntry.COLUMN_USER_KEY + " = ? ";
                 retCursor = reminderByPlace.query(
                         recappDBHelper.getReadableDatabase(),
                         projection,
                         selection,
-                        new String[]{""+placeId},
+                        new String[]{""+userId},
                         null,
                         null,
                         sortOrder
@@ -421,13 +426,13 @@ public class RecappProvider extends ContentProvider {
                 );
                 break;
             case COMMENT_WITH_USER:
-                email = CommentEntry.getUserFromUri(uri);
-                selection = UserEntry.COLUMN_EMAIL + " = ? ";
+                userId = CommentEntry.getUserFromUri(uri);
+                selection = UserEntry.TABLE_NAME+"."+UserEntry._ID + " = ? ";
                 retCursor = commentByUser.query(
                         recappDBHelper.getReadableDatabase(),
                         projection,
                         selection,
-                        new String[]{email},
+                        new String[]{""+userId},
                         null,
                         null,
                         sortOrder
@@ -449,7 +454,19 @@ public class RecappProvider extends ContentProvider {
                 );
 
                 break;
-
+            case COMMENT_WITH_PLACE_USER:
+                placeId = CommentEntry.getPlaceUserFromUri(uri);
+                selection = CommentEntry.TABLE_NAME+"."+CommentEntry.COLUMN_PLACE_KEY + " = ?";
+                retCursor = commentByUser.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{""+placeId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
             case COMMENT_WITH_ID:
                 long commentId = CommentEntry.getIdFromUri(uri);
                 selection = CommentEntry._ID + " = ? ";
@@ -660,30 +677,31 @@ public class RecappProvider extends ContentProvider {
                 );
                 break;
             case USER_BY_PLACE_USER:
-                userId = UserByPlaceEntry.getUserFromUri(uri);
+                userId = UserByPlaceEntry.getPlaceFromUri(uri);
                 selection = UserByPlaceEntry.COLUMN_USER_KEY + " = ? ";
-                retCursor = userByPlaceUser.query(
+                retCursor = userByPlacePlace.query(
                         recappDBHelper.getReadableDatabase(),
                         projection,
                         selection,
-                        new  String[]{""+userId},
+                        new String[]{"" + userId},
                         null,
                         null,
                         sortOrder
                 );
                 break;
             case USER_BY_PLACE_PLACE:
-                placeId = UserByPlaceEntry.getPlaceFromUri(uri);
+                placeId = UserByPlaceEntry.getUserFromUri(uri);
                 selection = UserByPlaceEntry.COLUMN_PLACE_KEY + " = ? ";
-                retCursor = userByPlacePlace.query(
+                retCursor = userByPlaceUser.query(
                         recappDBHelper.getReadableDatabase(),
                         projection,
                         selection,
-                        new String[]{""+placeId},
+                        new  String[]{""+placeId},
                         null,
                         null,
                         sortOrder
                 );
+
                 break;
             case USER_BY_PLACE_ID:
                 long userByPlaceId = UserByPlaceEntry.getIdFromUri(uri);

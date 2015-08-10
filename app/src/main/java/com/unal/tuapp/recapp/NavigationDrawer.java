@@ -10,13 +10,14 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,7 +32,6 @@ import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.unal.tuapp.recapp.data.RecappContract;
-import com.unal.tuapp.recapp.data.RecappDBHelper;
 import com.unal.tuapp.recapp.data.User;
 
 import java.io.BufferedReader;
@@ -46,9 +46,10 @@ import java.io.PrintWriter;
 /**
  * Created by andresgutierrez on 7/11/15.
  */
-public class NavigationDrawer extends AppCompatActivity  {
+public class NavigationDrawer extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private int totalFilter;
     private String emailUser;
+    private User user;
     private NavigationView navDrawer;
     private NavigationView navFilterDrawer;
     private TabLayout tabLayout;
@@ -61,14 +62,14 @@ public class NavigationDrawer extends AppCompatActivity  {
     private Button add;
     private final String TAG = NavigationDrawer.class.getSimpleName();
     private final String FILE = "filters.txt";
-    private RecappDBHelper recappDBHelper;
+    private static final int USER = 10;
+    private Cursor userCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         root = getLayoutInflater().inflate(R.layout.activity_navigation_drawer, null);
         setContentView(root);
-        recappDBHelper = RecappDBHelper.getInstance(getApplicationContext());
         totalFilter = 0;
         mGooglePlus = GooglePlus.getInstance(this, null, null);
 
@@ -89,8 +90,9 @@ public class NavigationDrawer extends AppCompatActivity  {
             de.hdodenhof.circleimageview.CircleImageView imageView;
             imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
             addUser(emailUser,
-                    currentPerson.getName().getGivenName(),currentPerson.getName().getFamilyName());
-            new LoadProfileImage(root,imageView).execute(personPhotoUrl,account.getAccountName(mGooglePlus.mGoogleApiClient));
+                    currentPerson.getName().getGivenName(), currentPerson.getName().getFamilyName());
+            new LoadProfileImage(root,imageView).execute(personPhotoUrl, account.getAccountName(mGooglePlus.mGoogleApiClient));
+            getSupportLoaderManager().initLoader(USER,null,this);
         }
         add = (Button) root.findViewById(R.id.add);
         add.setOnClickListener(new View.OnClickListener() {
@@ -113,7 +115,6 @@ public class NavigationDrawer extends AppCompatActivity  {
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         setUpToolbar();
         setUpViewPager();
-        //setUpTabLayout();
         navigationDrawer = (DrawerLayout) findViewById(R.id.navigation_drawer);
         navDrawer = (NavigationView) findViewById(R.id.nav_drawer);
         drawerToggle = new ActionBarDrawerToggle(this,navigationDrawer,toolbar,R.string.drawer_open,R.string.drawer_close){
@@ -125,16 +126,7 @@ public class NavigationDrawer extends AppCompatActivity  {
                     InputMethodManager inputManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                     if(inputManager.isAcceptingText()){
                         inputManager.hideSoftInputFromWindow(temp.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                        //ViewPagerAdapter viewPagerAdapter = (ViewPagerAdapter)viewPager.getAdapter();
-                        //Fragment fragment = viewPagerAdapter.getItem(viewPager.getCurrentItem());
 
-                        /*if(slideOffset==0.0) {
-                            getSupportFragmentManager()
-                                    .beginTransaction()
-                                    .detach(fragment)
-                                    .attach(fragment)
-                                    .commit();
-                        }*/
                     }
 
                 }
@@ -151,24 +143,22 @@ public class NavigationDrawer extends AppCompatActivity  {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()){
                     case R.id.favorites:
-                        View view = root.findViewById(R.id.view_pager);
-                        Cursor user = getContentResolver().query(
-                                RecappContract.UserEntry.buildUserEmail("agutierrezt930410@gmail.com"),
-                                null,
-                                null,
-                                null,
-                                null
-                        );
-                        if(user.moveToFirst()) {
-                            Snackbar.make(view, user.getString(user.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_NAME))
-                                    , Snackbar.LENGTH_LONG).show();
-                            //Log.e("algo",""+user.getBlob(user.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_IMAGE)));
-                        }
-                        user.close();
+                        Intent intentFavorite = new Intent(NavigationDrawer.this,UserDetail.class);
+                        intentFavorite.putExtra("user",user);
+                        intentFavorite.putExtra("type","favorite");
+                        startActivity(intentFavorite);
                         break;
                     case R.id.appointments:
+                        Intent intentReminder = new Intent(NavigationDrawer.this,UserDetail.class);
+                        intentReminder.putExtra("user",user);
+                        intentReminder.putExtra("type","reminder");
+                        startActivity(intentReminder);
                         break;
                     case R.id.comments:
+                        Intent intentComment = new Intent(NavigationDrawer.this,UserDetail.class);
+                        intentComment.putExtra("user",user);
+                        intentComment.putExtra("type","comment");
+                        startActivity(intentComment);
                         break;
                     case R.id.sign_out:
                         if(mGooglePlus.mGoogleApiClient.isConnected()){
@@ -204,6 +194,7 @@ public class NavigationDrawer extends AppCompatActivity  {
                 return false;
             }
         });
+
 
 
     }
@@ -280,24 +271,11 @@ public class NavigationDrawer extends AppCompatActivity  {
         PlacesFragment placesFragment = new PlacesFragment();
         placesFragment.setOnPlaceListener(new PlacesFragment.onPlaceListener() {
             @Override
-            public void onPlace(View view, long positon) {
+            public void onPlace(View view, long position) {
                 //Log.e("algo",""+positon);
-                Cursor userCursor = getContentResolver().query(
-                        RecappContract.UserEntry.buildUserEmail(emailUser),
-                        new String[]{RecappContract.UserEntry._ID, RecappContract.UserEntry.COLUMN_USER_IMAGE},
-                        null,
-                        null,
-                        null
-                );
-                User user = new User();
-                if (userCursor.moveToFirst()) {
-
-                    user.setProfileImage(userCursor.getBlob(userCursor.
-                            getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_IMAGE)));
-                }
 
                 Intent intent = new Intent(NavigationDrawer.this, Detail.class);
-                intent.putExtra("id", positon);
+                intent.putExtra("id", position);
                 intent.putExtra("user", user);
 
                 startActivity(intent);
@@ -384,5 +362,32 @@ public class NavigationDrawer extends AppCompatActivity  {
 
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(
+                this,
+                RecappContract.UserEntry.buildUserEmail(emailUser),
+                null,
+                null,
+                null,
+                null
+        );
+    }
 
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if(data.moveToFirst()){
+            userCursor = data;
+            user = new User();
+            user.setEmail(data.getString(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_EMAIL)));
+            user.setId(data.getLong(data.getColumnIndexOrThrow(RecappContract.UserEntry._ID)));
+            user.setProfileImage(data.getBlob(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_IMAGE)));
+
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        userCursor.close();
+    }
 }

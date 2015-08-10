@@ -2,6 +2,7 @@ package com.unal.tuapp.recapp;
 
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.LoaderManager;
@@ -47,10 +48,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
         Bundle extras = getIntent().getExtras();
         if(extras!=null){
             id = extras.getLong("id");
-            user = new User();
-            long userId = ((User)extras.getParcelable("user")).getId();
-            user.setId((userId));
-            user.setProfileImage(((User) extras.getParcelable("user")).getProfileImage());
+            user = extras.getParcelable("user");
         }
         getSupportLoaderManager().initLoader(PLACE,null,this);
         mGooglePlus = GooglePlus.getInstance(this, null, null);
@@ -92,8 +90,52 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
         navDrawer.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                navDrawer.getMenu().setGroupCheckable(R.id.main, true, true);
-                menuItem.setChecked(true);
+                switch (menuItem.getItemId()){
+                    case R.id.home:
+                        Intent intentHome = new Intent(Detail.this,NavigationDrawer.class);
+                        startActivity(intentHome);
+                        break;
+                    case R.id.favorites:
+                        Intent intentFavorite = new Intent(Detail.this,UserDetail.class);
+                        intentFavorite.putExtra("user",user);
+                        intentFavorite.putExtra("type","favorite");
+                        startActivity(intentFavorite);
+                        break;
+                    case R.id.appointments:
+                        Intent intentReminder = new Intent(Detail.this,UserDetail.class);
+                        intentReminder.putExtra("user",user);
+                        intentReminder.putExtra("type","reminder");
+                        startActivity(intentReminder);
+                        break;
+                    case R.id.comments:
+                        Intent intentComment = new Intent(Detail.this,UserDetail.class);
+                        intentComment.putExtra("user",user);
+                        intentComment.putExtra("type","comment");
+                        startActivity(intentComment);
+                        break;
+                    case R.id.sign_out:
+                        if(mGooglePlus.mGoogleApiClient.isConnected()){
+                            Plus.AccountApi.clearDefaultAccount(mGooglePlus.mGoogleApiClient);
+                            mGooglePlus.mGoogleApiClient.disconnect();
+                            Intent intent = new Intent(Detail.this, Recapp.class);
+                            startActivity(intent);
+                            //animation = false;
+
+                        }
+                        break;
+                    case R.id.disconnect:
+                        if(mGooglePlus.mGoogleApiClient.isConnected()){
+                            Plus.AccountApi.clearDefaultAccount(mGooglePlus.mGoogleApiClient);
+                            Plus.AccountApi.revokeAccessAndDisconnect(mGooglePlus.mGoogleApiClient);
+                            mGooglePlus.mGoogleApiClient.disconnect();
+                            Intent intent = new Intent(Detail.this, Recapp.class);
+                            startActivity(intent);
+                            //animation = false;
+
+                        }
+                        break;
+                }
+                //menuItem.setChecked(true);
                 navigationDrawer.closeDrawers();
                 return false;
             }

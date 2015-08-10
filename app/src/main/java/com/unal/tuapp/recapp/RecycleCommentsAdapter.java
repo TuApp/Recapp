@@ -25,7 +25,7 @@ public class RecycleCommentsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private List<Comment> comments;
     private Cursor commentCursor;
 
-    public RecycleCommentsAdapter(ArrayList<Comment> comments) {
+    public RecycleCommentsAdapter(List<Comment> comments) {
         this.comments = comments;
     }
 

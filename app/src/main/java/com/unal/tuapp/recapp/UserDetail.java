@@ -1,6 +1,6 @@
 package com.unal.tuapp.recapp;
 
-import android.accounts.Account;
+
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -10,7 +10,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -68,12 +67,11 @@ public class UserDetail extends AppCompatActivity {
         toolbar = (Toolbar) root.findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         navigationView = (NavigationView) root.findViewById(R.id.nav_drawer);
         drawerLayout = (DrawerLayout) root.findViewById(R.id.user_detail);
 
-        //navigationView.getMenu().setGroupCheckable(R.id.main, false, false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction;
@@ -184,11 +182,12 @@ public class UserDetail extends AppCompatActivity {
             case "reminder":
                 //We should delete all reminders which endDate < now
                 getSupportActionBar().setTitle("My reminders");
-                fragmentTransaction.replace(R.id.user_detail_container,fragmentReminder,"reminder");
-                fragmentTransaction.add(R.id.user_detail_container,fragmentPlace,"favorite");
+                fragmentTransaction.replace(R.id.user_detail_container, fragmentReminder, "reminder");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentPlace, "favorite");
                 fragmentTransaction.add(R.id.user_detail_container,fragmentComment,"comment");
                 fragmentTransaction.hide(fragmentPlace);
                 fragmentTransaction.hide(fragmentComment);
+                fragmentTransaction.commit();
                 navigationView.getMenu().findItem(R.id.appointments).setChecked(true);
                 break;
 
@@ -220,11 +219,14 @@ public class UserDetail extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState){
-        savedInstanceState.putString("newType",newType);
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putString("newType", newType);
     }
     @Override
     public void onBackPressed() {
 
     }
+
+
+
 }

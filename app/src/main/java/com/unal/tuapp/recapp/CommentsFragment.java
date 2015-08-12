@@ -7,9 +7,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -33,8 +39,6 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
     private RecycleCommentsAdapter recycleCommentsAdapter;
     private static final int COMMENT = 20;
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
@@ -48,6 +52,7 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recycleCommentsAdapter = new RecycleCommentsAdapter(comments);
+
         AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(recycleCommentsAdapter);
         alphaInAnimationAdapter.setDuration(1000);
         recyclerView.setAdapter(new SlideInRightAnimationAdapter(alphaInAnimationAdapter));
@@ -74,7 +79,11 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
         return new CursorLoader(
                 getActivity(),
                 RecappContract.CommentEntry.buildCommentUserUri(user.getId()),
-                null,
+                new String[]{RecappContract.CommentEntry.TABLE_NAME+"."+RecappContract.CommentEntry._ID,
+                        RecappContract.CommentEntry.TABLE_NAME+"."+ RecappContract.CommentEntry.COLUMN_DATE,
+                        RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_DESCRIPTION,
+                        RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_RATING,
+                        RecappContract.UserEntry.COLUMN_USER_IMAGE},
                 null,
                 null,
                 sortOrder
@@ -93,6 +102,8 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
     public void onLoaderReset(Loader<Cursor> loader) {
         //List<Comment> comments = new ArrayList<>();
         //recycleCommentsAdapter.swapData(comments);
-        recycleCommentsAdapter.closeCursor();
+        recycleCommentsAdapter.setCommentCursor(null);
     }
+
+
 }

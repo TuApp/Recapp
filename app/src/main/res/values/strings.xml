@@ -22,5 +22,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="comments">Comments</string>
     <string name="title_activity_user_detail">UserDetail</string>
+    <string name="action_delete">Delete</string>
 
 </resources>

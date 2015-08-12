@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +51,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private EditText commentText;
     private RatingBar commentRating;
     private Place place;
-    private PlaceImages placeImages;
+
+    private Cursor favoriteCursor;
+    private Cursor placeCursor;
+    private Cursor ratingCursor;
 
     private TextView card_title;
     private TextView card_description;
@@ -61,7 +65,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public int count;
     public static final int COMMENT_BY_PLACE = 1;
     public static final int PLACE = 2;
-    public static final int PLACE_IMAGES = 3;
+    public static final int RATING = 3;
     public static final int USER_BY_PLACE = 4;
 
 
@@ -80,7 +84,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             public void onClick(View view) {
 
-                if (count % 2 == 0) {
+                if (count == 0) {
                     //favorite.setImageResource(R.drawable.ic_favorites_color);
                     ContentValues userByPlace = new ContentValues();
                     userByPlace.put(RecappContract.UserByPlaceEntry.COLUMN_USER_KEY,user.getId());
@@ -121,11 +125,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         card_description = (TextView) root.findViewById(R.id.card_description);
         card_address = (TextView) root.findViewById(R.id.card_address);
         card_image = (ImageView) root.findViewById(R.id.card_image);
+        card_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.e("algo","algo");
+                Snackbar.make(getActivity().findViewById(R.id.detail_coordination), "Fabian aqui llame a la nueva intencion", Snackbar.LENGTH_SHORT).show();
+            }
+        });
         share = (Button) root.findViewById(R.id.card_share);
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(getActivity().findViewById(R.id.detail_coordination), "algo", Snackbar.LENGTH_SHORT).show();
+
             }
         });
         comment = (RecyclerView) root.findViewById(R.id.comment_list);
@@ -152,35 +163,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     getActivity().getContentResolver().insert(
                             RecappContract.CommentEntry.CONTENT_URI,
                             values
+                    );
 
-                    );
-                    //We pass the groupBy  in the argument the selection
-                    Cursor cursorRating = getActivity().getContentResolver().query(
-                            RecappContract.CommentEntry.buildCommentPlaceUri(id),
-                            new String[]{"AVG(" + RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_RATING + ")"},
-                            RecappContract.CommentEntry.TABLE_NAME+"."+ RecappContract.CommentEntry.COLUMN_RATING,
-                            null,
-                            null
-                    );
-                    double rating = 0;
-                    if (cursorRating.moveToFirst()) {
-                        rating =cursorRating.getDouble(0);
-                    }
+
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
                             Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-
-                    ContentValues values1 = new ContentValues();
-                    values1.put(RecappContract.PlaceEntry.COLUMN_RATING, rating);
-                    getActivity().getContentResolver().update(
-                            RecappContract.PlaceEntry.CONTENT_URI,
-                            values1,
-                            RecappContract.PlaceEntry._ID + " = ? ",
-                            new String[]{"" + id}
-                    );
-
-
-
                     commentText.setText("");
                     commentRating.setRating(0);
                     comment.scrollToPosition(0);
@@ -193,10 +181,27 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
-        getLoaderManager().initLoader(COMMENT_BY_PLACE,null,this);
-        getLoaderManager().initLoader(PLACE,null,this);
-        getLoaderManager().initLoader(USER_BY_PLACE,null,this);
-        getLoaderManager().initLoader(PLACE_IMAGES,null,this);
+        if(getLoaderManager().getLoader(COMMENT_BY_PLACE)==null) {
+            getLoaderManager().initLoader(COMMENT_BY_PLACE, null, this);
+        }else {
+            getLoaderManager().restartLoader(COMMENT_BY_PLACE, null, this);
+        }
+        if(getLoaderManager().getLoader(PLACE)==null){
+            getLoaderManager().initLoader(PLACE,null,this);
+        }else{
+            getLoaderManager().restartLoader(PLACE,null,this);
+        }
+        if(getLoaderManager().getLoader(USER_BY_PLACE)==null){
+            getLoaderManager().initLoader(USER_BY_PLACE,null,this);
+        }else{
+            getLoaderManager().restartLoader(USER_BY_PLACE, null, this);
+        }
+        if(getLoaderManager().getLoader(RATING)==null){
+            getLoaderManager().initLoader(RATING,null,this);
+        }else {
+            getLoaderManager().restartLoader(RATING, null, this);
+        }
+
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -208,7 +213,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 return  new CursorLoader(
                     getActivity(),
                     RecappContract.CommentEntry.buildCommentPlaceUserUri(this.id),
-                    new String[]{RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_DESCRIPTION,
+                    new String[]{RecappContract.CommentEntry.TABLE_NAME+"."+RecappContract.CommentEntry._ID,
+                            RecappContract.CommentEntry.TABLE_NAME+"."+ RecappContract.CommentEntry.COLUMN_DATE,
+                            RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_DESCRIPTION,
                             RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_RATING,
                             RecappContract.UserEntry.COLUMN_USER_IMAGE},
                     null,
@@ -224,18 +231,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         null,
                         null,
                         null
-
                 );
-            case PLACE_IMAGES:
-                String sortOrder = RecappContract.PlaceImageEntry.COLUMN_WORTH + " DESC ";
+            case RATING:
                 return  new CursorLoader(
                         getActivity(),
-                        RecappContract.PlaceImageEntry.buildPlaceImagePlaceUri(this.id),
-                        new String[]{RecappContract.PlaceImageEntry.TABLE_NAME+"."+
-                                RecappContract.PlaceImageEntry.COLUMN_IMAGE},
+                        RecappContract.CommentEntry.buildCommentPlaceUri(this.id),
+                        new String[]{"AVG(" + RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_RATING + ")"},
+                        RecappContract.CommentEntry.TABLE_NAME+"."+ RecappContract.CommentEntry.COLUMN_RATING,
                         null,
-                        null,
-                        sortOrder
+                        null
                 );
             case USER_BY_PLACE:
                 String selection = RecappContract.UserByPlaceEntry.COLUMN_USER_KEY+" = ? AND "+
@@ -275,25 +279,32 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     card_title.setText(place.getName());
                     card_description.setText(place.getDescription());
                     card_address.setText(place.getAddress());
+                    card_image.setImageBitmap(BitmapFactory.decodeByteArray(
+                            place.getImageFavorite(), 0, place.getImageFavorite().length
+                    ));
+
+                    placeCursor = data;
 
 
 
                 }
                 break;
-            case PLACE_IMAGES:
-                placeImages = new PlaceImages();
-                placeImages.setImages(data);
-                List<byte[]> images = placeImages.getImages();
-                if(images.size()>0){
-                    card_image.setImageBitmap(BitmapFactory.decodeByteArray(
-                            images.get(0),0,images.get(0).length
-                    ));
-                }else if(place!=null){
-                    card_image.setImageBitmap(BitmapFactory.decodeByteArray(
-                            place.getImageFavorite(),0,place.getImageFavorite().length
-                    ));
+            case RATING:
+                double rating = 0;
+                if (data.moveToFirst()) {
+                    rating =data.getDouble(0);
                 }
+                ContentValues values = new ContentValues();
+                values.put(RecappContract.PlaceEntry.COLUMN_RATING, rating);
+                getActivity().getContentResolver().update(
+                        RecappContract.PlaceEntry.CONTENT_URI,
+                        values,
+                        RecappContract.PlaceEntry._ID + " = ? ",
+                        new String[]{"" + this.id}
+                );
+                ratingCursor = data;
                 break;
+
             case USER_BY_PLACE:
                 if(data.moveToFirst()){
                     count=1;
@@ -303,6 +314,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     favorite.setImageResource(R.drawable.ic_favorites);
                 }
                 favorite.invalidate();
+                favoriteCursor = data;
 
         }
 
@@ -317,9 +329,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 commentsAdapter.swapData(comments);
                 commentsAdapter.closeCursor();
                 break;
-
+            case PLACE:
+                placeCursor.close();
+                break;
+            case RATING:
+                ratingCursor.close();
+                break;
+            case USER_BY_PLACE:
+                favoriteCursor.close();
+                break;
 
         }
+
 
     }
 }

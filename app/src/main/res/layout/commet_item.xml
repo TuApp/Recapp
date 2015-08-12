@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     android:layout_margin="8dp">
 
-
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/comment_foto"
         android:layout_width="60dp"
@@ -21,6 +20,14 @@
         android:textSize="20sp"
         android:layout_toRightOf="@+id/comment_foto"
         android:layout_marginBottom="8dp"/>
+    <TextView
+        android:id="@+id/comment_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:layout_toRightOf="@+id/comment_foto"
+        android:layout_below="@+id/comment_text"
+        android:layout_marginBottom="8dp"/>
     <RatingBar
         android:id="@+id/comment_rating"
         android:isIndicator="true"
@@ -28,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/comment_foto"
-        android:layout_below="@+id/comment_text"
+        android:layout_below="@+id/comment_date"
         android:numStars="4"
         android:rating="0.0"
         android:stepSize="0.5" />

@@ -9,4 +9,5 @@
     <color name="secondary_text">#BDBDBD</color>
     <color name="divider">#B6B6B6</color>
     <color name="header_nav_filter">#BBDEFB</color>
+    <color name="contextual_toolbar">#9E9E9E</color>
 </resources>

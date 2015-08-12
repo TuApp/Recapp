@@ -16,8 +16,24 @@ public class Comment  implements Parcelable {
     private byte[] imageProfile;
     private String comment;
     private double rating;
+    private long id;
+    private long date;
 
     public Comment(){}
+
+    public long getId(){
+        return id;
+    }
+    public void setId(long id){
+        this.id=id;
+    }
+
+    public long getDate(){
+        return date;
+    }
+    public void setDate(long date){
+        this.date = date;
+    }
 
 
     public String getComment() {
@@ -55,6 +71,8 @@ public class Comment  implements Parcelable {
         parcel.writeByteArray(imageProfile);
         parcel.writeString(comment);
         parcel.writeDouble(rating);
+        parcel.writeLong(id);
+        parcel.writeLong(date);
     }
     private Comment (Parcel parcel){
         int size = parcel.readInt();
@@ -62,6 +80,8 @@ public class Comment  implements Parcelable {
         parcel.readByteArray(this.imageProfile);
         comment = parcel.readString();
         rating = parcel.readFloat();
+        id = parcel.readLong();
+        date = parcel.readLong();
 
     }
     public static final Creator<Comment> CREATOR
@@ -80,6 +100,8 @@ public class Comment  implements Parcelable {
         ArrayList<Comment> comments = new ArrayList<>();
         while (cursor.moveToNext()){
             Comment comment = new Comment();
+            comment.setId(cursor.getLong(cursor.getColumnIndexOrThrow(RecappContract.CommentEntry._ID)));
+            comment.setDate(cursor.getLong(cursor.getColumnIndexOrThrow(RecappContract.CommentEntry.COLUMN_DATE)));
             comment.setComment(cursor.getString(cursor.getColumnIndexOrThrow(RecappContract.CommentEntry.COLUMN_DESCRIPTION)));
             comment.setRating(cursor.getDouble(cursor.getColumnIndexOrThrow(RecappContract.CommentEntry.COLUMN_RATING)));
             comment.setImageProfile(cursor.getBlob(

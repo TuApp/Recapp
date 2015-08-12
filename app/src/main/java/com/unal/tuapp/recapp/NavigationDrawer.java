@@ -235,6 +235,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggles
 
     }

@@ -23,7 +23,7 @@ import java.util.List;
  * Created by andresgutierrez on 7/13/15.
  */
 public class RecyclePlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private Cursor placeCursor;
+    private Cursor placeCursor=null;
     private static List<Place> places;
     public static OnItemClickListener mItemClickListener;
     public final int FAVORITE=0,NORMAL=1;
@@ -97,11 +97,14 @@ public class RecyclePlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public void setPlaceCursor(Cursor cursor){
+        if(placeCursor!=null){
+            closeCursor();
+        }
         placeCursor = cursor;
     }
     public void closeCursor(){
         placeCursor.close();
-
+        placeCursor = null;
     }
 
     @Override

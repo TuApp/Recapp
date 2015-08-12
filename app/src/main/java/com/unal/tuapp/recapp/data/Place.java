@@ -21,6 +21,7 @@ public class Place {
     private double rating;
     private byte[] imageFavorite;
 
+
     public Place(String address, String description, long id,
                  double log, double lat, String name, double rating,byte[] imageFavorite) {
         this.address = address;

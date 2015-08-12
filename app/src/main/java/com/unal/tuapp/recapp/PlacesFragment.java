@@ -48,7 +48,7 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
         //recyclerView.setHasFixedSize(true);
 
         addPlaces();
-        final List<Place> places = new ArrayList<>();
+        List<Place> places = new ArrayList<>();
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayout);
         recyclePlaceAdapter = new RecyclePlaceAdapter(places);

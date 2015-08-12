@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class RecycleCommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Comment> comments;
-    private Cursor commentCursor;
+    private Cursor commentCursor=null;
 
     public RecycleCommentsAdapter(List<Comment> comments) {
         this.comments = comments;
@@ -33,10 +33,12 @@ public class RecycleCommentsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         private TextView comment;
         private RatingBar ratingBar;
         private de.hdodenhof.circleimageview.CircleImageView imageView;
+        private TextView date;
 
         public CommentsViewHolder(View itemView){
             super(itemView);
             comment = (TextView) itemView.findViewById(R.id.comment_text);
+            date = (TextView) itemView.findViewById(R.id.comment_date);
             ratingBar = (RatingBar) itemView.findViewById(R.id.comment_rating);
             imageView = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.comment_foto);
         }
@@ -70,6 +72,7 @@ public class RecycleCommentsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
         //We need to change the value, dynamically
         commentsViewHolder.ratingBar.setRating((float)comment.getRating());
+        commentsViewHolder.date.setText(Utility.getDate(comment.getDate()));
         LayerDrawable stars = (LayerDrawable)  commentsViewHolder.ratingBar.getProgressDrawable();
         stars.getDrawable(0).setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_ATOP);
         stars.getDrawable(1).setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_ATOP);
@@ -82,10 +85,14 @@ public class RecycleCommentsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         notifyDataSetChanged();
     }
     public void setCommentCursor(Cursor cursor){
+        if(commentCursor!=null){
+            closeCursor();
+        }
         this.commentCursor = cursor;
     }
     public void closeCursor(){
         commentCursor.close();
+        commentCursor = null;
 
     }
 

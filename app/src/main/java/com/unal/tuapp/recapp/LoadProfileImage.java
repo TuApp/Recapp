@@ -1,17 +1,11 @@
 package com.unal.tuapp.recapp;
 
-import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 
 import com.unal.tuapp.recapp.data.RecappContract;
 

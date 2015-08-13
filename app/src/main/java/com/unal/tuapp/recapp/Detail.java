@@ -2,6 +2,7 @@ package com.unal.tuapp.recapp;
 
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -21,6 +22,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -57,22 +59,30 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
         mGooglePlus = GooglePlus.getInstance(this, null, null);
 
         if(mGooglePlus.mGoogleApiClient.isConnected()){
-            Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGooglePlus.mGoogleApiClient);
-            Account account = Plus.AccountApi;
-            String personPhotoUrl = currentPerson.getImage().getUrl();
 
-            //We try to request a image with major size, the new image will be of 600*600 pixels
-            personPhotoUrl = personPhotoUrl.substring(0,personPhotoUrl.length()-2) + mGooglePlus.PROFILE_PIC_SIZE;
+            //Account account = Plus.AccountApi;
+
 
             TextView name = (TextView) findViewById(R.id.user_name);
-            name.setText(currentPerson.getDisplayName());
+            name.setText(user.getName()+" "+user.getLastName());
 
             TextView email = (TextView) findViewById(R.id.user_email);
-            email.setText(account.getAccountName(mGooglePlus.mGoogleApiClient));
+            email.setText(user.getEmail());
             de.hdodenhof.circleimageview.CircleImageView imageView;
             imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
+            if(user.getProfileImage()!=null) {
+                imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
+                        user.getProfileImage().length));
+            }else{
+                Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGooglePlus.mGoogleApiClient);
+                String personPhotoUrl = currentPerson.getImage().getUrl();
+                //We try to request a image with major size, the new image will be of 600*600 pixels
+                //The user doesn't have a image so we try to download one and put it to the user
+                personPhotoUrl = personPhotoUrl.substring(0,personPhotoUrl.length()-2) + mGooglePlus.PROFILE_PIC_SIZE;
+                new LoadProfileImage(root,imageView).execute(personPhotoUrl,user.getEmail());
+            }
 
-            new LoadProfileImage(root,imageView).execute(personPhotoUrl);
+
         }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -99,6 +109,14 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
             @Override
             public void onDrawerSlide(View view,float slideOffset){
                 super.onDrawerSlide(view,slideOffset);
+                View temp = getCurrentFocus();
+                if(temp!=null){
+                    InputMethodManager inputManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if(inputManager.isAcceptingText()){
+                        inputManager.hideSoftInputFromWindow(temp.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    }
+
+                }
 
             }
         };

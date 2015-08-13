@@ -3,7 +3,6 @@ package com.unal.tuapp.recapp;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Parcel;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -21,8 +20,6 @@ import com.unal.tuapp.recapp.data.User;
 import java.util.ArrayList;
 import java.util.List;
 
-import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
-import jp.wasabeef.recyclerview.animators.adapters.SlideInRightAnimationAdapter;
 
 /**
  * Created by andresgutierrez on 8/8/15.
@@ -58,19 +55,19 @@ public class PlacesFavoriteFragment extends Fragment implements LoaderManager.Lo
                 }
             }
         });
-        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(recyclePlaceAdapter);
-        alphaAdapter.setDuration(1000);
-        recyclerView.setAdapter(new SlideInRightAnimationAdapter(alphaAdapter));
+        //AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(recyclePlaceAdapter);
+        //alphaAdapter.setDuration(1000);
+        recyclerView.setAdapter(recyclePlaceAdapter);
 
         return root;
     }
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
-        if(getLoaderManager().getLoader(PLACE)==null){
-            getLoaderManager().initLoader(PLACE,null,this);
+        if(getLoaderManager().getLoader(PLACE)==null) {
+            getLoaderManager().initLoader(PLACE, null, this);
         }else{
-            getLoaderManager().restartLoader(PLACE, null, this);
+            getLoaderManager().restartLoader(PLACE,null,this);
         }
         //getLoaderManager().initLoader(PLACE,null,this);
 
@@ -104,12 +101,14 @@ public class PlacesFavoriteFragment extends Fragment implements LoaderManager.Lo
         recyclePlaceAdapter.swapData(places);
         recyclePlaceAdapter.setPlaceCursor(data);
 
+
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        //List<Place> places = new ArrayList<>();
-        //recyclePlaceAdapter.swapData(places);
         recyclePlaceAdapter.closeCursor();
+    }
+    public void resetLoader(){
+        getLoaderManager().restartLoader(PLACE,null,this);
     }
 }

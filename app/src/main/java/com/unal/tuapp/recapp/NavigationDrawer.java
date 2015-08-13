@@ -86,13 +86,14 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
 
             TextView email = (TextView) findViewById(R.id.user_email);
             emailUser = account.getAccountName(mGooglePlus.mGoogleApiClient);
+            getSupportLoaderManager().initLoader(USER,null,this);
             email.setText(emailUser);
             de.hdodenhof.circleimageview.CircleImageView imageView;
             imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
             addUser(emailUser,
                     currentPerson.getName().getGivenName(), currentPerson.getName().getFamilyName());
-            new LoadProfileImage(root,imageView).execute(personPhotoUrl, account.getAccountName(mGooglePlus.mGoogleApiClient));
-            getSupportLoaderManager().initLoader(USER,null,this);
+            new LoadProfileImage(root, imageView).execute(personPhotoUrl, account.getAccountName(mGooglePlus.mGoogleApiClient));
+
         }
         add = (Button) root.findViewById(R.id.add);
         add.setOnClickListener(new View.OnClickListener() {
@@ -273,7 +274,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         placesFragment.setOnPlaceListener(new PlacesFragment.onPlaceListener() {
             @Override
             public void onPlace(View view, long position) {
-                //Log.e("algo",""+positon);
+
 
                 Intent intent = new Intent(NavigationDrawer.this, Detail.class);
                 intent.putExtra("id", position);
@@ -356,7 +357,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             values.put(RecappContract.UserEntry.COLUMN_USER_NAME,name);
             values.put(RecappContract.UserEntry.COLUMN_USER_LASTNAME,lastname);
             getContentResolver().insert(RecappContract.UserEntry.CONTENT_URI,values);
-            //Log.e("We do it", "add person");
+
         }
         userCursor.close();
 
@@ -383,7 +384,8 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             user.setEmail(data.getString(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_EMAIL)));
             user.setId(data.getLong(data.getColumnIndexOrThrow(RecappContract.UserEntry._ID)));
             user.setProfileImage(data.getBlob(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_IMAGE)));
-
+            user.setName(data.getString(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_NAME)));
+            user.setLastName(data.getString(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_LASTNAME)));
         }
     }
 

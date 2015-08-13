@@ -56,16 +56,16 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             public void onItemClick(View view, long position) {
                 //TextView name = (TextView) view.findViewById(R.id.place_item);
-                //Log.e("algo", "" + position + " " + name.getText().toString());
+
                 if (mOnPlaceListener != null) {
                     mOnPlaceListener.onPlace(view, position);
                 }
 
             }
         });
-        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(recyclePlaceAdapter);
-        alphaAdapter.setDuration(1000);
-        recyclerView.setAdapter(new SlideInRightAnimationAdapter(alphaAdapter));
+        //AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(recyclePlaceAdapter);
+        //alphaAdapter.setDuration(1000);
+        recyclerView.setAdapter(recyclePlaceAdapter);
 
         return root;
     }
@@ -74,11 +74,8 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
         //getLoaderManager().initLoader(PLACES_LOADER,null,this);
-        if(getLoaderManager().getLoader(PLACES_LOADER)==null){
-            getLoaderManager().initLoader(PLACES_LOADER,null,this);
-        }else{
-            getLoaderManager().restartLoader(PLACES_LOADER,null,this);
-        }
+        getLoaderManager().initLoader(PLACES_LOADER,null,this);
+
 
     }
     public interface onPlaceListener{
@@ -103,18 +100,17 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        //Log.w("algo", "algo");
+
         List<Place> places =Place.allPlaces(cursor);
         recyclePlaceAdapter.swapData(places);
         recyclePlaceAdapter.setPlaceCursor(cursor);
+        //recyclePlaceAdapter.setPlaceCursor(cursor);
 
 
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        List<Place> places = new ArrayList<>();
-        recyclePlaceAdapter.swapData(places);
         recyclePlaceAdapter.closeCursor();
 
     }

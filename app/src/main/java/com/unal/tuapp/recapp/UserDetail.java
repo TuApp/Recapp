@@ -2,6 +2,7 @@ package com.unal.tuapp.recapp;
 
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,7 +20,7 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.unal.tuapp.recapp.data.User;
 
-public class UserDetail extends AppCompatActivity {
+public class UserDetail extends AppCompatActivity implements CommentsFragment.OnCommentListener {
     private Toolbar toolbar;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
@@ -46,22 +47,27 @@ public class UserDetail extends AppCompatActivity {
         }
         googlePlus = GooglePlus.getInstance(this,null,null);
         if(googlePlus.mGoogleApiClient.isConnected()){
-            Person currentPerson = Plus.PeopleApi.getCurrentPerson(googlePlus.mGoogleApiClient);
-            com.google.android.gms.plus.Account account = Plus.AccountApi;
-            String personPhotoUrl = currentPerson.getImage().getUrl();
-
-            //We try to request a image with major size, the new image will be of 600*600 pixels
-            personPhotoUrl = personPhotoUrl.substring(0,personPhotoUrl.length()-2) + googlePlus.PROFILE_PIC_SIZE;
+            //Account account = Plus.AccountApi;
 
             TextView name = (TextView) findViewById(R.id.user_name);
-            name.setText(currentPerson.getDisplayName());
+            name.setText(user.getName()+" "+user.getLastName());
 
             TextView email = (TextView) findViewById(R.id.user_email);
-            email.setText(account.getAccountName(googlePlus.mGoogleApiClient));
+            email.setText(user.getEmail());
             de.hdodenhof.circleimageview.CircleImageView imageView;
             imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
+            if(user.getProfileImage()!=null) {
 
-            new LoadProfileImage(root,imageView).execute(personPhotoUrl);
+                imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
+                        user.getProfileImage().length));
+            }else{
+                Person currentPerson = Plus.PeopleApi.getCurrentPerson(googlePlus.mGoogleApiClient);
+                String personPhotoUrl = currentPerson.getImage().getUrl();
+                //We try to request a image with major size, the new image will be of 600*600 pixels
+                //The user doesn't have a image so we try to download one and put it to the user
+                personPhotoUrl = personPhotoUrl.substring(0,personPhotoUrl.length()-2) + googlePlus.PROFILE_PIC_SIZE;
+                new LoadProfileImage(root,imageView).execute(personPhotoUrl,user.getEmail());
+            }
 
         }
         toolbar = (Toolbar) root.findViewById(R.id.toolbar);
@@ -227,6 +233,15 @@ public class UserDetail extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onCommentDelete(boolean comment) {
+        if(comment){
+           PlacesFavoriteFragment placesFavoriteFragment = (PlacesFavoriteFragment)getSupportFragmentManager()
+                   .findFragmentByTag("favorite");
+            if(placesFavoriteFragment!=null){
+                placesFavoriteFragment.resetLoader();
+            }
 
-
+        }
+    }
 }

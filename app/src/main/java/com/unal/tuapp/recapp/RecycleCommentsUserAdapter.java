@@ -17,17 +17,27 @@ import com.unal.tuapp.recapp.data.Comment;
 import java.util.List;
 
 /**
- * Created by andresgutierrez on 7/22/15.
+ * Created by andresgutierrez on 8/12/15.
  */
-public class RecycleCommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<Comment> comments;
+public class RecycleCommentsUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public static OnItemClickListener mItemClickListener;
+    private static List<Comment> comments;
     private Cursor commentCursor=null;
 
-    public RecycleCommentsAdapter(List<Comment> comments) {
+    public RecycleCommentsUserAdapter(List<Comment> comments) {
         this.comments = comments;
     }
 
-    public static class CommentsViewHolder extends RecyclerView.ViewHolder{
+
+
+    public interface OnItemClickListener{
+        void onItemClick(View view,long id,long idPlace);
+    }
+    public void setOnItemClickListener(final OnItemClickListener onItemClickListener){
+        mItemClickListener = onItemClickListener;
+    }
+
+    public static class CommentsViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
         private TextView comment;
         private RatingBar ratingBar;
         private de.hdodenhof.circleimageview.CircleImageView imageView;
@@ -39,8 +49,24 @@ public class RecycleCommentsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             date = (TextView) itemView.findViewById(R.id.comment_date);
             ratingBar = (RatingBar) itemView.findViewById(R.id.comment_rating);
             imageView = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.comment_foto);
+            itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            if(mItemClickListener!=null){
+
+                long id = comments.get(getAdapterPosition()).getId();
+                long idPlace = comments.get(getAdapterPosition()).getIdPlace();
+
+                mItemClickListener.onItemClick(view,id,idPlace);
+
+            }
+            return false;
         }
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -93,6 +119,5 @@ public class RecycleCommentsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         commentCursor = null;
 
     }
-
 
 }

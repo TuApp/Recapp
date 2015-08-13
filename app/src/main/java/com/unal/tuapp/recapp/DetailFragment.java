@@ -128,7 +128,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         card_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.e("algo","algo");
+
                 Snackbar.make(getActivity().findViewById(R.id.detail_coordination), "Fabian aqui llame a la nueva intencion", Snackbar.LENGTH_SHORT).show();
             }
         });
@@ -140,12 +140,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
         });
         comment = (RecyclerView) root.findViewById(R.id.comment_list);
-
+        List<Comment> comments = new ArrayList<>();
 
 
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         comment.setLayoutManager(linearLayout);
-        ArrayList<Comment> comments = new ArrayList<>();
         commentsAdapter = new RecycleCommentsAdapter(comments);
         comment.setAdapter(commentsAdapter);
 
@@ -153,7 +152,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             public void onClick(View view) {
 
-                if (!commentText.getText().toString().equals("")) {
+                if (!(commentText.getText().toString()).equals("")) {
                     ContentValues values = new ContentValues();
                     values.put(RecappContract.CommentEntry.COLUMN_DESCRIPTION, commentText.getText().toString());
                     values.put(RecappContract.CommentEntry.COLUMN_RATING, commentRating.getRating());
@@ -183,22 +182,22 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onActivityCreated(Bundle savedInstanceState){
         if(getLoaderManager().getLoader(COMMENT_BY_PLACE)==null) {
             getLoaderManager().initLoader(COMMENT_BY_PLACE, null, this);
-        }else {
+        }else{
             getLoaderManager().restartLoader(COMMENT_BY_PLACE, null, this);
         }
-        if(getLoaderManager().getLoader(PLACE)==null){
-            getLoaderManager().initLoader(PLACE,null,this);
+        if(getLoaderManager().getLoader(PLACE)==null) {
+            getLoaderManager().initLoader(PLACE, null, this);
         }else{
-            getLoaderManager().restartLoader(PLACE,null,this);
+            getLoaderManager().restartLoader(PLACE, null, this);
         }
-        if(getLoaderManager().getLoader(USER_BY_PLACE)==null){
+        if (getLoaderManager().getLoader(USER_BY_PLACE) == null) {
             getLoaderManager().initLoader(USER_BY_PLACE,null,this);
         }else{
-            getLoaderManager().restartLoader(USER_BY_PLACE, null, this);
+            getLoaderManager().restartLoader(USER_BY_PLACE,null,this);
         }
-        if(getLoaderManager().getLoader(RATING)==null){
-            getLoaderManager().initLoader(RATING,null,this);
-        }else {
+        if(getLoaderManager().getLoader(RATING)==null) {
+            getLoaderManager().initLoader(RATING, null, this);
+        }else{
             getLoaderManager().restartLoader(RATING, null, this);
         }
 
@@ -213,11 +212,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 return  new CursorLoader(
                     getActivity(),
                     RecappContract.CommentEntry.buildCommentPlaceUserUri(this.id),
-                    new String[]{RecappContract.CommentEntry.TABLE_NAME+"."+RecappContract.CommentEntry._ID,
-                            RecappContract.CommentEntry.TABLE_NAME+"."+ RecappContract.CommentEntry.COLUMN_DATE,
-                            RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_DESCRIPTION,
-                            RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_RATING,
-                            RecappContract.UserEntry.COLUMN_USER_IMAGE},
+                        new String[]{RecappContract.CommentEntry.TABLE_NAME+"."+RecappContract.CommentEntry._ID,
+                                RecappContract.CommentEntry.TABLE_NAME+"."+ RecappContract.CommentEntry.COLUMN_DATE,
+                                RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_DESCRIPTION,
+                                RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_RATING,
+                                RecappContract.UserEntry.COLUMN_USER_IMAGE,
+                                RecappContract.CommentEntry.COLUMN_PLACE_KEY},
                     null,
                     null,
                     sortOrderComment
@@ -265,6 +265,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 List<Comment> comments = Comment.allComment(data);
                 commentsAdapter.swapData(comments);
                 commentsAdapter.setCommentCursor(data);
+                //comment.setAdapter(commentsAdapter);
                 break;
             case PLACE:
                 if(data.moveToFirst()) {
@@ -322,11 +323,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
         switch (loader.getId()){
             case COMMENT_BY_PLACE:
-                List<Comment> comments = new ArrayList<>();
-                commentsAdapter.swapData(comments);
                 commentsAdapter.closeCursor();
                 break;
             case PLACE:

@@ -7,7 +7,7 @@ package com.unal.tuapp.recapp.data;
 import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
+
 
 import java.util.ArrayList;
 
@@ -18,6 +18,7 @@ public class Comment  implements Parcelable {
     private double rating;
     private long id;
     private long date;
+    private long idPlace;
 
     public Comment(){}
 
@@ -26,6 +27,12 @@ public class Comment  implements Parcelable {
     }
     public void setId(long id){
         this.id=id;
+    }
+    public long getIdPlace(){
+        return idPlace;
+    }
+    public void setIdPlace(long id){
+        this.idPlace=id;
     }
 
     public long getDate(){
@@ -73,6 +80,7 @@ public class Comment  implements Parcelable {
         parcel.writeDouble(rating);
         parcel.writeLong(id);
         parcel.writeLong(date);
+        parcel.writeLong(idPlace);
     }
     private Comment (Parcel parcel){
         int size = parcel.readInt();
@@ -82,6 +90,7 @@ public class Comment  implements Parcelable {
         rating = parcel.readFloat();
         id = parcel.readLong();
         date = parcel.readLong();
+        idPlace = parcel.readLong();
 
     }
     public static final Creator<Comment> CREATOR
@@ -107,6 +116,7 @@ public class Comment  implements Parcelable {
             comment.setImageProfile(cursor.getBlob(
                     cursor.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_IMAGE)
             ));
+            comment.setIdPlace(cursor.getLong(cursor.getColumnIndexOrThrow(RecappContract.CommentEntry.COLUMN_PLACE_KEY)));
 
 
             comments.add(comment);

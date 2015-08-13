@@ -1,6 +1,7 @@
 package com.unal.tuapp.recapp;
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,8 +26,7 @@ import com.unal.tuapp.recapp.data.User;
 import java.util.ArrayList;
 import java.util.List;
 
-import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
-import jp.wasabeef.recyclerview.animators.adapters.SlideInRightAnimationAdapter;
+
 
 /**
  * Created by andresgutierrez on 8/8/15.
@@ -36,12 +35,52 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
     private User user;
     private View root;
     private RecyclerView recyclerView;
-    private RecycleCommentsAdapter recycleCommentsAdapter;
+    private RecycleCommentsUserAdapter recycleCommentsAdapter;
     private static final int COMMENT = 20;
+    private ActionMode actionMode;
+    private long idComment;
+    private long idPlaceComment;
+    private OnCommentListener onCommentListener;
+
+    public interface OnCommentListener{
+         void onCommentDelete(boolean comment);
+    }
+
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.menu_context,menu);
+            return true;
+        }
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()){
+                case R.id.delete_comment:
+                    deleteComment();
+                    mode.finish();
+            }
+            return false;
+        }
+
+
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            actionMode = null;
+        }
+
+
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater,container,savedInstanceState);
+        super.onCreateView(inflater, container, savedInstanceState);
         root = inflater.inflate(R.layout.fragment_comments,container,false);
         Bundle extras = getActivity().getIntent().getExtras();
         if(extras!=null){
@@ -51,11 +90,25 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
         List<Comment> comments = new ArrayList<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-        recycleCommentsAdapter = new RecycleCommentsAdapter(comments);
+        recycleCommentsAdapter = new RecycleCommentsUserAdapter(comments);
+        recycleCommentsAdapter.setOnItemClickListener(new RecycleCommentsUserAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, long id,long idPlace) {
+                idComment = id;
+                idPlaceComment = idPlace;
+                if(actionMode==null){
+                    actionMode = ((AppCompatActivity)getActivity()).startSupportActionMode(mActionModeCallback);
+                }else{
+                    actionMode.finish();
+                    actionMode = ((AppCompatActivity)getActivity()).startSupportActionMode(mActionModeCallback);
 
-        AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(recycleCommentsAdapter);
-        alphaInAnimationAdapter.setDuration(1000);
-        recyclerView.setAdapter(new SlideInRightAnimationAdapter(alphaInAnimationAdapter));
+                }
+            }
+        });
+
+        //AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(recycleCommentsAdapter);
+        //alphaInAnimationAdapter.setDuration(1000);
+        recyclerView.setAdapter(recycleCommentsAdapter);
 
         return root;
     }
@@ -83,7 +136,8 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
                         RecappContract.CommentEntry.TABLE_NAME+"."+ RecappContract.CommentEntry.COLUMN_DATE,
                         RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_DESCRIPTION,
                         RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_RATING,
-                        RecappContract.UserEntry.COLUMN_USER_IMAGE},
+                        RecappContract.UserEntry.COLUMN_USER_IMAGE,
+                        RecappContract.CommentEntry.COLUMN_PLACE_KEY},
                 null,
                 null,
                 sortOrder
@@ -95,15 +149,59 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
         List<Comment> comments = Comment.allComment(data);
         recycleCommentsAdapter.swapData(comments);
         recycleCommentsAdapter.setCommentCursor(data);
-
+        //recyclerView.setAdapter(recycleCommentsAdapter);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        //List<Comment> comments = new ArrayList<>();
-        //recycleCommentsAdapter.swapData(comments);
-        recycleCommentsAdapter.setCommentCursor(null);
+        recycleCommentsAdapter.closeCursor();
     }
 
+    public void deleteComment(){
+        Cursor cursor=getActivity().getContentResolver().query(
+                RecappContract.CommentEntry.buildCommentUri(idComment),
+                new String[]{RecappContract.CommentEntry.COLUMN_RATING},
+                null,
+                null,
+                null
+        );
+        cursor.moveToFirst();
+        double rating = cursor.getDouble(0);
+        cursor.close();
+        Cursor cursorPlace=getActivity().getContentResolver().query(
+                RecappContract.PlaceEntry.buildPlaceUri(idPlaceComment),
+                new String[]{RecappContract.PlaceEntry.COLUMN_RATING},
+                null,
+                null,
+                null
+        );
+        cursorPlace.moveToFirst();
+        double ratingPlace = cursorPlace.getDouble(0);
+        double newRating = ratingPlace-rating;
+        cursorPlace.close();
+        ContentValues values = new ContentValues();
+        values.put(RecappContract.PlaceEntry.COLUMN_RATING,newRating);
+        getActivity().getContentResolver().update(
+                RecappContract.PlaceEntry.CONTENT_URI,
+                values,
+                RecappContract.PlaceEntry._ID +" = ?",
+                new String[]{""+idPlaceComment}
+        );
+        getActivity().getContentResolver().delete(
+                RecappContract.CommentEntry.CONTENT_URI,
+                RecappContract.CommentEntry._ID +" = ?",
+                new String[]{""+idComment}
+        );
+        onCommentListener.onCommentDelete(true);
+    }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try{
+            onCommentListener = (OnCommentListener)activity;
+        }catch (ClassCastException e){
+            throw new ClassCastException(activity.toString());
+        }
+    }
 }

@@ -4,13 +4,16 @@ import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by andresgutierrez on 8/5/15.
  */
-public class Place {
+public class Place implements ClusterItem {
 
     private long id;
     private String name;
@@ -112,5 +115,10 @@ public class Place {
         }
 
         return places;
+    }
+
+    @Override
+    public LatLng getPosition() {
+        return new LatLng(lat,log);
     }
 }

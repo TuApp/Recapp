@@ -19,13 +19,16 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -42,19 +45,24 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterManager;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by andresgutierrez on 7/13/15.
  */
 public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleApiClient.OnConnectionFailedListener,
-                        GoogleApiClient.ConnectionCallbacks,LocationListener,LoaderManager.LoaderCallbacks<Cursor> {
+                        GoogleApiClient.ConnectionCallbacks,LocationListener,LoaderManager.LoaderCallbacks<Cursor>,
+                        ClusterManager.OnClusterClickListener<Place>,
+                        ClusterManager.OnClusterInfoWindowClickListener<Place>,
+                        ClusterManager.OnClusterItemClickListener<Place>,
+                        ClusterManager.OnClusterItemInfoWindowClickListener<Place>{
     private GoogleApiClient mGoogleApiClient;
     private SupportMapFragment mapFragment;
     private GoogleMap map;
@@ -72,9 +80,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     private BitmapDescriptor icon=null;
     private int PLACE=100;
     private Cursor placeCursor;
-    private Map<Marker,Place> markers;
-    private Marker toDistace;
-    private Button calculateDistance;
+    private ImageButton calculateDistance;
+    private ImageButton myPositon;
+    private ClusterManager<Place> placeClusterManager;
+    private Cluster<Place> clickedCluster;
+    private Place clickedPlace;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -91,14 +102,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         }
         try{
             view = inflater.inflate(R.layout.fragment_map,container,false);
-            calculateDistance = (Button) view.findViewById(R.id.the_way);
+            calculateDistance = (ImageButton) view.findViewById(R.id.the_way);
+            myPositon = (ImageButton) view.findViewById(R.id.my_position);
+            myPositon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(me!=null){
+                        LatLng myLocation = new LatLng(me.getPosition().latitude,
+                                me.getPosition().longitude);
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(myLocation)
+                                .zoom(16)
+                                .build();
+                        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),3000,null);
+                    }
+                }
+            });
             calculateDistance.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(toDistace!=null){
+                    if(clickedPlace!=null){
                         //We should create an implicit intent to show the way
-                        Uri gmmIntentUri = Uri.parse("google.navigation:q="+toDistace.getPosition().latitude+","+
-                        toDistace.getPosition().longitude);
+                        Uri gmmIntentUri = Uri.parse("google.navigation:q="+clickedPlace.getLat()+","+
+                        clickedPlace.getLog());
                         Intent mapIntent = new Intent(Intent.ACTION_VIEW,gmmIntentUri);
                         mapIntent.setPackage("com.google.android.apps.maps");
                         if(mapIntent.resolveActivity(getActivity().getPackageManager())!=null){
@@ -124,32 +150,28 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
 
         if (map == null) {
             map = mapFragment.getMap();
-            map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-                @Override
-                public void onInfoWindowClick(Marker marker) {
-                    if(!marker.equals(me)) {
-                        mOnMapListener.onMap(markers.get(marker));
-                    }
-                }
-            });
-            map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(Marker marker) {
-                    if (!marker.equals(me)) {
-                        calculateDistance.setVisibility(View.VISIBLE);
-                        toDistace = marker;
-                    }
-                    return false;
-                }
-            });
+            placeClusterManager = new ClusterManager<>(getActivity(),map);
+            placeClusterManager.setRenderer(new MyClusterRender(getActivity(), map, placeClusterManager));
+            map.setOnCameraChangeListener(placeClusterManager);
+            map.setOnInfoWindowClickListener(placeClusterManager);
+            map.setInfoWindowAdapter(placeClusterManager.getMarkerManager());
+
+            placeClusterManager.getMarkerCollection().setOnInfoWindowAdapter(new InfoWindowAdapterMarker(getActivity()));
+            placeClusterManager.getClusterMarkerCollection().setOnInfoWindowAdapter(null);
+            map.setOnMarkerClickListener(placeClusterManager);
+            placeClusterManager.setOnClusterClickListener(this);
+            placeClusterManager.setOnClusterItemClickListener(this);
+            placeClusterManager.setOnClusterInfoWindowClickListener(this);
+            placeClusterManager.setOnClusterItemInfoWindowClickListener(this);
+
             map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng latLng) {
-                    toDistace = null;
+                    clickedPlace = null;
                     calculateDistance.setVisibility(View.GONE);
                 }
             });
-            map.setInfoWindowAdapter(new InfoWindowAdapterMarker(getActivity()));
+            //map.setInfoWindowAdapter(new InfoWindowAdapterMarker(getActivity()));
 
 
         }
@@ -202,8 +224,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         googleMap.getUiSettings().setAllGesturesEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
-        //googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-        //googleMap.getUiSettings().setCompassEnabled(true);
         int dp = 60;
         if(map==null){
             map = googleMap;
@@ -280,17 +300,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         me.setIcon(icon);
         //me.remove();
         LatLng myLocation = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        /*float zoom = map.getCameraPosition().zoom;
-        if(zoom<10){
-            zoom = 10f;
-        }*/
         me.setPosition(myLocation);
         //Should we animate the camera?
-        /*CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(myLocation)
-                .zoom(zoom)
-                .build();
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));*/
+
 
     }
 
@@ -328,6 +340,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         List<Place> allPlaces = Place.allPlaces(data);
         placeCursor = data;
         addPlaces(allPlaces);
+        placeClusterManager.cluster();
 
     }
 
@@ -337,24 +350,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     }
 
     public void addPlaces(List<Place> places){
-        if(markers!=null) {
-            for (Marker marker : markers.keySet()) {
-                marker.remove();
-            }
-        }
-        markers = new HashMap<>();
         for (Place place:places) {
-            markers.put(map.addMarker(new MarkerOptions()
-                            .position(new LatLng(place.getLat(), place.getLog())))
-                    ,place);
+            placeClusterManager.addItem(place);
         }
 
     }
 
     private class InfoWindowAdapterMarker implements GoogleMap.InfoWindowAdapter{
         private Context context;
+        private View popup;
         public InfoWindowAdapterMarker(Context context){
             this.context=context;
+            LayoutInflater layoutInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            this.popup = layoutInflater.inflate(R.layout.info_window_adapter, null);
         }
 
         @Override
@@ -362,19 +370,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
             if(marker.equals(me)){
                 return null;
             }
-            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View popup = layoutInflater.inflate(R.layout.info_window_adapter, null);
-            Place place = markers.get(marker);
-            ImageView imageView = (ImageView)popup.findViewById(R.id.place_image);
-            imageView.setImageBitmap(BitmapFactory.decodeByteArray(
-                    place.getImageFavorite(), 0, place.getImageFavorite().length
-            ));
-            TextView name = (TextView) popup.findViewById(R.id.place_name);
-            name.setText(place.getName());
-            TextView address = (TextView) popup.findViewById(R.id.place_address);
-            address.setText(place.getAddress());
-            TextView rating = (TextView) popup.findViewById(R.id.place_rating);
-            rating.setText("Rating: "+place.getRating());
+
+            //Place place = markers.get(marker);
+            if(clickedPlace!=null) {
+                ImageView imageView = (ImageView) popup.findViewById(R.id.place_image);
+                imageView.setImageBitmap(BitmapFactory.decodeByteArray(
+                        clickedPlace.getImageFavorite(), 0, clickedPlace.getImageFavorite().length
+                ));
+                TextView name = (TextView) popup.findViewById(R.id.place_name);
+                name.setText(clickedPlace.getName());
+                TextView address = (TextView) popup.findViewById(R.id.place_address);
+                address.setText(clickedPlace.getAddress());
+                TextView rating = (TextView) popup.findViewById(R.id.place_rating);
+                rating.setText("Rating: " + clickedPlace.getRating());
+            }
 
             return popup;
 
@@ -383,6 +392,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         @Override
         public View getInfoWindow(Marker marker) {
             return null;
+        }
+    }
+
+    @Override
+    public boolean onClusterClick(Cluster<Place> cluster) {
+        clickedCluster = cluster;
+        return false;
+    }
+
+    @Override
+    public void onClusterInfoWindowClick(Cluster<Place> cluster) {
+        //We don't do anything
+    }
+
+    @Override
+    public boolean onClusterItemClick(Place place) {
+        clickedPlace = place;
+        calculateDistance.setVisibility(View.VISIBLE);
+        return false;
+    }
+
+    @Override
+    public void onClusterItemInfoWindowClick(Place place) {
+        if(mOnMapListener!=null){
+            mOnMapListener.onMap(place);
         }
     }
 }

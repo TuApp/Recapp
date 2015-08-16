@@ -73,7 +73,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     float scale;
     private Location currentLocation;
     private long UPDATE_INTERVAL = 30000;
-    private long UPDATE_FAST_INTERVAL = 5000;
+    private long UPDATE_FAST_INTERVAL = 2000;
     private Marker me;
     private LocationRequest locationRequest;
     private User user;
@@ -249,11 +249,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     @Override
     public void onConnected(Bundle bundle) {
         if(user!= null){
-            Bitmap iconImage = BitmapFactory.decodeByteArray(user.getProfileImage(),0,user.getProfileImage().length);
-            Bitmap iconImageScaled = Bitmap.createScaledBitmap(iconImage,70,70,true);
-            icon = BitmapDescriptorFactory.fromBitmap(
-                   iconImageScaled
-            );
+            if(user.getProfileImage()!=null) {
+                Bitmap iconImage = BitmapFactory.decodeByteArray(user.getProfileImage(), 0, user.getProfileImage().length);
+                Bitmap iconImageScaled = Bitmap.createScaledBitmap(iconImage, 80, 80, true);
+                icon = BitmapDescriptorFactory.fromBitmap(
+                        iconImageScaled
+                );
+            }
         }
         currentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         LatLng myLocation = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
@@ -262,8 +264,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
             me = map.addMarker(new MarkerOptions()
                     .position(myLocation)
                     .title("Me")
-                    .icon(icon)
                     .flat(true));
+            if(icon!=null){
+                me.setIcon(icon);
+            }
         }else{
             me.setPosition(myLocation);
         }
@@ -291,13 +295,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     public void onLocationChanged(Location location) {
         currentLocation = location;
         if(user!= null){
-            Bitmap iconImage = BitmapFactory.decodeByteArray(user.getProfileImage(),0,user.getProfileImage().length);
-            Bitmap iconImageScaled = Bitmap.createScaledBitmap(iconImage,70,70,true);
-            icon = BitmapDescriptorFactory.fromBitmap(
-                    iconImageScaled
-            );
+            if(user.getProfileImage()!=null) {
+                Bitmap iconImage = BitmapFactory.decodeByteArray(user.getProfileImage(), 0, user.getProfileImage().length);
+                Bitmap iconImageScaled = Bitmap.createScaledBitmap(iconImage, 80, 80, true);
+                icon = BitmapDescriptorFactory.fromBitmap(
+                        iconImageScaled
+                );
+                me.setIcon(icon);
+            }
         }
-        me.setIcon(icon);
+
         //me.remove();
         LatLng myLocation = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
         me.setPosition(myLocation);

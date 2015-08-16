@@ -237,7 +237,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         getActivity(),
                         RecappContract.CommentEntry.buildCommentPlaceUri(this.id),
                         new String[]{"AVG(" + RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_RATING + ")"},
-                        RecappContract.CommentEntry.TABLE_NAME+"."+ RecappContract.CommentEntry.COLUMN_RATING,
+                        RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry._ID,
                         null,
                         null
                 );

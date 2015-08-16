@@ -135,8 +135,8 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
         values.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream.toByteArray());
 
         values1.put(RecappContract.PlaceEntry.COLUMN_NAME, "algo1");
-        values1.put(RecappContract.PlaceEntry.COLUMN_LAT, 2.34234);
-        values1.put(RecappContract.PlaceEntry.COLUMN_LOG, 1.3242134);
+        values1.put(RecappContract.PlaceEntry.COLUMN_LAT, 1.34234);
+        values1.put(RecappContract.PlaceEntry.COLUMN_LOG, -1.3242134);
         values1.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, " ADD AS");
         values1.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "alguna descripcion DSFAS");
         ByteArrayOutputStream stream1 =  new ByteArrayOutputStream();
@@ -145,8 +145,8 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
         values1.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream1.toByteArray());
 
         values2.put(RecappContract.PlaceEntry.COLUMN_NAME, "algo2");
-        values2.put(RecappContract.PlaceEntry.COLUMN_LAT, 2.34234);
-        values2.put(RecappContract.PlaceEntry.COLUMN_LOG,1.3242134);
+        values2.put(RecappContract.PlaceEntry.COLUMN_LAT, 0.34234);
+        values2.put(RecappContract.PlaceEntry.COLUMN_LOG, 0.3242134);
         values2.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, " dfsdafaddress2");
         values2.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "alguna descripcioDSFn");
 
@@ -156,8 +156,8 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
         values2.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream2.toByteArray());
 
         values3.put(RecappContract.PlaceEntry.COLUMN_NAME, "algo3");
-        values3.put(RecappContract.PlaceEntry.COLUMN_LAT, 2.34234);
-        values3.put(RecappContract.PlaceEntry.COLUMN_LOG,1.3242134);
+        values3.put(RecappContract.PlaceEntry.COLUMN_LAT, 2.14234);
+        values3.put(RecappContract.PlaceEntry.COLUMN_LOG,1.9242134);
         values3.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, "nueva direcion");
         values3.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "alguna descripcioDSFn");
 
@@ -167,8 +167,8 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
         values3.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream3.toByteArray());
 
         values4.put(RecappContract.PlaceEntry.COLUMN_NAME, "algo4");
-        values4.put(RecappContract.PlaceEntry.COLUMN_LAT, 2.34234);
-        values4.put(RecappContract.PlaceEntry.COLUMN_LOG, 1.3242134);
+        values4.put(RecappContract.PlaceEntry.COLUMN_LAT, 4.405637);
+        values4.put(RecappContract.PlaceEntry.COLUMN_LOG, -73.946686);
         values4.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, "234ad");
         values4.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "alguna descripcioDSFn");
 

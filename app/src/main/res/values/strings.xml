@@ -23,5 +23,6 @@
     <string name="comments">Comments</string>
     <string name="title_activity_user_detail">UserDetail</string>
     <string name="action_delete">Delete</string>
+    <string name="the_way">Calculate the route</string>
 
 </resources>

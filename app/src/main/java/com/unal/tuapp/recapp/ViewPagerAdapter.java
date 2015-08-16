@@ -15,11 +15,10 @@ import java.util.List;
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     private final List<Fragment> mFragmentList;
     private final List<String> mFragmentTitleList;
-    private FragmentManager manager;
+
 
     public ViewPagerAdapter(FragmentManager manager){
         super(manager);
-        this.manager = manager;
         mFragmentList = new ArrayList<>();
         mFragmentTitleList = new ArrayList<>();
 

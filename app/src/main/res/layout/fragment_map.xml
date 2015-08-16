@@ -12,5 +12,13 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
+    <Button
+        android:id="@+id/the_way"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|top"
+        android:text="@string/the_way"
+        android:visibility="gone"/>
+
 </android.support.design.widget.CoordinatorLayout>
 

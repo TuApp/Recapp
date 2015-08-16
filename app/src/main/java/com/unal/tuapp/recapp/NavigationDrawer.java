@@ -18,6 +18,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +32,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
 
@@ -64,6 +66,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private final String FILE = "filters.txt";
     private static final int USER = 10;
     private Cursor userCursor;
+    private MapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +89,11 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
 
             TextView email = (TextView) findViewById(R.id.user_email);
             emailUser = account.getAccountName(mGooglePlus.mGoogleApiClient);
-            getSupportLoaderManager().initLoader(USER,null,this);
+            if(getSupportLoaderManager().getLoader(USER)==null) {
+                getSupportLoaderManager().initLoader(USER, null, this);
+            }else{
+                getSupportLoaderManager().restartLoader(USER,null,this);
+            }
             email.setText(emailUser);
             de.hdodenhof.circleimageview.CircleImageView imageView;
             imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
@@ -283,11 +290,13 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 startActivity(intent);
             }
         });
-        MapFragment mapFragment = new MapFragment();
+        mapFragment = new MapFragment();
         mapFragment.setOnMapListener(new MapFragment.onMapListener() {
             @Override
-            public void onMap(Marker marker) {
+            public void onMap(Place place) {
                 Intent intent = new Intent(NavigationDrawer.this, Detail.class);
+                intent.putExtra("id",place.getId());
+                intent.putExtra("user",user);
                 startActivity(intent);
             }
         });
@@ -386,6 +395,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             user.setProfileImage(data.getBlob(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_IMAGE)));
             user.setName(data.getString(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_NAME)));
             user.setLastName(data.getString(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_LASTNAME)));
+            if(user!=null) {
+                mapFragment.setUser(user);
+            }
         }
     }
 

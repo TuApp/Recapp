@@ -1,6 +1,7 @@
 package com.unal.tuapp.recapp;
 
 import android.graphics.BitmapFactory;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.CursorLoader;
@@ -11,10 +12,14 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -31,6 +36,8 @@ import com.unal.tuapp.recapp.data.PlaceImages;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
 
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +74,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public static final int PLACE = 2;
     public static final int RATING = 3;
     public static final int USER_BY_PLACE = 4;
+
 
 
     @Override
@@ -106,6 +114,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 //favorite.invalidate();
             }
         });
+
 
         commentText = (EditText) root.findViewById(R.id.comment_text);
 
@@ -156,7 +165,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     ContentValues values = new ContentValues();
                     values.put(RecappContract.CommentEntry.COLUMN_DESCRIPTION, commentText.getText().toString());
                     values.put(RecappContract.CommentEntry.COLUMN_RATING, commentRating.getRating());
-                    values.put(RecappContract.CommentEntry.COLUMN_DATE,System.currentTimeMillis());
+                    values.put(RecappContract.CommentEntry.COLUMN_DATE, System.currentTimeMillis());
                     values.put(RecappContract.CommentEntry.COLUMN_USER_KEY, user.getId());
                     values.put(RecappContract.CommentEntry.COLUMN_PLACE_KEY, id);
                     getActivity().getContentResolver().insert(
@@ -175,6 +184,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 }
             }
         });
+
 
         return root;
     }
@@ -341,4 +351,5 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
 
     }
+
 }

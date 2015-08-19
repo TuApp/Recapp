@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -44,6 +45,9 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
     private User  user;
     private long id;
     private ActionBarDrawerToggle actionBarDrawerToggle;
+    private FloatingActionButton reminder;
+    private DetailFragment detailFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,12 +98,13 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
         );
 
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         navDrawer = (NavigationView) findViewById(R.id.nav_drawer);
         //We need to do this because now we're not in home
 
         navigationDrawer = (DrawerLayout) findViewById(R.id.detail);
         navDrawer.getMenu().setGroupCheckable(R.id.main,false,false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
 
         //navigationView.getMenu().setGroupCheckable(R.id.main, false, false);
@@ -126,31 +131,31 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
         navDrawer.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                switch (menuItem.getItemId()){
+                switch (menuItem.getItemId()) {
                     case R.id.home:
-                        Intent intentHome = new Intent(Detail.this,NavigationDrawer.class);
+                        Intent intentHome = new Intent(Detail.this, NavigationDrawer.class);
                         startActivity(intentHome);
                         break;
                     case R.id.favorites:
-                        Intent intentFavorite = new Intent(Detail.this,UserDetail.class);
-                        intentFavorite.putExtra("user",user);
-                        intentFavorite.putExtra("type","favorite");
+                        Intent intentFavorite = new Intent(Detail.this, UserDetail.class);
+                        intentFavorite.putExtra("user", user);
+                        intentFavorite.putExtra("type", "favorite");
                         startActivity(intentFavorite);
                         break;
                     case R.id.appointments:
-                        Intent intentReminder = new Intent(Detail.this,UserDetail.class);
-                        intentReminder.putExtra("user",user);
-                        intentReminder.putExtra("type","reminder");
+                        Intent intentReminder = new Intent(Detail.this, UserDetail.class);
+                        intentReminder.putExtra("user", user);
+                        intentReminder.putExtra("type", "reminder");
                         startActivity(intentReminder);
                         break;
                     case R.id.comments:
-                        Intent intentComment = new Intent(Detail.this,UserDetail.class);
-                        intentComment.putExtra("user",user);
-                        intentComment.putExtra("type","comment");
+                        Intent intentComment = new Intent(Detail.this, UserDetail.class);
+                        intentComment.putExtra("user", user);
+                        intentComment.putExtra("type", "comment");
                         startActivity(intentComment);
                         break;
                     case R.id.sign_out:
-                        if(mGooglePlus.mGoogleApiClient.isConnected()){
+                        if (mGooglePlus.mGoogleApiClient.isConnected()) {
                             Plus.AccountApi.clearDefaultAccount(mGooglePlus.mGoogleApiClient);
                             mGooglePlus.mGoogleApiClient.disconnect();
                             Intent intent = new Intent(Detail.this, Recapp.class);
@@ -160,7 +165,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
                         }
                         break;
                     case R.id.disconnect:
-                        if(mGooglePlus.mGoogleApiClient.isConnected()){
+                        if (mGooglePlus.mGoogleApiClient.isConnected()) {
                             Plus.AccountApi.clearDefaultAccount(mGooglePlus.mGoogleApiClient);
                             Plus.AccountApi.revokeAccessAndDisconnect(mGooglePlus.mGoogleApiClient);
                             mGooglePlus.mGoogleApiClient.disconnect();
@@ -176,12 +181,25 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
                 return false;
             }
         });
+        reminder = (FloatingActionButton) root.findViewById(R.id.reminder);
+        reminder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //reminder.setVisibility(view.GONE);
+                //We should to create other activity
+                Intent intent = new Intent(Detail.this,ReminderActivity.class);
+                intent.putExtra("id",id);
+                intent.putExtra("user",user);
+                startActivity(intent);
+
+            }
+        });
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        DetailFragment detailFragment = new DetailFragment();
 
-        fragmentTransaction.replace(R.id.detail_container,detailFragment);
+        detailFragment = new DetailFragment();
+        fragmentTransaction.replace(R.id.detail_container, detailFragment);
         fragmentTransaction.commit();
 
     }
@@ -217,6 +235,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
 
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void onBackPressed() {
 

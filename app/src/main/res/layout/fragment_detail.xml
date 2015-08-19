@@ -25,7 +25,8 @@
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
                 card_view:cardCornerRadius="4dp"
-                android:minHeight="200dp">
+                android:minHeight="200dp"
+                android:elevation="2dp">
 
                 <RelativeLayout
                     android:id="@+id/card_detail_position"

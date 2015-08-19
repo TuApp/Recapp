@@ -24,5 +24,10 @@
     <string name="title_activity_user_detail">UserDetail</string>
     <string name="action_delete">Delete</string>
     <string name="the_way">Calculate the route</string>
+    <string name="save">Save</string>
+    <string name="newEvent">New event</string>
+    <string name="eventName">Event name</string>
+    <string name="to">To</string>
+    <string name="notification">Notification</string>
 
 </resources>

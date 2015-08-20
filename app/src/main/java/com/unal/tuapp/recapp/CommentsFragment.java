@@ -158,40 +158,30 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
     }
 
     public void deleteComment(){
-        Cursor cursor=getActivity().getContentResolver().query(
-                RecappContract.CommentEntry.buildCommentUri(idComment),
-                new String[]{RecappContract.CommentEntry.COLUMN_RATING},
-                null,
-                null,
-                null
-        );
-        cursor.moveToFirst();
-        double rating = cursor.getDouble(0);
-        cursor.close();
-        Cursor cursorPlace=getActivity().getContentResolver().query(
-                RecappContract.PlaceEntry.buildPlaceUri(idPlaceComment),
-                new String[]{RecappContract.PlaceEntry.COLUMN_RATING},
-                null,
-                null,
-                null
-        );
-        cursorPlace.moveToFirst();
-        double ratingPlace = cursorPlace.getDouble(0);
-        double newRating = ratingPlace-rating;
-        cursorPlace.close();
-        ContentValues values = new ContentValues();
-        values.put(RecappContract.PlaceEntry.COLUMN_RATING,newRating);
-        getActivity().getContentResolver().update(
-                RecappContract.PlaceEntry.CONTENT_URI,
-                values,
-                RecappContract.PlaceEntry._ID +" = ?",
-                new String[]{""+idPlaceComment}
-        );
         getActivity().getContentResolver().delete(
                 RecappContract.CommentEntry.CONTENT_URI,
                 RecappContract.CommentEntry._ID +" = ?",
                 new String[]{""+idComment}
         );
+        Cursor cursorRating = getActivity().getContentResolver().query(
+                RecappContract.CommentEntry.buildCommentPlaceUri(idPlaceComment),
+                new String[]{"AVG(" +RecappContract.CommentEntry.TABLE_NAME+"."
+                        +RecappContract.CommentEntry.COLUMN_RATING+")"},
+                RecappContract.PlaceEntry.TABLE_NAME+"."+RecappContract.PlaceEntry._ID,
+                null,
+                null
+        );
+        cursorRating.moveToFirst();
+        double newRating = cursorRating.getDouble(0);
+        ContentValues values = new ContentValues();
+        values.put(RecappContract.PlaceEntry.COLUMN_RATING, newRating);
+        getActivity().getContentResolver().update(
+                RecappContract.PlaceEntry.CONTENT_URI,
+                values,
+                RecappContract.PlaceEntry._ID + " = ?",
+                new String[]{"" + idPlaceComment}
+        );
+
         onCommentListener.onCommentDelete(true);
     }
 

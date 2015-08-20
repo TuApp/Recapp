@@ -263,8 +263,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
 
             me = map.addMarker(new MarkerOptions()
                     .position(myLocation)
-                    .title("Me")
-                    .flat(true));
+                    .title("Me"));
             if(icon!=null){
                 me.setIcon(icon);
             }

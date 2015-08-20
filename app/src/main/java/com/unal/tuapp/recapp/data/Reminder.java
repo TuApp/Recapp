@@ -1,6 +1,7 @@
 package com.unal.tuapp.recapp.data;
 
 import android.database.Cursor;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,17 +13,17 @@ public class Reminder {
     private long id;
     private String name;
     private String description;
-    private long startDate;
+    private long notification;
     private long endDate;
     private Place place;
 
-    public Reminder(String description, long endDate, long id, String name, Place place, long startDate) {
+    public Reminder(String description, long endDate, long id, String name, Place place, long notification) {
         this.description = description;
         this.endDate = endDate;
         this.id = id;
         this.name = name;
         this.place = place;
-        this.startDate = startDate;
+        this.notification = notification;
     }
 
     public String getDescription() {
@@ -65,12 +66,12 @@ public class Reminder {
         this.place = place;
     }
 
-    public long getStartDate() {
-        return startDate;
+    public long getNotificiation() {
+        return notification;
     }
 
-    public void setStartDate(long startDate) {
-        this.startDate = startDate;
+    public void setNotification(long notification) {
+        this.notification = notification;
     }
 
     public static ArrayList<Reminder> allReminder(Cursor data){
@@ -96,8 +97,9 @@ public class Reminder {
                             RecappContract.ReminderEntry.COLUMN_NAME)),
                     place,
                     data.getLong(data.getColumnIndexOrThrow(RecappContract.ReminderEntry.TABLE_NAME+"."+
-                            RecappContract.ReminderEntry.COLUMN_START_DATE))
+                            RecappContract.ReminderEntry.COLUMN_NOTIFICATION))
             );
+            Log.e("algo",reminder.getDescription());
             reminders.add(reminder);
         }
         return reminders;

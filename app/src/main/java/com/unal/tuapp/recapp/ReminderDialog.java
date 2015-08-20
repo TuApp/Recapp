@@ -3,6 +3,7 @@ package com.unal.tuapp.recapp;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,8 +32,10 @@ import android.widget.TimePicker;
 
 import com.unal.tuapp.recapp.data.RecappContract;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by andresgutierrez on 8/18/15.
@@ -43,12 +48,15 @@ public class ReminderDialog extends DialogFragment implements LoaderManager.Load
     private ImageView placeImage;
     private TextView placeName;
     private TextView placeAddress;
+    private EditText eventName;
+    private EditText eventDescription;
+    private CheckBox eventNotification;
     private EditText date;
     private EditText time;
     private long id;
 
     public interface OnDialogListener{
-        void onAction(String action);
+        void onAction(String action,Object...values);
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,6 +78,9 @@ public class ReminderDialog extends DialogFragment implements LoaderManager.Load
         ((AppCompatActivity)getActivity()).getSupportActionBar().
                 setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel);
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.newEvent);
+        eventName = (EditText) root.findViewById(R.id.event_name);
+        eventDescription = (EditText) root.findViewById(R.id.event_description);
+        eventNotification = (CheckBox) root.findViewById(R.id.event_notification);
         RelativeLayout placeLayout = (RelativeLayout) root.findViewById(R.id.event_place);
         LinearLayout dateLayout = (LinearLayout) root.findViewById(R.id.date_event);
         date = (EditText) dateLayout.findViewById(R.id.date);
@@ -130,10 +141,87 @@ public class ReminderDialog extends DialogFragment implements LoaderManager.Load
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId()==android.R.id.home){
-            onDialogListener.onAction("dismiss");
+            if(!eventName.getText().toString().equals("") || !eventDescription.getText().toString().equals("")||
+                    !date.getText().toString().equals("") || !time.getText().toString().equals("")) {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+                        getActivity()
+                );
+                alertDialog.setTitle("Dismiss")
+                        .setMessage("Are you sure that you want to discard the reminder")
+                        .setCancelable(false)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                onDialogListener.onAction("dismiss");
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                AlertDialog dialog = alertDialog.create();
+                dialog.show();
+            }else{
+                onDialogListener.onAction("dismiss");
+            }
         }
         if(item.getItemId()==R.id.save){
-            onDialogListener.onAction("save");
+            String name = eventName.getText().toString();
+            String description = eventDescription.getText().toString();
+            boolean notification = false;
+            if(eventNotification.isChecked()){
+                notification = true;
+            }
+            if(!name.equals("") && !description.equals("") &&
+                    !date.getText().toString().equals("") && !time.getText().toString().equals("")) {
+                //We should save the reminder
+                SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd,yyyy HH:mm");
+                String dateEvent = date.getText().toString()+" "+time.getText().toString();
+                try {
+                    Date event = dateFormat.parse(dateEvent);
+                    Date now = new Date();
+
+                    if(event.compareTo(now)>0){ // We can create the event
+                        onDialogListener.onAction("save",name,description,notification,
+                                event);
+                    }else{
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+                                getActivity()
+                        );
+                        alertDialog.setTitle("Invalid date")
+                                .setMessage("The date should be greater than now")
+                                .setCancelable(false)
+                                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                    }
+                                });
+                        AlertDialog dialog = alertDialog.create();
+                        dialog.show();
+                    }
+                } catch (ParseException e) {
+
+                }
+
+            }else{
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+                        getActivity()
+                );
+                alertDialog.setTitle("Invalid saved")
+                        .setMessage("All fields are required")
+                        .setCancelable(false)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                AlertDialog dialog = alertDialog.create();
+                dialog.show();
+            }
         }
         return true;
     }

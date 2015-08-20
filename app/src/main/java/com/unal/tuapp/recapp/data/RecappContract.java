@@ -93,10 +93,10 @@ public class RecappContract {
     public static class ReminderEntry implements BaseColumns {
         public static final String TABLE_NAME = "Reminder";
 
-        public static final String COLUMN_START_DATE = "start_date";
         public static final String COLUMN_END_DATE = "end_date";
-        public static final String COLUMN_NAME = "name";
-        public static final String COLUMN_DESCRIPTION = "description";
+        public static final String COLUMN_NAME = "name_reminder";
+        public static final String COLUMN_DESCRIPTION = "description_reminder";
+        public static final String COLUMN_NOTIFICATION = "notification";
         public static final String COLUMN_USER_KEY = "user_id";
         public static final String COLUMN_PLACE_KEY = "place_id";
 

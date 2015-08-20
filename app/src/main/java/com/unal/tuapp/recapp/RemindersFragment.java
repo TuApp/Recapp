@@ -67,7 +67,7 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String sortOrder = RecappContract.ReminderEntry.TABLE_NAME+"."+
-                RecappContract.ReminderEntry.COLUMN_END_DATE + " ASC ";
+                RecappContract.ReminderEntry.COLUMN_END_DATE + " DESC ";
         return new CursorLoader(
                 getActivity(),
                 RecappContract.ReminderEntry.buildReminderUserUri(user.getId()),

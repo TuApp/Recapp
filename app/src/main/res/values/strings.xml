@@ -29,5 +29,6 @@
     <string name="eventName">Event name</string>
     <string name="to">To</string>
     <string name="notification">Notification</string>
+    <string name="description">Description</string>
 
 </resources>

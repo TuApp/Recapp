@@ -51,10 +51,10 @@ public class RecappDBHelper extends SQLiteOpenHelper{
 
         final String CREATE_REMINDER_TABLE = "CREATE TABLE "+ ReminderEntry.TABLE_NAME +" ( "+
                 ReminderEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                ReminderEntry.COLUMN_START_DATE + " INTEGER NOT NULL, " +
                 ReminderEntry.COLUMN_END_DATE + " INTEGER NOT NULL, "+
                 ReminderEntry.COLUMN_NAME + " TEXT NOT NULL, "+
                 ReminderEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
+                ReminderEntry.COLUMN_NOTIFICATION + " INTEGER NOT NULL, " +
                 ReminderEntry.COLUMN_USER_KEY + " INTEGER," +
                 ReminderEntry.COLUMN_PLACE_KEY + " INTEGER, "+
                 "FOREIGN KEY ( " + ReminderEntry.COLUMN_USER_KEY +" ) REFERENCES " +

@@ -374,7 +374,6 @@ public class RecappProvider extends ContentProvider {
                 );
                 break;
             case REMINDER_WITH_USER:
-                //We expect that the string will be the user's email
                 placeId = ReminderEntry.getPlaceFromUri(uri);
                 selection = ReminderEntry.COLUMN_PLACE_KEY + " = ? ";
                 retCursor = reminderByUser.query(
@@ -388,7 +387,6 @@ public class RecappProvider extends ContentProvider {
                 );
                 break;
             case REMINDER_WITH_PLACE:
-                //We expect a number which will be the place id
                 userId = ReminderEntry.getUserFromUri(uri);
                 selection = ReminderEntry.COLUMN_USER_KEY + " = ? ";
                 retCursor = reminderByPlace.query(

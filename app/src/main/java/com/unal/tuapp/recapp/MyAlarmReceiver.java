@@ -32,6 +32,8 @@ public class MyAlarmReceiver extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
+
+
         if(extras!=null){
             title = extras.getString("title");
             body =  extras.getString("body");
@@ -44,13 +46,12 @@ public class MyAlarmReceiver extends BroadcastReceiver{
             Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
             NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle();
-            bigPictureStyle.bigPicture(BitmapFactory.decodeByteArray(placeImage,0,placeImage.length))
-                    .setBigContentTitle("Place name: "+ placeName)
-                    .setSummaryText("Place address: "+placeAddress);
+            bigPictureStyle.bigPicture(BitmapFactory.decodeByteArray(placeImage, 0, placeImage.length))
+                    .setBigContentTitle("Place name: " + placeName)
+                    .setSummaryText("Place address: " + placeAddress);
 
-
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-                    context).setSmallIcon(R.mipmap.ic_launcher)
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                    .setSmallIcon(R.mipmap.ic_launcher)
                     .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
                     .setContentTitle("Event name: " + title)
                     .setContentText("Event description: " + body)
@@ -61,6 +62,7 @@ public class MyAlarmReceiver extends BroadcastReceiver{
                     .setSound(alarmSound)
                     .setStyle(bigPictureStyle);
             Notification notification = mBuilder.build();
+
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify((int)notificationId,notification);
         }

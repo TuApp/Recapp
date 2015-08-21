@@ -160,19 +160,21 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
     public void deleteComment(){
         getActivity().getContentResolver().delete(
                 RecappContract.CommentEntry.CONTENT_URI,
-                RecappContract.CommentEntry._ID +" = ?",
-                new String[]{""+idComment}
+                RecappContract.CommentEntry._ID + " = ?",
+                new String[]{"" + idComment}
         );
         Cursor cursorRating = getActivity().getContentResolver().query(
                 RecappContract.CommentEntry.buildCommentPlaceUri(idPlaceComment),
-                new String[]{"AVG(" +RecappContract.CommentEntry.TABLE_NAME+"."
-                        +RecappContract.CommentEntry.COLUMN_RATING+")"},
-                RecappContract.PlaceEntry.TABLE_NAME+"."+RecappContract.PlaceEntry._ID,
+                new String[]{"AVG(" + RecappContract.CommentEntry.TABLE_NAME + "."
+                        + RecappContract.CommentEntry.COLUMN_RATING + ")"},
+                RecappContract.PlaceEntry.TABLE_NAME + "." + RecappContract.PlaceEntry._ID,
                 null,
                 null
         );
-        cursorRating.moveToFirst();
-        double newRating = cursorRating.getDouble(0);
+        double newRating = 0;
+        if(cursorRating.moveToFirst()) {
+            newRating = cursorRating.getDouble(0);
+        }
         ContentValues values = new ContentValues();
         values.put(RecappContract.PlaceEntry.COLUMN_RATING, newRating);
         getActivity().getContentResolver().update(

@@ -30,5 +30,6 @@
     <string name="to">To</string>
     <string name="notification">Notification</string>
     <string name="description">Description</string>
+    <string name="place">Place</string>
 
 </resources>

@@ -6,8 +6,12 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -16,6 +20,7 @@ import android.view.View;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
 
@@ -64,14 +69,21 @@ public class ReminderActivity extends AppCompatActivity implements ReminderDialo
                 /*NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
                         this).setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle("Title")
+
                         .setContentText("Body");
                 NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 mNotificationManager.notify((int)notificationId,mBuilder.build());*/
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                Bitmap bitmap = (Bitmap) values[6];
+                bitmap.compress(Bitmap.CompressFormat.PNG,100,out);
                 Intent intent = new Intent(this,MyAlarmReceiver.class);
                 intent.putExtra("title",(String) values[0]);
                 intent.putExtra("body",(String)values[1]);
                 intent.putExtra("notification",notificationId);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(this,12345,intent,0);
+                intent.putExtra("placeName",(String)values[4]);
+                intent.putExtra("placeAddress",(String)values[5]);
+                intent.putExtra("placeImage",out.toByteArray());
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this,(int)notificationId,intent,0);
                 AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
                 alarmManager.set(AlarmManager.RTC_WAKEUP,((Date) values[3]).getTime(),pendingIntent);
 
@@ -92,6 +104,5 @@ public class ReminderActivity extends AppCompatActivity implements ReminderDialo
         intent.putExtra("user", user);
         startActivity(intent);
     }
-
 
 }

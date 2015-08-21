@@ -6,6 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -185,7 +186,8 @@ public class ReminderDialog extends DialogFragment implements LoaderManager.Load
 
                     if(event.compareTo(now)>0){ // We can create the event
                         onDialogListener.onAction("save",name,description,notification,
-                                event);
+                                event,placeName.getText().toString(),placeAddress.getText().toString(),
+                                ((BitmapDrawable)placeImage.getDrawable()).getBitmap());
                     }else{
                         AlertDialog.Builder alertDialog = new AlertDialog.Builder(
                                 getActivity()

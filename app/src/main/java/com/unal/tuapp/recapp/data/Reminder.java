@@ -79,8 +79,8 @@ public class Reminder {
         while (data.moveToNext()){
             Place place = new Place(data.getString(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.TABLE_NAME+"."+
                     RecappContract.PlaceEntry.COLUMN_ADDRESS)), data.getString(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.TABLE_NAME+"."+
-                    RecappContract.PlaceEntry.COLUMN_DESCRIPTION)),data.getLong(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.TABLE_NAME + "." +
-                    RecappContract.PlaceEntry._ID)),data.getDouble(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.TABLE_NAME + "." +
+                    RecappContract.PlaceEntry.COLUMN_DESCRIPTION)),data.getLong(data.getColumnIndexOrThrow(RecappContract.ReminderEntry.TABLE_NAME + "." +
+                    RecappContract.ReminderEntry.COLUMN_PLACE_KEY)),data.getDouble(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.TABLE_NAME + "." +
                     RecappContract.PlaceEntry.COLUMN_LOG)),data.getDouble(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.TABLE_NAME + "." +
                     RecappContract.PlaceEntry.COLUMN_LAT)),data.getString(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.TABLE_NAME + "." +
                     RecappContract.PlaceEntry.COLUMN_NAME)),data.getDouble(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.TABLE_NAME + "." +
@@ -99,7 +99,6 @@ public class Reminder {
                     data.getLong(data.getColumnIndexOrThrow(RecappContract.ReminderEntry.TABLE_NAME+"."+
                             RecappContract.ReminderEntry.COLUMN_NOTIFICATION))
             );
-            Log.e("algo",reminder.getDescription());
             reminders.add(reminder);
         }
         return reminders;

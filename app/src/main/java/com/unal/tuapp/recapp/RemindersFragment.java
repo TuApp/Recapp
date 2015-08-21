@@ -9,6 +9,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,9 +45,17 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
         recyclerView.setLayoutManager(linearLayoutManager);
         List<Reminder> reminders = new ArrayList<>();
         recycleRemindersAdapter = new RecycleRemindersAdapter(reminders);
-        AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(recycleRemindersAdapter);
-        alphaInAnimationAdapter.setDuration(1000);
-        recyclerView.setAdapter(new SlideInRightAnimationAdapter(alphaInAnimationAdapter));
+        recycleRemindersAdapter.setOnItemClickListener(new RecycleRemindersAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(long reminderId) {
+                getActivity().getContentResolver().delete(
+                        RecappContract.ReminderEntry.CONTENT_URI,
+                        RecappContract.ReminderEntry._ID + " = ?",
+                        new String[]{"" + reminderId}
+                );
+            }
+        });
+        recyclerView.setAdapter(recycleRemindersAdapter);
 
         return root;
     }
@@ -71,7 +80,19 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
         return new CursorLoader(
                 getActivity(),
                 RecappContract.ReminderEntry.buildReminderUserUri(user.getId()),
-                null,
+                new String[]{RecappContract.PlaceEntry.COLUMN_NAME,
+                        RecappContract.PlaceEntry.TABLE_NAME+"."+RecappContract.PlaceEntry.COLUMN_RATING,
+                        RecappContract.PlaceEntry.TABLE_NAME+"."+RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE,
+                        RecappContract.PlaceEntry.TABLE_NAME+"."+RecappContract.PlaceEntry.COLUMN_ADDRESS,
+                        RecappContract.PlaceEntry.TABLE_NAME+"."+RecappContract.PlaceEntry.COLUMN_DESCRIPTION,
+                        RecappContract.PlaceEntry.TABLE_NAME+"."+RecappContract.PlaceEntry.COLUMN_LAT,
+                        RecappContract.PlaceEntry.TABLE_NAME+"."+RecappContract.PlaceEntry.COLUMN_LOG,
+                        RecappContract.ReminderEntry.TABLE_NAME+"."+ RecappContract.ReminderEntry._ID,
+                        RecappContract.ReminderEntry.TABLE_NAME+"."+ RecappContract.ReminderEntry.COLUMN_NAME,
+                        RecappContract.ReminderEntry.TABLE_NAME+"."+ RecappContract.ReminderEntry.COLUMN_DESCRIPTION,
+                        RecappContract.ReminderEntry.TABLE_NAME+"."+ RecappContract.ReminderEntry.COLUMN_NOTIFICATION,
+                        RecappContract.ReminderEntry.TABLE_NAME+"."+ RecappContract.ReminderEntry.COLUMN_END_DATE,
+                        RecappContract.ReminderEntry.TABLE_NAME+"."+ RecappContract.ReminderEntry.COLUMN_PLACE_KEY},
                 null,
                 null,
                 sortOrder

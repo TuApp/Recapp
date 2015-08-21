@@ -12,20 +12,29 @@ import android.widget.TextView;
 
 import com.unal.tuapp.recapp.data.Reminder;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created by andresgutierrez on 8/9/15.
  */
 public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<Reminder> reminders;
+    public static OnItemClickListener mOnItemClickListener;
+    private static List<Reminder> reminders;
     private Cursor reminderCursor;
+
+    public interface OnItemClickListener{
+        void onItemClick(long reminderId);
+    }
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+        mOnItemClickListener = onItemClickListener;
+    }
 
     public RecycleRemindersAdapter(List<Reminder> reminders){
         this.reminders = reminders;
     }
 
-    public static class RemindersViewHolder extends RecyclerView.ViewHolder{
+    public static class RemindersViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private RelativeLayout layoutReminder;
         private TextView nameReminder;
         private TextView descriptionReminder;
@@ -34,10 +43,12 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
         private ImageView imagePlace;
         private TextView namePlace;
         private TextView addressPlace;
+        private ImageView deleteReminder;
 
         public RemindersViewHolder(View itemView){
             super(itemView);
             layoutReminder = (RelativeLayout)itemView.findViewById(R.id.layout_reminder);
+            deleteReminder = (ImageView) itemView.findViewById(R.id.delete_reminder);
             nameReminder = (TextView) layoutReminder.findViewById(R.id.name_reminder);
             descriptionReminder = (TextView) layoutReminder.findViewById(R.id.description_reminder);
             dateReminder = (TextView) layoutReminder.findViewById(R.id.date_reminder);
@@ -45,6 +56,15 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
             imagePlace = (ImageView) layoutPlace.findViewById(R.id.image_place);
             namePlace = (TextView) layoutPlace.findViewById(R.id.name_place);
             addressPlace = (TextView) layoutPlace.findViewById(R.id.address_place);
+            deleteReminder.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            if(mOnItemClickListener!=null){
+                long id = reminders.get(getAdapterPosition()).getId();
+                mOnItemClickListener.onItemClick(id);
+            }
         }
     }
     @Override
@@ -65,12 +85,16 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
         Reminder reminder = reminders.get(position);
         remindersViewHolder.nameReminder.setText(reminder.getName());
         remindersViewHolder.descriptionReminder.setText(reminder.getDescription());
-        remindersViewHolder.dateReminder.setText(""+Utility.getDate(reminder.getEndDate()));
+        remindersViewHolder.dateReminder.setText("" + Utility.getDate(reminder.getEndDate()));
         remindersViewHolder.imagePlace.setImageBitmap(BitmapFactory.decodeByteArray(
-                reminder.getPlace().getImageFavorite(),0,reminder.getPlace().getImageFavorite().length
+                reminder.getPlace().getImageFavorite(), 0, reminder.getPlace().getImageFavorite().length
         ));
         remindersViewHolder.namePlace.setText(reminder.getPlace().getName());
         remindersViewHolder.addressPlace.setText(reminder.getPlace().getAddress());
+        Date now = new Date();
+        if(reminder.getEndDate()<now.getTime()){
+            remindersViewHolder.deleteReminder.setVisibility(View.VISIBLE);
+        }
 
     }
     public void swapDate(List<Reminder> reminders){

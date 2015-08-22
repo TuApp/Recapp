@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -286,7 +287,6 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 Intent intent = new Intent(NavigationDrawer.this, Detail.class);
                 intent.putExtra("id", position);
                 intent.putExtra("user", user);
-
                 startActivity(intent);
             }
         });

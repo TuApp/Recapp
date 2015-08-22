@@ -20,7 +20,7 @@
             android:id="@+id/card_image_favorite"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop" />
 
         <TextView android:id="@+id/place_item_favorite"
             android:layout_toRightOf="@+id/card_image_favorite"

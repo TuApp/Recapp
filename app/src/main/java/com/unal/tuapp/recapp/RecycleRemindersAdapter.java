@@ -1,12 +1,20 @@
 package com.unal.tuapp.recapp;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.LayerDrawable;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -32,9 +40,13 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public RecycleRemindersAdapter(List<Reminder> reminders){
         this.reminders = reminders;
+
     }
 
-    public static class RemindersViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public static class RemindersViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
+            View.OnLongClickListener{
+        private CardView front;
+        private CardView back;
         private RelativeLayout layoutReminder;
         private TextView nameReminder;
         private TextView descriptionReminder;
@@ -44,19 +56,33 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
         private TextView namePlace;
         private TextView addressPlace;
         private ImageView deleteReminder;
+        private ImageView deleteReminderPlace;
+        private RatingBar placeRating;
 
         public RemindersViewHolder(View itemView){
             super(itemView);
-            layoutReminder = (RelativeLayout)itemView.findViewById(R.id.layout_reminder);
-            deleteReminder = (ImageView) itemView.findViewById(R.id.delete_reminder);
+            front = (CardView) itemView.findViewById(R.id.reminder_layout);
+            back = (CardView) itemView.findViewById(R.id.reminder_place_layout);
+            //Layout for the front of the card
+            layoutReminder = (RelativeLayout)front.findViewById(R.id.layout_reminder);
+            deleteReminder = (ImageView) layoutReminder.findViewById(R.id.delete_reminder);
             nameReminder = (TextView) layoutReminder.findViewById(R.id.name_reminder);
             descriptionReminder = (TextView) layoutReminder.findViewById(R.id.description_reminder);
             dateReminder = (TextView) layoutReminder.findViewById(R.id.date_reminder);
-            layoutPlace = (RelativeLayout) layoutReminder.findViewById(R.id.layout_reminder_place);
+
+            //Layout for the back of the card
+            layoutPlace = (RelativeLayout) back.findViewById(R.id.layout_place);
             imagePlace = (ImageView) layoutPlace.findViewById(R.id.image_place);
             namePlace = (TextView) layoutPlace.findViewById(R.id.name_place);
             addressPlace = (TextView) layoutPlace.findViewById(R.id.address_place);
+            deleteReminderPlace = (ImageView) layoutPlace.findViewById(R.id.delete_reminder_back);
+            placeRating = (RatingBar) layoutPlace.findViewById(R.id.rating_place);
+
             deleteReminder.setOnClickListener(this);
+            deleteReminderPlace.setOnClickListener(this);
+            front.setOnLongClickListener(this);
+            back.setOnLongClickListener(this);
+
         }
 
         @Override
@@ -65,6 +91,18 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
                 long id = reminders.get(getAdapterPosition()).getId();
                 mOnItemClickListener.onItemClick(id);
             }
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            if(view.getId()==R.id.reminder_layout){//Front
+                front.setVisibility(View.GONE);
+                back.setVisibility(View.VISIBLE);
+            }else{
+                front.setVisibility(View.VISIBLE);
+                back.setVisibility(View.GONE);
+            }
+            return true;
         }
     }
     @Override
@@ -91,9 +129,15 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
         ));
         remindersViewHolder.namePlace.setText(reminder.getPlace().getName());
         remindersViewHolder.addressPlace.setText(reminder.getPlace().getAddress());
+        remindersViewHolder.placeRating.setRating((float) reminder.getPlace().getRating());
+        LayerDrawable layerDrawable =(LayerDrawable) remindersViewHolder.placeRating.getProgressDrawable();
+        layerDrawable.getDrawable(0).setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_ATOP);
+        layerDrawable.getDrawable(1).setColorFilter(Color.LTGRAY,PorterDuff.Mode.SRC_ATOP);
+        layerDrawable.getDrawable(2).setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
         Date now = new Date();
         if(reminder.getEndDate()<now.getTime()){
             remindersViewHolder.deleteReminder.setVisibility(View.VISIBLE);
+            remindersViewHolder.deleteReminderPlace.setVisibility(View.VISIBLE);
         }
 
     }

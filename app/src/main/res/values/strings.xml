@@ -16,8 +16,10 @@
     <string name="map">Map</string>
     <string name="events">Events</string>
     <string name="tutorial">Tutorial</string>
-    <string name="filter">Filter</string>
+    <string name="category">Category</string>
+    <string name="sub_category">Sub category</string>
     <string name="add">Add</string>
+    <string name="addCategory">Add category</string>
     <string name="title_activity_detail">Detail</string>
     <string name="hello_world">Hello world!</string>
     <string name="comments">Comments</string>

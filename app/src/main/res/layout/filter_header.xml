@@ -1,36 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="150dp"
-    android:background="@color/header_nav_filter">
-
-    <android.support.design.widget.TextInputLayout  android:id="@+id/filter"
+    android:layout_height="150dp">
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp">
+        android:layout_height="match_parent"
+        android:background="@color/header_nav_filter">
 
-        <EditText
-            android:id="@+id/filter_text"
+        <android.support.design.widget.TextInputLayout  android:id="@+id/filter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/filter"
-            android:textSize="20dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp">
+
+            <MultiAutoCompleteTextView
+                android:id="@+id/filter_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/category"
+                android:ems="15"
+                android:paddingLeft="8dp"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:id="@+id/add_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_below="@+id/filter"
+            android:text="@string/addCategory"
+            android:textColor="@android:color/black"/>
+
+        <AutoCompleteTextView
+            android:id="@+id/filter_subcategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/sub_category"
+            android:layout_below="@+id/add_category"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
+            android:paddingLeft="8dp"/>
+
+        <Button android:id="@+id/add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/filter_subcategory"
+            android:text="@string/add"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:textColor="@android:color/black"
-            android:singleLine="true"
-            android:padding="16dp"/>
-    </android.support.design.widget.TextInputLayout>
+            android:visibility="gone"/>
 
-    <Button android:id="@+id/add"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/filter"
-        android:text="@string/add"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:textColor="@android:color/black"
-        android:inputType="text" />
+    </RelativeLayout>
 
-</RelativeLayout>
+
+</android.support.v4.widget.NestedScrollView>

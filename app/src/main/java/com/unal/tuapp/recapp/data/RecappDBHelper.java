@@ -92,10 +92,11 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 TutorialEntry.TABLE_NAME + " ( " + TutorialEntry._ID + " ) );";
         final String CREATE_CATEGORY_TABLE = "CREATE TABLE " + CategoryEntry.TABLE_NAME + " ( " +
                 CategoryEntry._ID + "  INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                CategoryEntry.COLUMN_NAME + " TEXT NOT NULL );";
+                CategoryEntry.COLUMN_NAME + " TEXT UNIQUE NOT NULL, "+
+                CategoryEntry.COLUMN_IMAGE + " BLOB NOT NULL );";
         final String CREATE_SUB_CATEGORY_TABLE = "CREATE TABLE " + SubCategoryEntry.TABLE_NAME + "(" +
                 SubCategoryEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                SubCategoryEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                SubCategoryEntry.COLUMN_NAME + " TEXT UNIQUE NOT NULL, " +
                 SubCategoryEntry.COLUMN_CATEGORY_KEY + " INTEGER, "+
                 SubCategoryEntry.COLUMN_PLACE_KEY + " INTEGER, "+
                 SubCategoryEntry.COLUMN_TUTORIAL_KEY + " INTEGER, "+

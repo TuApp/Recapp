@@ -10,40 +10,45 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.util.Rfc822Tokenizer;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.unal.tuapp.recapp.data.Category;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.data.SubCategory;
 import com.unal.tuapp.recapp.data.User;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -63,11 +68,19 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private View root;
     private ActionBarDrawerToggle drawerToggle;
     private Button add;
+    private Button addCategory;
     private final String TAG = NavigationDrawer.class.getSimpleName();
     private final String FILE = "filters.txt";
     private static final int USER = 10;
+    private static final int CATEGORY = 199;
+    private static final int SUB_CATEGORY = 299;
     private Cursor userCursor;
     private MapFragment mapFragment;
+    private MultiAutoCompleteTextView filterCategory;
+    private LimitArrayAdapterCategory adapter;
+    private LimitArrayAdapterSubCategory adapterSubCategory;
+    private AutoCompleteTextView filterSubcategory;
+    private String [] subCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +108,11 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             }else{
                 getSupportLoaderManager().restartLoader(USER,null,this);
             }
+            if(getSupportLoaderManager().getLoader(CATEGORY)==null){
+                getSupportLoaderManager().initLoader(CATEGORY,null,this);
+            }else{
+                getSupportLoaderManager().restartLoader(CATEGORY,null,this);
+            }
             email.setText(emailUser);
             de.hdodenhof.circleimageview.CircleImageView imageView;
             imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
@@ -103,16 +121,57 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             new LoadProfileImage(root, imageView).execute(personPhotoUrl, account.getAccountName(mGooglePlus.mGoogleApiClient));
 
         }
+        filterCategory = (MultiAutoCompleteTextView) findViewById(R.id.filter_text);
+        List<Category> categories  = new ArrayList<>();
+        filterCategory.setTokenizer(new Rfc822Tokenizer());
+        adapter = new LimitArrayAdapterCategory(this,
+              categories);
+
+        filterCategory.setThreshold(1);
+        filterCategory.setAdapter(adapter);
+
+        List<SubCategory> subCategories = new ArrayList<>();
+        filterSubcategory = (AutoCompleteTextView) findViewById(R.id.filter_subcategory);
+        adapterSubCategory = new LimitArrayAdapterSubCategory(this,subCategories);
+        filterSubcategory.setThreshold(1);
+        filterSubcategory.setAdapter(adapterSubCategory);
+
+
+        addCategory = (Button) root.findViewById(R.id.add_category);
+        addCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String [] text = filterCategory.getText().toString().split(", ");
+                if(!Arrays.deepEquals(text,subCategory)){
+                    subCategory = text;
+                    if(getSupportLoaderManager().getLoader(SUB_CATEGORY)==null){
+                        getSupportLoaderManager().initLoader(SUB_CATEGORY,null,NavigationDrawer.this);
+                    }else{
+                        getSupportLoaderManager().restartLoader(SUB_CATEGORY,null,NavigationDrawer.this);
+                    }
+                }
+            }
+        });
         add = (Button) root.findViewById(R.id.add);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText editText = (EditText) root.findViewById(R.id.filter_text);
-                if(!editText.getText().toString().trim().equals("")){
+                //EditText editText = (EditText) root.findViewById(R.id.filter_text);
+                if(!filterSubcategory.getText().toString().trim().equals("")){
                     Menu menu = navFilterDrawer.getMenu();
-                    menu.add(0,totalFilter,Menu.NONE,editText.getText().toString());
-                    totalFilter++;
-                    editText.setText("");
+                    String menuFilter = filterSubcategory.getText().toString();
+                    boolean isAdded = false;
+                    for(int i=0; i<menu.size(); i++){
+                        if(menuFilter.toLowerCase().equals(menu.getItem(i).toString().toLowerCase())){
+                            isAdded = true;
+                            break;
+                        }
+                    }
+                    if(!isAdded) {
+                        menu.add(0, totalFilter, Menu.NONE, menuFilter).setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+                        totalFilter++;
+                    }
+                    filterSubcategory.setText("");
 
 
                 }
@@ -336,7 +395,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             Menu menu = navFilterDrawer.getMenu();
             menu.clear();
             while((text=input.readLine())!=null){
-                menu.add(0,totalFilter,Menu.NONE,text);
+                menu.add(0,totalFilter,Menu.NONE,text).setIcon(android.R.drawable.ic_menu_close_clear_cancel);
                 totalFilter++;
 
             }
@@ -350,6 +409,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     }
     @Override
     public void onBackPressed() {
+
     }
 
     public void addUser(String email,String name, String lastname){
@@ -375,34 +435,93 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(
-                this,
-                RecappContract.UserEntry.buildUserEmail(emailUser),
-                null,
-                null,
-                null,
-                null
-        );
+        switch(id){
+            case USER:
+                return new CursorLoader(
+                        this,
+                        RecappContract.UserEntry.buildUserEmail(emailUser),
+                        null,
+                        null,
+                        null,
+                        null
+                );
+            case CATEGORY:
+                return new CursorLoader(
+                        this,
+                        RecappContract.CategoryEntry.CONTENT_URI,
+                        null,
+                        null,
+                        null,
+                        null
+                );
+            case SUB_CATEGORY:
+                String selection = buildSelection(subCategory);
+                return new CursorLoader(
+                        this,
+                        RecappContract.SubCategoryEntry.buildSubCategoryCategoryUri(),
+                        new String[]{RecappContract.SubCategoryEntry.TABLE_NAME+"."+ RecappContract.SubCategoryEntry._ID,
+                                RecappContract.SubCategoryEntry.TABLE_NAME+"."+ RecappContract.SubCategoryEntry.COLUMN_NAME,
+                                RecappContract.CategoryEntry.TABLE_NAME+"."+ RecappContract.CategoryEntry.COLUMN_IMAGE},
+                        selection,
+                        subCategory,
+                        null
+
+                );
+
+        }
+        return null;
+
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(data.moveToFirst()){
-            userCursor = data;
-            user = new User();
-            user.setEmail(data.getString(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_EMAIL)));
-            user.setId(data.getLong(data.getColumnIndexOrThrow(RecappContract.UserEntry._ID)));
-            user.setProfileImage(data.getBlob(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_IMAGE)));
-            user.setName(data.getString(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_NAME)));
-            user.setLastName(data.getString(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_LASTNAME)));
-            if(user!=null) {
-                mapFragment.setUser(user);
-            }
+        switch (loader.getId()){
+            case USER:
+                if(data.moveToFirst()){
+                    userCursor = data;
+                    user = new User();
+                    user.setEmail(data.getString(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_EMAIL)));
+                    user.setId(data.getLong(data.getColumnIndexOrThrow(RecappContract.UserEntry._ID)));
+                    user.setProfileImage(data.getBlob(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_IMAGE)));
+                    user.setName(data.getString(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_NAME)));
+                    user.setLastName(data.getString(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_LASTNAME)));
+                    if(user!=null) {
+                        mapFragment.setUser(user);
+                    }
+                }
+                break;
+            case CATEGORY:
+                List<Category> categories = Category.allCategories(data);
+                adapter.setData(categories);
+                break;
+            case SUB_CATEGORY:
+                List<SubCategory> subCategories = SubCategory.allSubCategories(data);
+                adapterSubCategory.setData(subCategories);
+                if(subCategories.size()>0){
+                    add.setVisibility(View.VISIBLE);
+                }else{
+                    add.setVisibility(View.GONE);
+                }
+                break;
+
+
         }
+
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         userCursor.close();
+    }
+    public String buildSelection(String [] subCategory){
+        String where = null;
+        if(subCategory!=null && subCategory.length>0){
+            where = RecappContract.CategoryEntry.TABLE_NAME+"."+ RecappContract.SubCategoryEntry.COLUMN_NAME + " IN ( ? ";
+            for (int i =1; i<subCategory.length; i++){
+                where+=",? ";
+            }
+            where += " )";
+        }
+        return where;
     }
 }

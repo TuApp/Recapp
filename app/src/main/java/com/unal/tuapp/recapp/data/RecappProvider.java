@@ -45,9 +45,10 @@ public class RecappProvider extends ContentProvider {
     static final int TUTORIAL_IMAGE_WITH_ID = 820;
     static final int SUB_CATEGORY = 900;
     static final int SUB_CATEGORY_WITH_CATEGORY = 910;
-    static final int SUB_CATEGORY_WITH_TUTORIAL = 920;
-    static final int SUB_CATEGORY_WITH_PLACE = 930;
-    static final int SUB_CATEGORY_WITH_ID = 940;
+    static final int SUB_CATEGORY_WITH_CATEGORY_ID = 920;
+    static final int SUB_CATEGORY_WITH_TUTORIAL = 930;
+    static final int SUB_CATEGORY_WITH_PLACE = 940;
+    static final int SUB_CATEGORY_WITH_ID = 950;
     static final int USER_BY_PLACE = 1000;
     static final int USER_BY_PLACE_USER = 1010;
     static final int USER_BY_PLACE_PLACE = 1020;
@@ -198,7 +199,8 @@ public class RecappProvider extends ContentProvider {
 
         //Mathcers for sub category
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY,SUB_CATEGORY);
-        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_CATEGORY+"/#",SUB_CATEGORY_WITH_CATEGORY);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_CATEGORY,SUB_CATEGORY_WITH_CATEGORY);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_CATEGORY+"/#",SUB_CATEGORY_WITH_CATEGORY_ID);
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_TUTORIAL+"/#",SUB_CATEGORY_WITH_TUTORIAL);
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_PLACE+"/#",SUB_CATEGORY_WITH_PLACE);
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/#",SUB_CATEGORY_WITH_ID);
@@ -273,6 +275,8 @@ public class RecappProvider extends ContentProvider {
             case SUB_CATEGORY:
                 return SubCategoryEntry.CONTENT_TYPE;
             case SUB_CATEGORY_WITH_CATEGORY:
+                return SubCategoryEntry.CONTENT_TYPE;
+            case SUB_CATEGORY_WITH_CATEGORY_ID:
                 return SubCategoryEntry.CONTENT_TYPE;
             case SUB_CATEGORY_WITH_TUTORIAL:
                 return SubCategoryEntry.CONTENT_TYPE;
@@ -612,6 +616,17 @@ public class RecappProvider extends ContentProvider {
                 );
                 break;
             case SUB_CATEGORY_WITH_CATEGORY:
+                retCursor = subCategoryCategory.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case SUB_CATEGORY_WITH_CATEGORY_ID:
                 categoryId = SubCategoryEntry.getCategoryFromUri(uri);
                 selection = CategoryEntry._ID + " = ? ";
                 retCursor = subCategoryCategory.query(

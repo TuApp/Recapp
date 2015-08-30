@@ -283,6 +283,7 @@ public class RecappContract {
         public static final String TABLE_NAME = "Category";
 
         public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_IMAGE = "image_category";
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_CATEGORY).build();
 
@@ -317,6 +318,11 @@ public class RecappContract {
 
         public static Uri buildSubCategoryUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildSubCategoryCategoryUri(){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_CATEGORY).build();
         }
 
         public static Uri buildSubCategoryCategoryUri(long category) {

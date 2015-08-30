@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.data.SubCategory;
 
 import java.io.ByteArrayOutputStream;
 
@@ -123,9 +124,9 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
         ContentValues values3 = new ContentValues();
         ContentValues values4 = new ContentValues();
 
-        values.put(RecappContract.PlaceEntry.COLUMN_NAME,"algo");
+        values.put(RecappContract.PlaceEntry.COLUMN_NAME, "algo");
         values.put(RecappContract.PlaceEntry.COLUMN_LAT, 2.34234);
-        values.put(RecappContract.PlaceEntry.COLUMN_LOG,1.3242134);
+        values.put(RecappContract.PlaceEntry.COLUMN_LOG, 1.3242134);
         values.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, "ALGO 1");
         values.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "alguna descripcionDSFS");
 
@@ -157,7 +158,7 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
 
         values3.put(RecappContract.PlaceEntry.COLUMN_NAME, "algo3");
         values3.put(RecappContract.PlaceEntry.COLUMN_LAT, 2.14234);
-        values3.put(RecappContract.PlaceEntry.COLUMN_LOG,1.9242134);
+        values3.put(RecappContract.PlaceEntry.COLUMN_LOG, 1.9242134);
         values3.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, "nueva direcion");
         values3.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "alguna descripcioDSFn");
 
@@ -193,6 +194,56 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
                 valuesArray
         );
 
+        ContentValues category = new ContentValues();
+        category.put(RecappContract.CategoryEntry.COLUMN_NAME, "pilas");
+        category.put(RecappContract.CategoryEntry.COLUMN_IMAGE, stream3.toByteArray());
+
+        ContentValues category1 = new ContentValues();
+        category1.put(RecappContract.CategoryEntry.COLUMN_NAME, "llantas");
+        category1.put(RecappContract.CategoryEntry.COLUMN_IMAGE, stream4.toByteArray());
+
+        Vector<ContentValues> categories = new Vector<>();
+        categories.add(category);
+        categories.add(category1);
+        ContentValues categoryArray [] = new ContentValues[2];
+        categories.toArray(categoryArray);
+        getActivity().getContentResolver().bulkInsert(
+                RecappContract.CategoryEntry.CONTENT_URI,
+                categoryArray
+        );
+
+        ContentValues subCategory = new ContentValues();
+        subCategory.put(RecappContract.SubCategoryEntry.COLUMN_NAME, "pilas");
+        subCategory.put(RecappContract.SubCategoryEntry.COLUMN_CATEGORY_KEY, 1);
+        subCategory.put(RecappContract.SubCategoryEntry.COLUMN_TUTORIAL_KEY, 0);
+        subCategory.put(RecappContract.SubCategoryEntry.COLUMN_PLACE_KEY, 2);
+
+        ContentValues subCategory1 = new ContentValues();
+        subCategory1.put(RecappContract.SubCategoryEntry.COLUMN_NAME, "aa");
+        subCategory1.put(RecappContract.SubCategoryEntry.COLUMN_CATEGORY_KEY, 1);
+        subCategory1.put(RecappContract.SubCategoryEntry.COLUMN_TUTORIAL_KEY, 0);
+        subCategory1.put(RecappContract.SubCategoryEntry.COLUMN_PLACE_KEY, 3);
+
+
+        ContentValues subCategory2 = new ContentValues();
+        subCategory2.put(RecappContract.SubCategoryEntry.COLUMN_NAME, "llantas");
+        subCategory2.put(RecappContract.SubCategoryEntry.COLUMN_CATEGORY_KEY, 2);
+        subCategory2.put(RecappContract.SubCategoryEntry.COLUMN_TUTORIAL_KEY, 0);
+        subCategory2.put(RecappContract.SubCategoryEntry.COLUMN_PLACE_KEY, 2);
+
+        Vector<ContentValues> subCategories = new Vector<>();
+        subCategories.add(subCategory);
+        subCategories.add(subCategory1);
+        subCategories.add(subCategory2);
+        ContentValues subCategoryArray [] = new ContentValues[3];
+
+        subCategories.toArray(subCategoryArray);
+
+
+        getActivity().getContentResolver().bulkInsert(
+                RecappContract.SubCategoryEntry.CONTENT_URI,
+                subCategoryArray
+        );
         ContentValues image = new ContentValues();
         ByteArrayOutputStream stream5 =  new ByteArrayOutputStream();
         BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.background_material).

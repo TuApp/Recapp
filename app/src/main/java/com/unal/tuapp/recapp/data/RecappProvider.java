@@ -48,7 +48,8 @@ public class RecappProvider extends ContentProvider {
     static final int SUB_CATEGORY_WITH_CATEGORY_ID = 920;
     static final int SUB_CATEGORY_WITH_TUTORIAL = 930;
     static final int SUB_CATEGORY_WITH_PLACE = 940;
-    static final int SUB_CATEGORY_WITH_ID = 950;
+    static final int SUB_CATEGORY_WITH_PLACE_ID = 950;
+    static final int SUB_CATEGORY_WITH_ID = 960;
     static final int USER_BY_PLACE = 1000;
     static final int USER_BY_PLACE_USER = 1010;
     static final int USER_BY_PLACE_PLACE = 1020;
@@ -202,7 +203,8 @@ public class RecappProvider extends ContentProvider {
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_CATEGORY,SUB_CATEGORY_WITH_CATEGORY);
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_CATEGORY+"/#",SUB_CATEGORY_WITH_CATEGORY_ID);
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_TUTORIAL+"/#",SUB_CATEGORY_WITH_TUTORIAL);
-        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_PLACE+"/#",SUB_CATEGORY_WITH_PLACE);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_PLACE,SUB_CATEGORY_WITH_PLACE);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_PLACE+"/#",SUB_CATEGORY_WITH_PLACE_ID);
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/#",SUB_CATEGORY_WITH_ID);
 
         //Matchers for user by place
@@ -281,6 +283,8 @@ public class RecappProvider extends ContentProvider {
             case SUB_CATEGORY_WITH_TUTORIAL:
                 return SubCategoryEntry.CONTENT_TYPE;
             case SUB_CATEGORY_WITH_PLACE:
+                return SubCategoryEntry.CONTENT_TYPE;
+            case SUB_CATEGORY_WITH_PLACE_ID:
                 return SubCategoryEntry.CONTENT_TYPE;
             case SUB_CATEGORY_WITH_ID:
                 return SubCategoryEntry.CONTENT_ITEM_TYPE;
@@ -653,6 +657,19 @@ public class RecappProvider extends ContentProvider {
                 );
                 break;
             case SUB_CATEGORY_WITH_PLACE:
+                subCategoryPlace.setDistinct(true);
+                retCursor = subCategoryPlace.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case SUB_CATEGORY_WITH_PLACE_ID:
+                subCategoryPlace.setDistinct(false);
                 placeId = SubCategoryEntry.getPlaceFromUri(uri);
                 selection = PlaceEntry._ID + " = ? ";
                 retCursor = subCategoryPlace.query(

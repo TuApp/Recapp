@@ -337,6 +337,10 @@ public class RecappContract {
                     .appendPath("" + tutorial).build();
         }
 
+        public static Uri buildSubCategoryPlaceUri() {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_PLACE).build();
+        }
         public static Uri buildSubCategoryPlaceUri(long place) {
             return CONTENT_URI.buildUpon()
                     .appendPath(PATH_PLACE)

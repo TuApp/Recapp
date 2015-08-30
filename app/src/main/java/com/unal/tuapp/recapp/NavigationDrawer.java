@@ -13,14 +13,12 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.util.Rfc822Tokenizer;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -74,13 +72,17 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private static final int USER = 10;
     private static final int CATEGORY = 199;
     private static final int SUB_CATEGORY = 299;
+    private static final int PLACE = 345;
+    private static final int PLACE_FILTER = 467;
     private Cursor userCursor;
     private MapFragment mapFragment;
+    private  PlacesFragment placesFragment;
     private MultiAutoCompleteTextView filterCategory;
     private LimitArrayAdapterCategory adapter;
     private LimitArrayAdapterSubCategory adapterSubCategory;
     private AutoCompleteTextView filterSubcategory;
     private String [] subCategory;
+    private List<String> filtersConstraint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +91,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         setContentView(root);
         totalFilter = 0;
         mGooglePlus = GooglePlus.getInstance(this, null, null);
+        filtersConstraint = new ArrayList<>();
 
         if(mGooglePlus.mGoogleApiClient.isConnected()){
             Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGooglePlus.mGoogleApiClient);
@@ -112,6 +115,16 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 getSupportLoaderManager().initLoader(CATEGORY,null,this);
             }else{
                 getSupportLoaderManager().restartLoader(CATEGORY,null,this);
+            }
+            if(getSupportLoaderManager().getLoader(PLACE)==null){
+                getSupportLoaderManager().initLoader(PLACE,null,this);
+            }else{
+                getSupportLoaderManager().restartLoader(PLACE,null,this);
+            }
+            if(getSupportLoaderManager().getLoader(PLACE_FILTER)==null){
+                getSupportLoaderManager().initLoader(PLACE_FILTER,null,this);
+            }else{
+                getSupportLoaderManager().restartLoader(PLACE_FILTER,null,this);
             }
             email.setText(emailUser);
             de.hdodenhof.circleimageview.CircleImageView imageView;
@@ -168,8 +181,16 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         }
                     }
                     if(!isAdded) {
+                        filtersConstraint.add(menuFilter);
                         menu.add(0, totalFilter, Menu.NONE, menuFilter).setIcon(android.R.drawable.ic_menu_close_clear_cancel);
                         totalFilter++;
+                        if(getSupportLoaderManager().getLoader(PLACE_FILTER)==null){
+                            getSupportLoaderManager().initLoader(PLACE_FILTER,null,NavigationDrawer.this);
+                        }else{
+                            getSupportLoaderManager().restartLoader(PLACE_FILTER,null,NavigationDrawer.this);
+                        }
+                        //((PlacesFragment)(((ViewPagerAdapter) viewPager.getAdapter()).getItem(viewPager.getCurrentItem()))).setFilters(filtersConstraint);
+
                     }
                     filterSubcategory.setText("");
 
@@ -259,6 +280,22 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 navFilterDrawer.getMenu().removeItem(menuItem.getItemId());
+                filtersConstraint.remove(menuItem.toString());
+                totalFilter--;
+                if(filtersConstraint.size()==0){
+                    if(getSupportLoaderManager().getLoader(PLACE)==null){
+                        getSupportLoaderManager().initLoader(PLACE,null,NavigationDrawer.this);
+                    }else{
+                        getSupportLoaderManager().restartLoader(PLACE,null,NavigationDrawer.this);
+                    }
+                }else{
+                    if(getSupportLoaderManager().getLoader(PLACE_FILTER)==null){
+                        getSupportLoaderManager().initLoader(PLACE_FILTER,null,NavigationDrawer.this);
+                    }else{
+                        getSupportLoaderManager().restartLoader(PLACE_FILTER,null,NavigationDrawer.this);
+                    }
+                }
+                //((PlacesFragment)(((ViewPagerAdapter) viewPager.getAdapter()).getItem(viewPager.getCurrentItem()))).setFilters(filtersConstraint);
                 return false;
             }
         });
@@ -337,7 +374,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.tutorial)));
 
         final ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        PlacesFragment placesFragment = new PlacesFragment();
+        placesFragment = new PlacesFragment();
         placesFragment.setOnPlaceListener(new PlacesFragment.onPlaceListener() {
             @Override
             public void onPlace(View view, long position) {
@@ -394,12 +431,23 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             String text;
             Menu menu = navFilterDrawer.getMenu();
             menu.clear();
+            filtersConstraint = new ArrayList<>();
             while((text=input.readLine())!=null){
                 menu.add(0,totalFilter,Menu.NONE,text).setIcon(android.R.drawable.ic_menu_close_clear_cancel);
                 totalFilter++;
 
             }
             input.close();
+            for(int i =0; i<menu.size(); i++){
+                filtersConstraint.add(menu.getItem(i).toString());
+            }
+            if(filtersConstraint.size()!=0){
+                if(getSupportLoaderManager().getLoader(PLACE_FILTER)==null){
+                    getSupportLoaderManager().initLoader(PLACE_FILTER,null,this);
+                }else{
+                    getSupportLoaderManager().restartLoader(PLACE_FILTER,null,this);
+                }
+            }
             deleteFile(FILE);
         }catch (Exception e){}
 
@@ -435,6 +483,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String sortOrder = RecappContract.PlaceEntry.COLUMN_RATING + " DESC ";
         switch(id){
             case USER:
                 return new CursorLoader(
@@ -467,6 +516,38 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         null
 
                 );
+            case PLACE:
+                return new CursorLoader(
+                        this,
+                        RecappContract.PlaceEntry.CONTENT_URI,
+                        null,
+                        null,
+                        null,
+                        sortOrder
+                );
+            case PLACE_FILTER:
+                String[] selectionArgs=null;
+                selection=null;
+                if(filtersConstraint.size()>0) {
+                    selectionArgs = new String[filtersConstraint.size()];
+                    filtersConstraint.toArray(selectionArgs);
+                    selection = buildSelectionPlaceFilters(selectionArgs);
+                }
+                return new CursorLoader(
+                        this,
+                        RecappContract.SubCategoryEntry.buildSubCategoryPlaceUri(),
+                        new String[]{RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry._ID,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_NAME,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_LOG,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_LAT,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_ADDRESS,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_DESCRIPTION,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_RATING,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE},
+                        selection,
+                        selectionArgs,
+                        sortOrder
+                );
 
         }
         return null;
@@ -475,6 +556,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        List<Place> places;
         switch (loader.getId()){
             case USER:
                 if(data.moveToFirst()){
@@ -497,10 +579,25 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             case SUB_CATEGORY:
                 List<SubCategory> subCategories = SubCategory.allSubCategories(data);
                 adapterSubCategory.setData(subCategories);
+
                 if(subCategories.size()>0){
                     add.setVisibility(View.VISIBLE);
                 }else{
                     add.setVisibility(View.GONE);
+                }
+                break;
+            case PLACE:
+                if(filtersConstraint.size()==0) {
+                    places = Place.allPlaces(data);
+                    placesFragment.setData(places, data);
+                    mapFragment.setDate(places,data);
+                }
+                break;
+            case PLACE_FILTER:
+                if(filtersConstraint.size()>0) {
+                    places = Place.allPlaces(data);
+                    placesFragment.setData(places, data);
+                    mapFragment.setDate(places,data);
                 }
                 break;
 
@@ -512,12 +609,25 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         userCursor.close();
+        placesFragment.closeData();
+        mapFragment.closeData();
     }
-    public String buildSelection(String [] subCategory){
+    public String buildSelection(String [] category){
         String where = null;
-        if(subCategory!=null && subCategory.length>0){
-            where = RecappContract.CategoryEntry.TABLE_NAME+"."+ RecappContract.SubCategoryEntry.COLUMN_NAME + " IN ( ? ";
-            for (int i =1; i<subCategory.length; i++){
+        if(category!=null && category.length>0){
+            where = RecappContract.CategoryEntry.TABLE_NAME+"."+ RecappContract.CategoryEntry.COLUMN_NAME + " IN ( ? ";
+            for (int i =1; i<category.length; i++){
+                where+=",? ";
+            }
+            where += " )";
+        }
+        return where;
+    }
+    public String buildSelectionPlaceFilters(String[] filters){
+        String where = null;
+        if(filters!=null && filters.length>0){
+            where = RecappContract.SubCategoryEntry.TABLE_NAME+"."+ RecappContract.SubCategoryEntry.COLUMN_NAME + " IN ( ? ";
+            for (int i =1; i<filters.length; i++){
                 where+=",? ";
             }
             where += " )";

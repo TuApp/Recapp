@@ -98,7 +98,9 @@ public class RecyclePlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         placeCursor = cursor;
     }
     public void closeCursor(){
-        placeCursor.close();
+        if(placeCursor!=null) {
+            placeCursor.close();
+        }
         placeCursor = null;
     }
 

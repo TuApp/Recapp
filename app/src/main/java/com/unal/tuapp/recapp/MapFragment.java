@@ -58,7 +58,7 @@ import java.util.List;
  * Created by andresgutierrez on 7/13/15.
  */
 public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleApiClient.OnConnectionFailedListener,
-                        GoogleApiClient.ConnectionCallbacks,LocationListener,LoaderManager.LoaderCallbacks<Cursor>,
+                        GoogleApiClient.ConnectionCallbacks,LocationListener,
                         ClusterManager.OnClusterClickListener<Place>,
                         ClusterManager.OnClusterInfoWindowClickListener<Place>,
                         ClusterManager.OnClusterItemClickListener<Place>,
@@ -78,11 +78,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     private LocationRequest locationRequest;
     private User user;
     private BitmapDescriptor icon=null;
-    private int PLACE=100;
     private Cursor placeCursor;
     private ImageButton calculateDistance;
     private ImageButton myPositon;
-    private ClusterManager<Place> placeClusterManager;
+    private static ClusterManager<Place> placeClusterManager;
     private Cluster<Place> clickedCluster;
     private Place clickedPlace;
 
@@ -175,11 +174,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
 
 
         }
-        if(getLoaderManager().getLoader(PLACE)==null){
-            getLoaderManager().initLoader(PLACE,null,this);
-        }else{
-            getLoaderManager().restartLoader(PLACE,null,this);
-        }
+
 
         viewPager = (ViewPager)getActivity().findViewById(R.id.view_pager);
         /*
@@ -326,36 +321,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("user",user);
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(
-                getActivity(),
-                RecappContract.PlaceEntry.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        List<Place> allPlaces = Place.allPlaces(data);
-        placeCursor = data;
-        addPlaces(allPlaces);
-        placeClusterManager.cluster();
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        placeCursor.close();
+        outState.putParcelable("user", user);
     }
 
     public void addPlaces(List<Place> places){
+        placeClusterManager.clearItems();
         for (Place place:places) {
             placeClusterManager.addItem(place);
         }
@@ -423,6 +393,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     public void onClusterItemInfoWindowClick(Place place) {
         if(mOnMapListener!=null){
             mOnMapListener.onMap(place);
+        }
+    }
+    public void setDate(List<Place> places,Cursor cursor){
+        addPlaces(places);
+        placeCursor = cursor;
+        placeClusterManager.cluster();
+    }
+    public void closeData(){
+        if(placeCursor!=null){
+            placeCursor.close();
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.unal.tuapp.recapp;
 
+import android.app.Activity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.CursorLoader;
@@ -24,6 +25,7 @@ import com.unal.tuapp.recapp.data.SubCategory;
 import java.io.ByteArrayOutputStream;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
@@ -33,12 +35,13 @@ import jp.wasabeef.recyclerview.animators.adapters.SlideInRightAnimationAdapter;
 /**
  * Created by andresgutierrez on 7/13/15.
  */
-public class PlacesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
-    private RecyclerView recyclerView;
-    private RecyclePlaceAdapter recyclePlaceAdapter;
+public class PlacesFragment extends Fragment {
+    private static RecyclerView recyclerView;
+    private static RecyclePlaceAdapter recyclePlaceAdapter;
     private View root;
     public static onPlaceListener mOnPlaceListener;
-    public static final int PLACES_LOADER = 0;
+
+    public List<String> filters;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
@@ -47,12 +50,13 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
 
         //For now we can use this line to optimize the recycleview because we know that the size of the list won't change
         //recyclerView.setHasFixedSize(true);
-
+        filters = new ArrayList<>();
         addPlaces();
         List<Place> places = new ArrayList<>();
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayout);
         recyclePlaceAdapter = new RecyclePlaceAdapter(places);
+        Log.e("algo","new");
         recyclePlaceAdapter.setOnItemClickListener(new RecyclePlaceAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, long position) {
@@ -74,9 +78,6 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
-        //getLoaderManager().initLoader(PLACES_LOADER,null,this);
-        getLoaderManager().initLoader(PLACES_LOADER,null,this);
-
 
     }
     public interface onPlaceListener{
@@ -86,34 +87,6 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
 
     public void setOnPlaceListener(final onPlaceListener mOnPlaceListener){
         this.mOnPlaceListener= mOnPlaceListener;
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        String sortOrder = RecappContract.PlaceEntry.COLUMN_RATING + " DESC ";
-        return new CursorLoader(getActivity(),
-                RecappContract.PlaceEntry.CONTENT_URI,
-                null,
-                null,
-                null,
-                sortOrder);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-
-        List<Place> places =Place.allPlaces(cursor);
-        recyclePlaceAdapter.swapData(places);
-        recyclePlaceAdapter.setPlaceCursor(cursor);
-        //recyclePlaceAdapter.setPlaceCursor(cursor);
-
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        recyclePlaceAdapter.closeCursor();
-
     }
 
     public void addPlaces(){
@@ -257,5 +230,27 @@ public class PlacesFragment extends Fragment implements LoaderManager.LoaderCall
         );
 
     }
+
+    public String buildSelection(String [] subCategory){
+        String where = null;
+        if(subCategory!=null && subCategory.length>0){
+            where = RecappContract.SubCategoryEntry.TABLE_NAME+"."+ RecappContract.SubCategoryEntry.COLUMN_NAME + " IN ( ? ";
+            for (int i =1; i<subCategory.length; i++){
+                where+=",? ";
+            }
+            where += " )";
+        }
+        return where;
+    }
+
+    public void setData(List<Place> places,Cursor cursor){
+        Log.e("algo",""+places.size());
+        recyclePlaceAdapter.swapData(places);
+        recyclePlaceAdapter.setPlaceCursor(cursor);
+    }
+    public void closeData(){
+        recyclePlaceAdapter.closeCursor();
+    }
+
 
 }

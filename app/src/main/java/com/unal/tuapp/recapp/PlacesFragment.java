@@ -244,7 +244,6 @@ public class PlacesFragment extends Fragment {
     }
 
     public void setData(List<Place> places,Cursor cursor){
-        Log.e("algo",""+places.size());
         recyclePlaceAdapter.swapData(places);
         recyclePlaceAdapter.setPlaceCursor(cursor);
     }

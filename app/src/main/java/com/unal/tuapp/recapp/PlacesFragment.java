@@ -1,36 +1,26 @@
 package com.unal.tuapp.recapp;
 
-import android.app.Activity;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.support.v4.content.CursorLoader;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
-import com.unal.tuapp.recapp.data.SubCategory;
 
 import java.io.ByteArrayOutputStream;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
-import jp.wasabeef.recyclerview.animators.adapters.SlideInRightAnimationAdapter;
 
 /**
  * Created by andresgutierrez on 7/13/15.
@@ -56,7 +46,6 @@ public class PlacesFragment extends Fragment {
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayout);
         recyclePlaceAdapter = new RecyclePlaceAdapter(places);
-        Log.e("algo","new");
         recyclePlaceAdapter.setOnItemClickListener(new RecyclePlaceAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, long position) {
@@ -185,24 +174,18 @@ public class PlacesFragment extends Fragment {
                 categoryArray
         );
 
-        ContentValues subCategory = new ContentValues();
+        ContentValues subCategory = new ContentValues(); //Id 1
         subCategory.put(RecappContract.SubCategoryEntry.COLUMN_NAME, "pilas");
         subCategory.put(RecappContract.SubCategoryEntry.COLUMN_CATEGORY_KEY, 1);
-        subCategory.put(RecappContract.SubCategoryEntry.COLUMN_TUTORIAL_KEY, 0);
-        subCategory.put(RecappContract.SubCategoryEntry.COLUMN_PLACE_KEY, 2);
 
-        ContentValues subCategory1 = new ContentValues();
+        ContentValues subCategory1 = new ContentValues(); //Id 2
         subCategory1.put(RecappContract.SubCategoryEntry.COLUMN_NAME, "aa");
         subCategory1.put(RecappContract.SubCategoryEntry.COLUMN_CATEGORY_KEY, 1);
-        subCategory1.put(RecappContract.SubCategoryEntry.COLUMN_TUTORIAL_KEY, 0);
-        subCategory1.put(RecappContract.SubCategoryEntry.COLUMN_PLACE_KEY, 3);
 
 
-        ContentValues subCategory2 = new ContentValues();
+        ContentValues subCategory2 = new ContentValues(); //Id 3
         subCategory2.put(RecappContract.SubCategoryEntry.COLUMN_NAME, "llantas");
         subCategory2.put(RecappContract.SubCategoryEntry.COLUMN_CATEGORY_KEY, 2);
-        subCategory2.put(RecappContract.SubCategoryEntry.COLUMN_TUTORIAL_KEY, 0);
-        subCategory2.put(RecappContract.SubCategoryEntry.COLUMN_PLACE_KEY, 2);
 
         Vector<ContentValues> subCategories = new Vector<>();
         subCategories.add(subCategory);
@@ -217,6 +200,38 @@ public class PlacesFragment extends Fragment {
                 RecappContract.SubCategoryEntry.CONTENT_URI,
                 subCategoryArray
         );
+
+        ContentValues subCategoryPlace = new ContentValues();
+        subCategoryPlace.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_PLACE_KEY, 1);
+        subCategoryPlace.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY, 1);
+
+        ContentValues subCategoryPlace1 = new ContentValues();
+        subCategoryPlace1.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_PLACE_KEY, 3);
+        subCategoryPlace1.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY, 1);
+
+        ContentValues subCategoryPlace2 = new ContentValues();
+        subCategoryPlace2.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_PLACE_KEY, 1);
+        subCategoryPlace2.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY, 2);
+
+        ContentValues subCategoryPlace3 = new ContentValues();
+        subCategoryPlace3.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_PLACE_KEY, 3);
+        subCategoryPlace3.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY, 3);
+
+        Vector<ContentValues> subCategoriesPlaces = new Vector<>();
+        subCategoriesPlaces.add(subCategoryPlace);
+        subCategoriesPlaces.add(subCategoryPlace1);
+        subCategoriesPlaces.add(subCategoryPlace2);
+        subCategoriesPlaces.add(subCategoryPlace3);
+
+        ContentValues []arraySubCategoriesPlaces = new ContentValues[4];
+        subCategoriesPlaces.toArray(arraySubCategoriesPlaces);
+
+        getActivity().getContentResolver().bulkInsert(
+                RecappContract.SubCategoryByPlaceEntry.CONTENT_URI,
+                arraySubCategoriesPlaces
+        );
+
+
         ContentValues image = new ContentValues();
         ByteArrayOutputStream stream5 =  new ByteArrayOutputStream();
         BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.background_material).

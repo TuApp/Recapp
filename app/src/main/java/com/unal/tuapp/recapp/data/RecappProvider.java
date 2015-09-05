@@ -46,14 +46,25 @@ public class RecappProvider extends ContentProvider {
     static final int SUB_CATEGORY = 900;
     static final int SUB_CATEGORY_WITH_CATEGORY = 910;
     static final int SUB_CATEGORY_WITH_CATEGORY_ID = 920;
-    static final int SUB_CATEGORY_WITH_TUTORIAL = 930;
-    static final int SUB_CATEGORY_WITH_PLACE = 940;
-    static final int SUB_CATEGORY_WITH_PLACE_ID = 950;
-    static final int SUB_CATEGORY_WITH_ID = 960;
-    static final int USER_BY_PLACE = 1000;
-    static final int USER_BY_PLACE_USER = 1010;
-    static final int USER_BY_PLACE_PLACE = 1020;
-    static final int USER_BY_PLACE_ID = 1030;
+    static final int SUB_CATEGORY_WITH_ID = 930;
+    static final int SUB_CATEGORY_BY_PLACE = 1000;
+    static final int SUB_CATEGORY_BY_PLACE_ID = 1010;
+    static final int SUB_CATEGORY_BY_PLACE_PLACE = 1020;
+    static final int SUB_CATEGORY_BY_PLACE_PLACE_ID = 1030;
+    static final int SUB_CATEGORY_BY_PLACE_SUB_CATEGORY = 1040;
+    static final int SUB_CATEGORY_BY_PLACE_SUB_CATEGORY_ID = 1050;
+    static final int SUB_CATEGORY_BY_PLACE_PLACE_SUB_CATEGORY = 1060;
+    static final int SUB_CATEGORY_BY_TUTORIAL = 1100;
+    static final int SUB_CATEGORY_BY_TUTORIAL_ID = 1110;
+    static final int SUB_CATEGORY_BY_TUTORIAL_TUTORIAL = 1120;
+    static final int SUB_CATEGORY_BY_TUTORIAL_TUTORIAL_ID = 1130;
+    static final int SUB_CATEGORY_BY_TUTORIAL_SUB_CATEGORY = 1140;
+    static final int SUB_CATEGORY_BY_TUTORIAL_SUB_CATEGORY_ID = 1150;
+    static final int SUB_CATEGORY_BY_TUTORIAL_TUTORIAL_SUB_CATEGORY = 1160;
+    static final int USER_BY_PLACE = 1200;
+    static final int USER_BY_PLACE_USER = 1210;
+    static final int USER_BY_PLACE_PLACE = 1220;
+    static final int USER_BY_PLACE_ID = 1230;
 
     private static final SQLiteQueryBuilder reminderByUser;
     private static final SQLiteQueryBuilder reminderByPlace;
@@ -62,8 +73,12 @@ public class RecappProvider extends ContentProvider {
     private static final SQLiteQueryBuilder placeImagePlace;
     private static final SQLiteQueryBuilder tutorialImageTutorial;
     private static final SQLiteQueryBuilder subCategoryCategory;
-    private static final SQLiteQueryBuilder subCategoryPlace;
-    private static final SQLiteQueryBuilder subCategoryTutorial;
+    private static final SQLiteQueryBuilder subCategoryByPlacePlace;
+    private static final SQLiteQueryBuilder subCategoryByPlaceSubCategory;
+    private static final SQLiteQueryBuilder subCategoryByPlacePlaceSubCategory;
+    private static final SQLiteQueryBuilder subCategoryByTutorialTutorial;
+    private static final SQLiteQueryBuilder subCategoryByTutorialSubCategory;
+    private static final SQLiteQueryBuilder subCategoryByTutorialTutorialSubCategory;
     private static final SQLiteQueryBuilder userByPlaceUser;
     private static final SQLiteQueryBuilder userByPlacePlace;
 
@@ -119,19 +134,53 @@ public class RecappProvider extends ContentProvider {
                         SubCategoryEntry.TABLE_NAME+"."+SubCategoryEntry.COLUMN_CATEGORY_KEY +
                         " = " + CategoryEntry.TABLE_NAME+"."+CategoryEntry._ID
         );
-        subCategoryTutorial = new SQLiteQueryBuilder();
-        subCategoryTutorial.setTables(
-                SubCategoryEntry.TABLE_NAME + " INNER JOIN " +
-                        TutorialEntry.TABLE_NAME + " ON " +
-                        SubCategoryEntry.TABLE_NAME+"."+SubCategoryEntry.COLUMN_TUTORIAL_KEY+
-                        " = " + TutorialEntry.TABLE_NAME+"."+TutorialEntry._ID
+        subCategoryByPlacePlace = new SQLiteQueryBuilder();
+        subCategoryByPlacePlace.setTables(
+                PlaceEntry.TABLE_NAME + " INNER JOIN " +
+                        SubCategoryByPlaceEntry.TABLE_NAME + " ON " +
+                        PlaceEntry.TABLE_NAME+"."+PlaceEntry._ID+
+                        " = " + SubCategoryByPlaceEntry.TABLE_NAME+"."+SubCategoryByPlaceEntry.COLUMN_PLACE_KEY
         );
-        subCategoryPlace = new SQLiteQueryBuilder();
-        subCategoryPlace.setTables(
+        subCategoryByPlaceSubCategory = new SQLiteQueryBuilder();
+        subCategoryByPlaceSubCategory.setTables(
                 SubCategoryEntry.TABLE_NAME + " INNER JOIN " +
-                        PlaceEntry.TABLE_NAME + " ON " +
-                        SubCategoryEntry.TABLE_NAME+"."+SubCategoryEntry.COLUMN_PLACE_KEY+
-                        " = " + PlaceEntry.TABLE_NAME+"."+PlaceEntry._ID
+                        SubCategoryByPlaceEntry.TABLE_NAME + " ON " +
+                        SubCategoryEntry.TABLE_NAME + "." + SubCategoryEntry._ID +
+                        " = " + SubCategoryByPlaceEntry.TABLE_NAME + "." + SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY
+        );
+        subCategoryByPlacePlaceSubCategory =  new SQLiteQueryBuilder();
+        subCategoryByPlacePlaceSubCategory.setTables(
+                SubCategoryEntry.TABLE_NAME + " INNER JOIN " +
+                        SubCategoryByPlaceEntry.TABLE_NAME + " ON " +
+                        SubCategoryEntry.TABLE_NAME + "." + SubCategoryEntry._ID +
+                        " = " + SubCategoryByPlaceEntry.TABLE_NAME + "." + SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY +
+                        " INNER JOIN " + PlaceEntry.TABLE_NAME + " ON "+
+                        PlaceEntry.TABLE_NAME+"."+PlaceEntry._ID + "=" +
+                        SubCategoryByPlaceEntry.TABLE_NAME+"."+SubCategoryByPlaceEntry.COLUMN_PLACE_KEY
+        );
+        subCategoryByTutorialTutorial = new SQLiteQueryBuilder();
+        subCategoryByTutorialTutorial.setTables(
+                SubCategoryByTutorialEntry.TABLE_NAME + " INNER JOIN "+
+                        TutorialEntry.TABLE_NAME + " ON "+
+                        SubCategoryByTutorialEntry.TABLE_NAME+"."+SubCategoryByTutorialEntry.COLUMN_TUTORIAL_KEY +
+                        " = "+ TutorialEntry.TABLE_NAME+"."+TutorialEntry._ID
+        );
+        subCategoryByTutorialSubCategory = new SQLiteQueryBuilder();
+        subCategoryByTutorialSubCategory.setTables(
+                SubCategoryByTutorialEntry.TABLE_NAME + " INNER JOIN "+
+                        SubCategoryEntry.TABLE_NAME + " ON "+
+                        SubCategoryByTutorialEntry.TABLE_NAME+"."+SubCategoryByTutorialEntry.COLUMN_SUBCATEGORY_KEY+
+                        " = "+ SubCategoryEntry.TABLE_NAME+"."+SubCategoryEntry._ID
+        );
+        subCategoryByTutorialTutorialSubCategory = new SQLiteQueryBuilder();
+        subCategoryByTutorialTutorialSubCategory.setTables(
+                SubCategoryByTutorialEntry.TABLE_NAME + " INNER JOIN "+
+                        TutorialEntry.TABLE_NAME + " ON "+
+                        SubCategoryByTutorialEntry.TABLE_NAME+"."+SubCategoryByTutorialEntry.COLUMN_TUTORIAL_KEY +
+                        " = "+ TutorialEntry.TABLE_NAME+"."+TutorialEntry._ID +
+                        " INNER JOIN " + SubCategoryEntry.TABLE_NAME + " ON "+
+                        SubCategoryByTutorialEntry.TABLE_NAME+"."+SubCategoryByTutorialEntry.COLUMN_SUBCATEGORY_KEY+
+                        " = "+ SubCategoryEntry.TABLE_NAME +"."+ SubCategoryEntry._ID
         );
         userByPlaceUser = new SQLiteQueryBuilder();
         userByPlaceUser.setTables(
@@ -180,32 +229,47 @@ public class RecappProvider extends ContentProvider {
         RecappContract.PATH_USER+"/#",COMMENT_WITH_PLACE_USER);
         matcher.addURI(authority,RecappContract.PATH_COMMENT+"/#",COMMENT_WITH_ID);
 
-        //Mathcer for category
+        //Mathcers for category
         matcher.addURI(authority,RecappContract.PATH_CATEGORY,CATEGORY);
         matcher.addURI(authority,RecappContract.PATH_CATEGORY+"/#",CATEGORY_WITH_ID);
 
-        //Mathcers for tutorial
+        //Matchers for tutorial
         matcher.addURI(authority,RecappContract.PATH_TUTORIAL,TUTORIAL);
         matcher.addURI(authority,RecappContract.PATH_TUTORIAL+"/#",TUTORIAL_WITH_ID);
 
-        //Mathcers for place with image
+        //Matchers for place with image
         matcher.addURI(authority,RecappContract.PATH_PLACEIMAGE,PLACE_IMAGE);
         matcher.addURI(authority,RecappContract.PATH_PLACEIMAGE+"/"+RecappContract.PATH_PLACE+"/#",PLACE_IMAGE_WITH_PLACE);
         matcher.addURI(authority,RecappContract.PATH_PLACEIMAGE+"/#",PLACE_IMAGE_WITH_ID);
 
-        //Mathcers for tutorial with image
+        //Matchers for tutorial with image
         matcher.addURI(authority,RecappContract.PATH_TUTORIALIAMGE,TUTORIAL_IMAGE);
         matcher.addURI(authority,RecappContract.PATH_TUTORIALIAMGE+"/"+RecappContract.PATH_TUTORIAL+"/#",TUTORIAL_IMAGE_WITH_TUTORIAL);
         matcher.addURI(authority,RecappContract.PATH_TUTORIALIAMGE+"/#",TUTORIAL_IMAGE_WITH_ID);
 
-        //Mathcers for sub category
+        //Matchers for sub category
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY,SUB_CATEGORY);
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_CATEGORY,SUB_CATEGORY_WITH_CATEGORY);
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_CATEGORY+"/#",SUB_CATEGORY_WITH_CATEGORY_ID);
-        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_TUTORIAL+"/#",SUB_CATEGORY_WITH_TUTORIAL);
-        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_PLACE,SUB_CATEGORY_WITH_PLACE);
-        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_PLACE+"/#",SUB_CATEGORY_WITH_PLACE_ID);
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/#",SUB_CATEGORY_WITH_ID);
+
+        //Matchers for sub category by place
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY_BY_PLACE,SUB_CATEGORY_BY_PLACE);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY_BY_PLACE+"/#",SUB_CATEGORY_BY_PLACE_ID);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY_BY_PLACE+"/"+RecappContract.PATH_PLACE,SUB_CATEGORY_BY_PLACE_PLACE);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY_BY_PLACE+"/"+RecappContract.PATH_PLACE+"/#",SUB_CATEGORY_BY_PLACE_PLACE_ID);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY_BY_PLACE+"/"+RecappContract.PATH_SUBCATEGORY,SUB_CATEGORY_BY_PLACE_SUB_CATEGORY);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY_BY_PLACE+"/"+RecappContract.PATH_SUBCATEGORY+"/#",SUB_CATEGORY_BY_PLACE_SUB_CATEGORY_ID);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY_BY_PLACE+"/"+RecappContract.PATH_PLACE+"/"+RecappContract.PATH_SUBCATEGORY,SUB_CATEGORY_BY_PLACE_PLACE_SUB_CATEGORY);
+
+        //Matchers for sub category by tutorial
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY_BY_TUTORIAL,SUB_CATEGORY_BY_TUTORIAL);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY_BY_TUTORIAL+"/#",SUB_CATEGORY_BY_TUTORIAL_ID);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY_BY_TUTORIAL+"/"+RecappContract.PATH_TUTORIAL,SUB_CATEGORY_BY_TUTORIAL_TUTORIAL);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY_BY_TUTORIAL+"/"+RecappContract.PATH_TUTORIAL+"/#",SUB_CATEGORY_BY_TUTORIAL_TUTORIAL_ID);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY_BY_TUTORIAL+"/"+RecappContract.PATH_SUBCATEGORY,SUB_CATEGORY_BY_TUTORIAL_SUB_CATEGORY);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY_BY_TUTORIAL+"/"+RecappContract.PATH_SUBCATEGORY+"/#",SUB_CATEGORY_BY_TUTORIAL_SUB_CATEGORY_ID);
+        matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY_BY_TUTORIAL+"/"+RecappContract.PATH_TUTORIAL+"/"+RecappContract.PATH_SUBCATEGORY,SUB_CATEGORY_BY_TUTORIAL_TUTORIAL_SUB_CATEGORY);
 
         //Matchers for user by place
         matcher.addURI(authority,RecappContract.PATH_USERBYPLACE,USER_BY_PLACE);
@@ -280,14 +344,36 @@ public class RecappProvider extends ContentProvider {
                 return SubCategoryEntry.CONTENT_TYPE;
             case SUB_CATEGORY_WITH_CATEGORY_ID:
                 return SubCategoryEntry.CONTENT_TYPE;
-            case SUB_CATEGORY_WITH_TUTORIAL:
-                return SubCategoryEntry.CONTENT_TYPE;
-            case SUB_CATEGORY_WITH_PLACE:
-                return SubCategoryEntry.CONTENT_TYPE;
-            case SUB_CATEGORY_WITH_PLACE_ID:
-                return SubCategoryEntry.CONTENT_TYPE;
             case SUB_CATEGORY_WITH_ID:
                 return SubCategoryEntry.CONTENT_ITEM_TYPE;
+            case SUB_CATEGORY_BY_PLACE:
+                return SubCategoryByPlaceEntry.CONTENT_TYPE;
+            case SUB_CATEGORY_BY_PLACE_ID:
+                return SubCategoryByPlaceEntry.CONTENT_ITEM_TYPE;
+            case SUB_CATEGORY_BY_PLACE_PLACE:
+                return SubCategoryByPlaceEntry.CONTENT_TYPE;
+            case SUB_CATEGORY_BY_PLACE_PLACE_ID:
+                return SubCategoryByPlaceEntry.CONTENT_TYPE;
+            case SUB_CATEGORY_BY_PLACE_SUB_CATEGORY:
+                return SubCategoryByPlaceEntry.CONTENT_TYPE;
+            case SUB_CATEGORY_BY_PLACE_SUB_CATEGORY_ID:
+                return SubCategoryByPlaceEntry.CONTENT_TYPE;
+            case SUB_CATEGORY_BY_PLACE_PLACE_SUB_CATEGORY:
+                return SubCategoryByPlaceEntry.CONTENT_TYPE;
+            case SUB_CATEGORY_BY_TUTORIAL:
+                return SubCategoryByTutorialEntry.CONTENT_TYPE;
+            case SUB_CATEGORY_BY_TUTORIAL_ID:
+                return SubCategoryByTutorialEntry.CONTENT_ITEM_TYPE;
+            case SUB_CATEGORY_BY_TUTORIAL_TUTORIAL:
+                return SubCategoryByTutorialEntry.CONTENT_TYPE;
+            case SUB_CATEGORY_BY_TUTORIAL_TUTORIAL_ID:
+                return SubCategoryByTutorialEntry.CONTENT_TYPE;
+            case SUB_CATEGORY_BY_TUTORIAL_SUB_CATEGORY:
+                return SubCategoryByTutorialEntry.CONTENT_TYPE;
+            case SUB_CATEGORY_BY_TUTORIAL_SUB_CATEGORY_ID:
+                return SubCategoryByTutorialEntry.CONTENT_TYPE;
+            case SUB_CATEGORY_BY_TUTORIAL_TUTORIAL_SUB_CATEGORY:
+                return SubCategoryByTutorialEntry.CONTENT_TYPE;
             case USER_BY_PLACE:
                 return UserByPlaceEntry.CONTENT_TYPE;
             case USER_BY_PLACE_USER:
@@ -643,22 +729,46 @@ public class RecappProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
-            case SUB_CATEGORY_WITH_TUTORIAL:
-                tutorialId = SubCategoryEntry.getTutorialFromUri(uri);
-                selection = TutorialEntry._ID + " = ? ";
-                retCursor = subCategoryCategory.query(
-                        recappDBHelper.getReadableDatabase(),
+            case SUB_CATEGORY_WITH_ID:
+                long subCategoryId = SubCategoryEntry.getIdFromUri(uri);
+                selection = SubCategoryEntry._ID + " = ? ";
+                retCursor= recappDBHelper.getReadableDatabase().query(
+                        SubCategoryEntry.TABLE_NAME,
                         projection,
                         selection,
-                        new String[]{""+tutorialId},
+                        new String[]{""+subCategoryId},
                         null,
                         null,
                         sortOrder
                 );
                 break;
-            case SUB_CATEGORY_WITH_PLACE:
-                subCategoryPlace.setDistinct(true);
-                retCursor = subCategoryPlace.query(
+            case SUB_CATEGORY_BY_PLACE:
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        SubCategoryByPlaceEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case SUB_CATEGORY_BY_PLACE_ID:
+                long subCategoryByPlaceId = SubCategoryByPlaceEntry.getIdFromUri(uri);
+                selection = SubCategoryByPlaceEntry._ID + " =? ";
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        SubCategoryByPlaceEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        new String[]{""+subCategoryByPlaceId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case SUB_CATEGORY_BY_PLACE_PLACE:
+                subCategoryByPlacePlace.setDistinct(true);
+                retCursor = subCategoryByPlacePlace.query(
                         recappDBHelper.getReadableDatabase(),
                         projection,
                         selection,
@@ -668,28 +778,139 @@ public class RecappProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
-            case SUB_CATEGORY_WITH_PLACE_ID:
-                subCategoryPlace.setDistinct(false);
-                placeId = SubCategoryEntry.getPlaceFromUri(uri);
-                selection = PlaceEntry._ID + " = ? ";
-                retCursor = subCategoryPlace.query(
+            case SUB_CATEGORY_BY_PLACE_PLACE_ID:
+                long subCategoryByPlaceByPlaceId = SubCategoryByPlaceEntry.getIdFromPlaceUri(uri);
+                selection = PlaceEntry.TABLE_NAME+"."+PlaceEntry._ID + "= ?";
+                subCategoryByPlacePlace.setDistinct(false);
+                retCursor = subCategoryByPlacePlace.query(
                         recappDBHelper.getReadableDatabase(),
                         projection,
                         selection,
-                        new String[]{""+placeId},
+                        new String[]{""+subCategoryByPlaceByPlaceId},
                         null,
                         null,
                         sortOrder
                 );
                 break;
-            case SUB_CATEGORY_WITH_ID:
-                long subCategoryId = SubCategoryEntry.getIdFromUri(uri);
-                selection = SubCategoryEntry._ID + " = ? ";
-                retCursor= recappDBHelper.getReadableDatabase().query(
-                        SubCategoryEntry.TABLE_NAME,
+            case SUB_CATEGORY_BY_PLACE_SUB_CATEGORY:
+                subCategoryByPlaceSubCategory.setDistinct(true);
+                retCursor = subCategoryByPlaceSubCategory.query(
+                        recappDBHelper.getReadableDatabase(),
                         projection,
                         selection,
-                        new String[]{""+subCategoryId},
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case SUB_CATEGORY_BY_PLACE_SUB_CATEGORY_ID:
+                subCategoryByPlaceSubCategory.setDistinct(true);
+                long subCategoryByPlaceBySubCategoryId = SubCategoryByPlaceEntry.getIdFromSubCategoryUri(uri);
+                selection = SubCategoryEntry.TABLE_NAME+"."+SubCategoryEntry._ID +"=?";
+                retCursor = subCategoryByPlaceSubCategory.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{""+subCategoryByPlaceBySubCategoryId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case SUB_CATEGORY_BY_PLACE_PLACE_SUB_CATEGORY:
+                subCategoryByPlacePlaceSubCategory.setDistinct(true);
+                retCursor = subCategoryByPlacePlaceSubCategory.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case SUB_CATEGORY_BY_TUTORIAL:
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        SubCategoryByTutorialEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case SUB_CATEGORY_BY_TUTORIAL_ID:
+                long subCategoryTutorialId = SubCategoryByTutorialEntry.getIdFromUri(uri);
+                selection = SubCategoryByTutorialEntry._ID +"=?";
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        SubCategoryByTutorialEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        new String[]{""+subCategoryTutorialId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case SUB_CATEGORY_BY_TUTORIAL_TUTORIAL:
+                subCategoryByTutorialTutorial.setDistinct(true);
+                retCursor = subCategoryByTutorialTutorial.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case SUB_CATEGORY_BY_TUTORIAL_TUTORIAL_ID:
+                long subCategoryTutorialTutorialId = SubCategoryByTutorialEntry.getIdTutorialUir(uri);
+                selection = SubCategoryByTutorialEntry.TABLE_NAME+"."+SubCategoryByTutorialEntry.COLUMN_TUTORIAL_KEY+" =?";
+                retCursor = subCategoryByTutorialTutorial.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{""+subCategoryTutorialTutorialId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case SUB_CATEGORY_BY_TUTORIAL_SUB_CATEGORY:
+                subCategoryByTutorialSubCategory.setDistinct(true);
+                retCursor = subCategoryByTutorialSubCategory.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case SUB_CATEGORY_BY_TUTORIAL_SUB_CATEGORY_ID:
+                long subCategoryTutorialSubCategoryId = SubCategoryByTutorialEntry.getIdSubCategoryUri(uri);
+                selection = SubCategoryByTutorialEntry.TABLE_NAME+"."+SubCategoryByTutorialEntry.COLUMN_SUBCATEGORY_KEY+"=?";
+                retCursor = subCategoryByTutorialSubCategory.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{""+subCategoryTutorialSubCategoryId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case SUB_CATEGORY_BY_TUTORIAL_TUTORIAL_SUB_CATEGORY:
+                subCategoryByTutorialTutorialSubCategory.setDistinct(true);
+                retCursor = subCategoryByTutorialTutorialSubCategory.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
                         null,
                         null,
                         sortOrder
@@ -835,6 +1056,22 @@ public class RecappProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
                 break;
+            case SUB_CATEGORY_BY_PLACE:
+                id = db.insert(SubCategoryByPlaceEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    returnUri = SubCategoryByPlaceEntry.buildSubCategoryByPlaceUri(id);
+                }else{
+                    throw new android.database.SQLException("Failed to insert row into " +uri);
+                }
+                break;
+            case SUB_CATEGORY_BY_TUTORIAL:
+                id = db.insert(SubCategoryByTutorialEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    returnUri = SubCategoryByTutorialEntry.buildSubCategoryByTutorialUri(id);
+                }else{
+                    throw new android.database.SQLException("Failded to insert row into "+ uri);
+                }
+                break;
             case USER_BY_PLACE:
                 id = db.insert(UserByPlaceEntry.TABLE_NAME,null,values);
                 if(id>0){
@@ -887,6 +1124,11 @@ public class RecappProvider extends ContentProvider {
             case SUB_CATEGORY:
                 rowsDeleted = db.delete(SubCategoryEntry.TABLE_NAME,selection,selectionArgs);
                 break;
+            case SUB_CATEGORY_BY_PLACE:
+                rowsDeleted = db.delete(SubCategoryByPlaceEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            case SUB_CATEGORY_BY_TUTORIAL:
+                rowsDeleted = db.delete(SubCategoryByTutorialEntry.TABLE_NAME,selection,selectionArgs);
             case USER_BY_PLACE:
                 rowsDeleted = db.delete(UserByPlaceEntry.TABLE_NAME,selection,selectionArgs);
                 break;
@@ -934,6 +1176,12 @@ public class RecappProvider extends ContentProvider {
 
             case SUB_CATEGORY:
                 rowUpdated = db.update(SubCategoryEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case SUB_CATEGORY_BY_PLACE:
+                rowUpdated = db.update(SubCategoryByPlaceEntry.TABLE_NAME,values,selection,selectionArgs);
+                break;
+            case SUB_CATEGORY_BY_TUTORIAL:
+                rowUpdated = db.update(SubCategoryByTutorialEntry.TABLE_NAME,values,selection,selectionArgs);
                 break;
             case USER_BY_PLACE:
                 rowUpdated = db.update(UserByPlaceEntry.TABLE_NAME,values,selection,selectionArgs);
@@ -1107,6 +1355,37 @@ public class RecappProvider extends ContentProvider {
                 }
                 getContext().getContentResolver().notifyChange(uri,null);
                 return returnCount;
+            case SUB_CATEGORY_BY_PLACE:
+                db.beginTransaction();
+                returnCount = 0;
+                try {
+                    for (ContentValues value: values){
+                        long id = db.insert(SubCategoryByPlaceEntry.TABLE_NAME,null,value);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+
+                    db.setTransactionSuccessful();
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
+            case SUB_CATEGORY_BY_TUTORIAL:
+                db.beginTransaction();
+                returnCount = 0;
+                try{
+                    for(ContentValues value:values){
+                        long id = db.insert(SubCategoryByTutorialEntry.TABLE_NAME,null,value);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                }finally {
+                    db.endTransaction();
+                }
             case USER_BY_PLACE:
                 db.beginTransaction();
                 returnCount = 0;
@@ -1121,6 +1400,8 @@ public class RecappProvider extends ContentProvider {
                 }finally {
                     db.endTransaction();
                 }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
             default:
                 return super.bulkInsert(uri,values);
 

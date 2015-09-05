@@ -3,7 +3,6 @@ package com.unal.tuapp.recapp.data;
 import android.database.Cursor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by andresgutierrez on 8/29/15.

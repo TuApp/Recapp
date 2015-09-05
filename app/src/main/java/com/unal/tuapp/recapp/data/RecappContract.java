@@ -23,6 +23,8 @@ public class RecappContract {
     public static final String PATH_TUTORIALIAMGE = "tutorialImage";
     public static final String PATH_CATEGORY = "category";
     public static final String PATH_SUBCATEGORY = "subCategory";
+    public static final String PATH_SUBCATEGORY_BY_PLACE = "subCategoryByPlace";
+    public static final String PATH_SUBCATEGORY_BY_TUTORIAL = "subCategoryByTutorial";
     public static final String PATH_USERBYPLACE = "userByPlace";
 
     public static class UserEntry implements BaseColumns {
@@ -306,8 +308,7 @@ public class RecappContract {
 
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_CATEGORY_KEY = "category_id";
-        public static final String COLUMN_TUTORIAL_KEY = "tutorial_id";
-        public static final String COLUMN_PLACE_KEY = "place_id";
+
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_SUBCATEGORY).build();
 
@@ -324,44 +325,123 @@ public class RecappContract {
             return CONTENT_URI.buildUpon()
                     .appendPath(PATH_CATEGORY).build();
         }
-
-        public static Uri buildSubCategoryCategoryUri(long category) {
+        public static Uri buildSubCategoryCategoryUri(long id){
             return CONTENT_URI.buildUpon()
                     .appendPath(PATH_CATEGORY)
-                    .appendPath("" + category).build();
+                    .appendPath(""+id).build();
         }
-
-        public static Uri buildSubCategoryTutorialUri(long tutorial) {
-            return CONTENT_URI.buildUpon()
-                    .appendPath(PATH_TUTORIAL)
-                    .appendPath("" + tutorial).build();
-        }
-
-        public static Uri buildSubCategoryPlaceUri() {
-            return CONTENT_URI.buildUpon()
-                    .appendPath(PATH_PLACE).build();
-        }
-        public static Uri buildSubCategoryPlaceUri(long place) {
-            return CONTENT_URI.buildUpon()
-                    .appendPath(PATH_PLACE)
-                    .appendPath("" + place).build();
-        }
-
-        public static long getCategoryFromUri(Uri uri) {
+        public static long getCategoryFromUri(Uri uri){
             return Long.parseLong(uri.getPathSegments().get(2));
         }
-
-        public static long getTutorialFromUri(Uri uri) {
-            return Long.parseLong(uri.getPathSegments().get(2));
-        }
-
-        public static long getPlaceFromUri(Uri uri) {
-            return Long.parseLong(uri.getPathSegments().get(2));
-        }
-
         public static long getIdFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(1));
         }
+    }
+    public static class SubCategoryByPlaceEntry implements BaseColumns{
+        public static final String TABLE_NAME = "SubCategoryByPlace";
+
+        public static final String COLUMN_PLACE_KEY = "place_id";
+        public static final String COLUMN_SUBCATEGORY_KEY = "subCategory_id";
+
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_SUBCATEGORY_BY_PLACE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE+"/"+ CONTENT_AUTHORITY+"/" +PATH_SUBCATEGORY_BY_PLACE;
+
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE+"/"+CONTENT_AUTHORITY+"/"+PATH_SUBCATEGORY_BY_PLACE;
+
+        public static Uri buildSubCategoryByPlaceUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+        public static Uri buildSubCategoryByPlacePlaceSubCategory(){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_PLACE)
+                    .appendPath(PATH_SUBCATEGORY).build();
+        }
+
+        public static Uri buildSubCategoryByPlaceByPlace(){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_PLACE).build();
+        }
+        public static Uri buildSubCategoryByPlaceByPlace(long id){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_PLACE)
+                    .appendPath(""+id).build();
+        }
+        public static Uri buildSubCategoryByPlaceBySubCategory(){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_SUBCATEGORY).build();
+        }
+        public static Uri buildSubCategoryByPlaceBySubCategory(long id){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_SUBCATEGORY)
+                    .appendPath(""+id).build();
+        }
+
+        public static long getIdFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(1));
+        }
+        public static long getIdFromPlaceUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
+        public static long getIdFromSubCategoryUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
+    }
+    public static class SubCategoryByTutorialEntry implements BaseColumns{
+        public static final String TABLE_NAME = "SubCategoryByTutorial";
+
+        public static final String COLUMN_TUTORIAL_KEY = "tutorial_id";
+        public static final String COLUMN_SUBCATEGORY_KEY = "subCategory_id";
+
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_SUBCATEGORY_BY_TUTORIAL).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE+"/"+ CONTENT_AUTHORITY+"/" +PATH_SUBCATEGORY_BY_TUTORIAL;
+
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE+"/"+CONTENT_AUTHORITY+"/"+PATH_SUBCATEGORY_BY_TUTORIAL;
+
+        public static Uri buildSubCategoryByTutorialUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+        public static Uri buildSubCategoryByTutorialSubCategoryTutorial(){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_TUTORIAL)
+                    .appendPath(PATH_SUBCATEGORY).build();
+        }
+
+        public static Uri buildSubCategoryByTutorialByTutorial(){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_TUTORIAL).build();
+        }
+        public static Uri buildSubCategoryByTutorialByTutorial(long id){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_TUTORIAL)
+                    .appendPath(""+id).build();
+        }
+        public static Uri buildSubCategoryByTutorialBySubCategory(){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_SUBCATEGORY).build();
+        }
+        public static Uri buildSubCategoryByTutorialBySubCategory(long id){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_SUBCATEGORY)
+                    .appendPath(""+id).build();
+        }
+
+        public static long getIdFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(1));
+        }
+        public static long getIdTutorialUir(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
+        public static long getIdSubCategoryUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
+
+
     }
     public static class UserByPlaceEntry implements BaseColumns {
         public static final String TABLE_NAME = "UserByPlace";

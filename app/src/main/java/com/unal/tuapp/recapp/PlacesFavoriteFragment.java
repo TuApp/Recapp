@@ -1,6 +1,5 @@
 package com.unal.tuapp.recapp;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

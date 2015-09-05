@@ -12,7 +12,6 @@ import com.unal.tuapp.recapp.data.RecappContract;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by andresgutierrez on 7/11/15.

@@ -535,7 +535,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 }
                 return new CursorLoader(
                         this,
-                        RecappContract.SubCategoryEntry.buildSubCategoryPlaceUri(),
+                        RecappContract.SubCategoryByPlaceEntry.buildSubCategoryByPlacePlaceSubCategory(),
                         new String[]{RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry._ID,
                                 RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_NAME,
                                 RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_LOG,

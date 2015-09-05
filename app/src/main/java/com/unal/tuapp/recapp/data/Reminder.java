@@ -1,10 +1,8 @@
 package com.unal.tuapp.recapp.data;
 
 import android.database.Cursor;
-import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by andresgutierrez on 8/9/15.

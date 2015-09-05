@@ -1,8 +1,6 @@
 package com.unal.tuapp.recapp.data;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.unal.tuapp.recapp.data.RecappContract.*;
@@ -98,14 +96,25 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 SubCategoryEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 SubCategoryEntry.COLUMN_NAME + " TEXT UNIQUE NOT NULL, " +
                 SubCategoryEntry.COLUMN_CATEGORY_KEY + " INTEGER, "+
-                SubCategoryEntry.COLUMN_PLACE_KEY + " INTEGER, "+
-                SubCategoryEntry.COLUMN_TUTORIAL_KEY + " INTEGER, "+
                 "FOREIGN KEY (" + SubCategoryEntry.COLUMN_CATEGORY_KEY +") REFERENCES " +
-                CategoryEntry.TABLE_NAME + "("+CategoryEntry._ID+"), " +
-                "FOREIGN KEY (" + SubCategoryEntry.COLUMN_TUTORIAL_KEY +") REFERENCES "+
-                TutorialEntry.TABLE_NAME +"("+TutorialEntry._ID+"), " +
-                "FOREIGN KEY (" + SubCategoryEntry.COLUMN_PLACE_KEY+") REFERENCES "+
-                PlaceEntry.TABLE_NAME +"("+PlaceEntry._ID+") );";
+                CategoryEntry.TABLE_NAME + "("+CategoryEntry._ID+") );";
+        final String CREATE_SUB_CATEGORY_BY_PLACE = "CREATE TABLE "+ SubCategoryByPlaceEntry.TABLE_NAME + "("+
+                SubCategoryByPlaceEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                SubCategoryByPlaceEntry.COLUMN_PLACE_KEY+ " INTEGER NOT NULL,"+
+                SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY+ " INTEGER NOT NULL, "+
+                "FOREIGN KEY (" +SubCategoryByPlaceEntry.COLUMN_PLACE_KEY+") REFERENCES "+
+                PlaceEntry.TABLE_NAME+"(" +PlaceEntry._ID+") , "+
+                "FOREIGN KEY ("+SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY+") REFERENCES "+
+                SubCategoryEntry.TABLE_NAME+"("+SubCategoryEntry._ID+") );";
+        final String CREATE_SUB_CATEGORY_BY_TUTORIAL = "CREATE TABLE "+ SubCategoryByTutorialEntry.TABLE_NAME +"("+
+                SubCategoryByTutorialEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                SubCategoryByTutorialEntry.COLUMN_TUTORIAL_KEY+" INTEGER NOT NULL,"+
+                SubCategoryByTutorialEntry.COLUMN_SUBCATEGORY_KEY+" INTEGER NOT NULL, "+
+                "FOREIGN KEY (" + SubCategoryByTutorialEntry.COLUMN_TUTORIAL_KEY+") REFERENCES "+
+                TutorialEntry.TABLE_NAME+"("+TutorialEntry._ID+"), "+
+                "FOREIGN KEY (" +SubCategoryByTutorialEntry.COLUMN_SUBCATEGORY_KEY+") REFERENCES "+
+                SubCategoryEntry.TABLE_NAME+"("+SubCategoryEntry._ID+"));";
+
         final String CREATE_USER_BY_PLACE_TABLE = "CREATE TABLE " + UserByPlaceEntry.TABLE_NAME + "(" +
                 UserByPlaceEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 UserByPlaceEntry.COLUMN_USER_KEY +" INTEGER NOT NULL, " +
@@ -123,6 +132,8 @@ public class RecappDBHelper extends SQLiteOpenHelper{
         sqLiteDatabase.execSQL(CREATE_TUTORIAL_IMAGE_TABLE);
         sqLiteDatabase.execSQL(CREATE_CATEGORY_TABLE);
         sqLiteDatabase.execSQL(CREATE_SUB_CATEGORY_TABLE);
+        sqLiteDatabase.execSQL(CREATE_SUB_CATEGORY_BY_PLACE);
+        sqLiteDatabase.execSQL(CREATE_SUB_CATEGORY_BY_TUTORIAL);
         sqLiteDatabase.execSQL(CREATE_USER_BY_PLACE_TABLE);
 
 
@@ -139,6 +150,8 @@ public class RecappDBHelper extends SQLiteOpenHelper{
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TutorialImageEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CategoryEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + SubCategoryEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + SubCategoryByPlaceEntry.TABLE_NAME );
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + SubCategoryByTutorialEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + UserByPlaceEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
 

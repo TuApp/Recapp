@@ -298,8 +298,17 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 totalFilter--;
                 if(query!=null && query.length()>0) {
                     handleIntent(getIntent());
-                }else {
+                }else if(filtersConstraint.size()>0) {
                     loadSelection();
+                }else{
+                    selectionPlaces = null;
+                    selectionArgs = null;
+                    if (getSupportLoaderManager().getLoader(PLACE) == null) {
+                        getSupportLoaderManager().initLoader(PLACE, null, NavigationDrawer.this);
+                    } else {
+                        getSupportLoaderManager().restartLoader(PLACE, null, NavigationDrawer.this);
+                    }
+
                 }
 
                 //((PlacesFragment)(((ViewPagerAdapter) viewPager.getAdapter()).getItem(viewPager.getCurrentItem()))).setFilters(filtersConstraint);
@@ -655,7 +664,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                     MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
             searchView.setQuery(query,false);
             Snackbar.make(root.findViewById(R.id.coordination_navigation_drawer),"Place name : " +query,Snackbar.LENGTH_LONG).show();
-
+            searchView.clearFocus();
             suggestions.saveRecentQuery(query, null);
             //searchView.invalidate();
             if(query.toUpperCase().equals("ALL PLACES") || query.toUpperCase().equals("TODOS LOS LUGARES")){

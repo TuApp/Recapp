@@ -2,11 +2,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".NavigationDrawer">
     <item android:id="@+id/action_navigation" android:icon="@android:drawable/ic_menu_view"
-        app:showAsAction="always"
-        android:title=""
+        app:showAsAction="ifRoom"
+        android:title="@string/filter"
         android:tint="@color/secondary_text"/>
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/help" android:title="@string/action_help"
         android:orderInCategory="101" app:showAsAction="never" />
+    <item android:id="@+id/search"
+        android:title="@string/search"
+        android:icon="@drawable/abc_ic_search_api_mtrl_alpha"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="android.support.v7.widget.SearchView"/>
 </menu>

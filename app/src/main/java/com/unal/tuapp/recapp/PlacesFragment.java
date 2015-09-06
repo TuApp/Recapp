@@ -8,7 +8,10 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -31,12 +34,14 @@ public class PlacesFragment extends Fragment {
     private View root;
     public static onPlaceListener mOnPlaceListener;
 
+
     public List<String> filters;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         root = inflater.inflate(R.layout.fragment_places,container,false);
         recyclerView = (RecyclerView) root.findViewById(R.id.places_recycle_view);
+        //setHasOptionsMenu(true);
 
         //For now we can use this line to optimize the recycleview because we know that the size of the list won't change
         //recyclerView.setHasFixedSize(true);
@@ -69,6 +74,7 @@ public class PlacesFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
     }
+
     public interface onPlaceListener{
         void onPlace(View view,long position);
     }
@@ -210,7 +216,7 @@ public class PlacesFragment extends Fragment {
         subCategoryPlace1.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY, 1);
 
         ContentValues subCategoryPlace2 = new ContentValues();
-        subCategoryPlace2.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_PLACE_KEY, 1);
+        subCategoryPlace2.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_PLACE_KEY, 4);
         subCategoryPlace2.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY, 2);
 
         ContentValues subCategoryPlace3 = new ContentValues();
@@ -246,17 +252,6 @@ public class PlacesFragment extends Fragment {
 
     }
 
-    public String buildSelection(String [] subCategory){
-        String where = null;
-        if(subCategory!=null && subCategory.length>0){
-            where = RecappContract.SubCategoryEntry.TABLE_NAME+"."+ RecappContract.SubCategoryEntry.COLUMN_NAME + " IN ( ? ";
-            for (int i =1; i<subCategory.length; i++){
-                where+=",? ";
-            }
-            where += " )";
-        }
-        return where;
-    }
 
     public void setData(List<Place> places,Cursor cursor){
         recyclePlaceAdapter.swapData(places);
@@ -265,6 +260,8 @@ public class PlacesFragment extends Fragment {
     public void closeData(){
         recyclePlaceAdapter.closeCursor();
     }
+
+
 
 
 }

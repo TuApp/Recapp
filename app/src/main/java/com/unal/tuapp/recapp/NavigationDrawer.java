@@ -1,24 +1,29 @@
 package com.unal.tuapp.recapp;
 
 
+import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.util.Rfc822Tokenizer;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +38,7 @@ import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.unal.tuapp.recapp.data.Category;
+import com.unal.tuapp.recapp.data.MySuggestionProvider;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.SubCategory;
@@ -83,12 +89,17 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private AutoCompleteTextView filterSubcategory;
     private String [] subCategory;
     private List<String> filtersConstraint;
+    private String[] selectionArgs=null;
+    private String selectionPlaces =null;
+    private String query;
+    private static SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         root = getLayoutInflater().inflate(R.layout.activity_navigation_drawer, null);
         setContentView(root);
+        query = "";
         totalFilter = 0;
         mGooglePlus = GooglePlus.getInstance(this, null, null);
         filtersConstraint = new ArrayList<>();
@@ -184,10 +195,12 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         filtersConstraint.add(menuFilter);
                         menu.add(0, totalFilter, Menu.NONE, menuFilter).setIcon(android.R.drawable.ic_menu_close_clear_cancel);
                         totalFilter++;
-                        if(getSupportLoaderManager().getLoader(PLACE_FILTER)==null){
-                            getSupportLoaderManager().initLoader(PLACE_FILTER,null,NavigationDrawer.this);
-                        }else{
-                            getSupportLoaderManager().restartLoader(PLACE_FILTER,null,NavigationDrawer.this);
+                        selectionArgs=null;
+                        selectionPlaces=null;
+                        if(query!=null && query.length()>0) {
+                            handleIntent(getIntent());
+                        }else {
+                            loadSelection();
                         }
                         //((PlacesFragment)(((ViewPagerAdapter) viewPager.getAdapter()).getItem(viewPager.getCurrentItem()))).setFilters(filtersConstraint);
 
@@ -282,32 +295,36 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 navFilterDrawer.getMenu().removeItem(menuItem.getItemId());
                 filtersConstraint.remove(menuItem.toString());
                 totalFilter--;
-                if(filtersConstraint.size()==0){
-                    if(getSupportLoaderManager().getLoader(PLACE)==null){
-                        getSupportLoaderManager().initLoader(PLACE,null,NavigationDrawer.this);
-                    }else{
-                        getSupportLoaderManager().restartLoader(PLACE,null,NavigationDrawer.this);
-                    }
-                }else{
-                    if(getSupportLoaderManager().getLoader(PLACE_FILTER)==null){
-                        getSupportLoaderManager().initLoader(PLACE_FILTER,null,NavigationDrawer.this);
-                    }else{
-                        getSupportLoaderManager().restartLoader(PLACE_FILTER,null,NavigationDrawer.this);
-                    }
+                if(query!=null && query.length()>0) {
+                    handleIntent(getIntent());
+                }else {
+                    loadSelection();
                 }
+
                 //((PlacesFragment)(((ViewPagerAdapter) viewPager.getAdapter()).getItem(viewPager.getCurrentItem()))).setFilters(filtersConstraint);
                 return false;
             }
         });
 
+        //handleIntent(getIntent());
 
-
+    }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+        handleIntent(intent);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_navigation_drawer, menu);
-        return true;
+        SearchManager searchManager = (SearchManager)getSystemService(SEARCH_SERVICE);
+        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.search));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        //searchView.setIconifiedByDefault(false);
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -344,20 +361,6 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         // Pass any configuration change to the drawer toggles
 
     }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        saveFilters();
-
-
-    }
-    @Override
-    public void onResume(){
-        super.onResume();
-        loadFilters();
-    }
-
 
     public void setUpToolbar(){
         setSupportActionBar(toolbar);
@@ -441,13 +444,8 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             for(int i =0; i<menu.size(); i++){
                 filtersConstraint.add(menu.getItem(i).toString());
             }
-            if(filtersConstraint.size()!=0){
-                if(getSupportLoaderManager().getLoader(PLACE_FILTER)==null){
-                    getSupportLoaderManager().initLoader(PLACE_FILTER,null,this);
-                }else{
-                    getSupportLoaderManager().restartLoader(PLACE_FILTER,null,this);
-                }
-            }
+
+
             deleteFile(FILE);
         }catch (Exception e){}
 
@@ -478,6 +476,26 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         }
         userCursor.close();
 
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        saveFilters();
+        outState.putString("query", query);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        loadFilters();
+        query = savedInstanceState.getString("query");
+        if(query!=null && query.length()>0) {
+            handleIntent(getIntent());
+        }else {
+            loadSelection();
+        }
 
     }
 
@@ -521,18 +539,11 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         this,
                         RecappContract.PlaceEntry.CONTENT_URI,
                         null,
-                        null,
-                        null,
+                        selectionPlaces,
+                        selectionArgs,
                         sortOrder
                 );
             case PLACE_FILTER:
-                String[] selectionArgs=null;
-                selection=null;
-                if(filtersConstraint.size()>0) {
-                    selectionArgs = new String[filtersConstraint.size()];
-                    filtersConstraint.toArray(selectionArgs);
-                    selection = buildSelectionPlaceFilters(selectionArgs);
-                }
                 return new CursorLoader(
                         this,
                         RecappContract.SubCategoryByPlaceEntry.buildSubCategoryByPlacePlaceSubCategory(),
@@ -544,7 +555,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                                 RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_DESCRIPTION,
                                 RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_RATING,
                                 RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE},
-                        selection,
+                        selectionPlaces,
                         selectionArgs,
                         sortOrder
                 );
@@ -633,5 +644,83 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             where += " )";
         }
         return where;
+    }
+
+    public void handleIntent(Intent intent){
+        if(Intent.ACTION_SEARCH.equals(intent.getAction())){
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            searchView.setQuery(query,false);
+            searchView.clearFocus();
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                    MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
+            suggestions.saveRecentQuery(query,null);
+            if(query.toUpperCase().equals("ALL PLACES") || query.toUpperCase().equals("TODOS LOS LUGARES")){
+                if(filtersConstraint.size()>0){
+                    loadSelection();
+                    if (getSupportLoaderManager().getLoader(PLACE_FILTER) == null) {
+                        getSupportLoaderManager().initLoader(PLACE_FILTER, null, this);
+                    } else {
+                        getSupportLoaderManager().restartLoader(PLACE_FILTER, null, this);
+                    }
+                }else{
+                    selectionArgs=null;
+                    selectionPlaces = null;
+                    if (getSupportLoaderManager().getLoader(PLACE) == null) {
+                        getSupportLoaderManager().initLoader(PLACE, null, this);
+                    } else {
+                        getSupportLoaderManager().restartLoader(PLACE, null, this);
+                    }
+
+                }
+            }else {
+                this.query = query;
+                if (filtersConstraint.size() > 0) {
+
+                    selectionArgs = new String[filtersConstraint.size()];
+                    String[] selectionArgsTemp;
+                    filtersConstraint.toArray(selectionArgs);
+                    selectionPlaces = buildSelectionPlaceFilters(selectionArgs);
+                    selectionArgsTemp = selectionArgs;
+                    selectionArgs = new String[filtersConstraint.size() + 1];
+                    for (int i = 0; i < selectionArgsTemp.length; i++) {
+                        selectionArgs[i] = selectionArgsTemp[i];
+                    }
+                    selectionArgs[filtersConstraint.size()] = "%" + query + "%";
+                    selectionPlaces += "  AND " + RecappContract.PlaceEntry.TABLE_NAME + "." + RecappContract.PlaceEntry.COLUMN_NAME + " LIKE ?";
+
+                    if (getSupportLoaderManager().getLoader(PLACE_FILTER) == null) {
+                        getSupportLoaderManager().initLoader(PLACE_FILTER, null, this);
+                    } else {
+                        getSupportLoaderManager().restartLoader(PLACE_FILTER, null, this);
+                    }
+                } else {
+                    selectionPlaces = RecappContract.PlaceEntry.TABLE_NAME + "." + RecappContract.PlaceEntry.COLUMN_NAME + " LIKE ?";
+                    selectionArgs = new String[1];
+                    selectionArgs[0] = "%" + query + "%";
+                    if (getSupportLoaderManager().getLoader(PLACE) == null) {
+                        getSupportLoaderManager().initLoader(PLACE, null, this);
+                    } else {
+                        getSupportLoaderManager().restartLoader(PLACE, null, this);
+                    }
+                }
+            }
+
+        }
+    }
+    public void loadSelection(){
+        if (filtersConstraint.size() != 0) {
+            selectionArgs = null;
+            selectionPlaces = null;
+            if (filtersConstraint.size() > 0) {
+                selectionArgs = new String[filtersConstraint.size()];
+                filtersConstraint.toArray(selectionArgs);
+                selectionPlaces = buildSelectionPlaceFilters(selectionArgs);
+            }
+            if (getSupportLoaderManager().getLoader(PLACE_FILTER) == null) {
+                getSupportLoaderManager().initLoader(PLACE_FILTER, null, this);
+            } else {
+                getSupportLoaderManager().restartLoader(PLACE_FILTER, null, this);
+            }
+        }
     }
 }

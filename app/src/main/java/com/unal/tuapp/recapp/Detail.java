@@ -231,6 +231,12 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
         if (id == R.id.action_settings) {
             return true;
         }
+        if (id == android.R.id.home){
+            Intent intentHome = new Intent(Detail.this, NavigationDrawer.class);
+            //intentHome.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intentHome);
+        }
+
 
         return super.onOptionsItemSelected(item);
     }

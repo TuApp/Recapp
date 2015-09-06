@@ -23,7 +23,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.util.Rfc822Tokenizer;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -92,7 +91,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private String[] selectionArgs=null;
     private String selectionPlaces =null;
     private String query;
+    private static MenuItem menuSearch;
     private static SearchView searchView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -318,13 +319,13 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_navigation_drawer, menu);
-        SearchManager searchManager = (SearchManager)getSystemService(SEARCH_SERVICE);
-        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.search));
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
+        menuSearch = menu.findItem(R.id.search);
         //searchView.setIconifiedByDefault(false);
-
-        return super.onCreateOptionsMenu(menu);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+        return true;
     }
 
     @Override
@@ -649,11 +650,14 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     public void handleIntent(Intent intent){
         if(Intent.ACTION_SEARCH.equals(intent.getAction())){
             String query = intent.getStringExtra(SearchManager.QUERY);
-            searchView.setQuery(query,false);
-            searchView.clearFocus();
+
             SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
                     MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
-            suggestions.saveRecentQuery(query,null);
+            searchView.setQuery(query,false);
+            Snackbar.make(root.findViewById(R.id.coordination_navigation_drawer),"Place name : " +query,Snackbar.LENGTH_LONG).show();
+
+            suggestions.saveRecentQuery(query, null);
+            //searchView.invalidate();
             if(query.toUpperCase().equals("ALL PLACES") || query.toUpperCase().equals("TODOS LOS LUGARES")){
                 if(filtersConstraint.size()>0){
                     loadSelection();

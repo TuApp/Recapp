@@ -22,7 +22,8 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/category"
                 android:ems="15"
-                android:paddingLeft="8dp"/>
+                android:paddingLeft="8dp"
+                android:imeOptions="flagNoFullscreen"/>
 
         </android.support.design.widget.TextInputLayout>
 
@@ -46,7 +47,8 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginTop="16dp"
-            android:paddingLeft="8dp"/>
+            android:paddingLeft="8dp"
+            android:imeOptions="flagNoFullscreen"/>
 
         <Button android:id="@+id/add"
             android:layout_width="match_parent"

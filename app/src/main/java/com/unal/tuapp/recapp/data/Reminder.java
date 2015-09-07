@@ -14,14 +14,50 @@ public class Reminder {
     private long notification;
     private long endDate;
     private Place place;
+    private boolean isSwipe;
+    private long placeId;
+    private long userId;
 
-    public Reminder(String description, long endDate, long id, String name, Place place, long notification) {
+    public Reminder(String description, long endDate, long id, String name, Place place, long notification,long placeId
+    ,long userId) {
         this.description = description;
         this.endDate = endDate;
         this.id = id;
         this.name = name;
         this.place = place;
         this.notification = notification;
+        this.isSwipe = false;
+        this.placeId = placeId;
+        this.userId = userId;
+
+    }
+
+    public long getNotification() {
+        return notification;
+    }
+
+    public long getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(long placeId) {
+        this.placeId = placeId;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
+    public boolean isSwipe() {
+        return isSwipe;
+    }
+
+    public void setIsSwipe(boolean isSwipe) {
+        this.isSwipe = isSwipe;
     }
 
     public String getDescription() {
@@ -95,7 +131,12 @@ public class Reminder {
                             RecappContract.ReminderEntry.COLUMN_NAME)),
                     place,
                     data.getLong(data.getColumnIndexOrThrow(RecappContract.ReminderEntry.TABLE_NAME+"."+
-                            RecappContract.ReminderEntry.COLUMN_NOTIFICATION))
+                            RecappContract.ReminderEntry.COLUMN_NOTIFICATION)),
+                    data.getLong(data.getColumnIndexOrThrow(RecappContract.ReminderEntry.TABLE_NAME+"."+
+                            RecappContract.ReminderEntry.COLUMN_PLACE_KEY)),
+                    data.getLong(data.getColumnIndexOrThrow(RecappContract.ReminderEntry.TABLE_NAME+"."+
+                            RecappContract.ReminderEntry.COLUMN_USER_KEY))
+
             );
             reminders.add(reminder);
         }

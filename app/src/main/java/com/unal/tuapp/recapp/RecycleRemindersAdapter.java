@@ -29,6 +29,7 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
     private static List<Reminder> reminders;
     private Cursor reminderCursor;
 
+
     public interface OnItemClickListener{
         void onItemClick(long reminderId);
     }
@@ -41,7 +42,7 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     }
 
-    public static class RemindersViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
+    public static class RemindersViewHolder extends RecyclerView.ViewHolder implements
             View.OnLongClickListener{
         private CardView front;
         private CardView back;
@@ -63,7 +64,6 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
             back = (CardView) itemView.findViewById(R.id.reminder_place_layout);
             //Layout for the front of the card
             layoutReminder = (RelativeLayout)front.findViewById(R.id.layout_reminder);
-            deleteReminder = (ImageView) layoutReminder.findViewById(R.id.delete_reminder);
             nameReminder = (TextView) layoutReminder.findViewById(R.id.name_reminder);
             descriptionReminder = (TextView) layoutReminder.findViewById(R.id.description_reminder);
             dateReminder = (TextView) layoutReminder.findViewById(R.id.date_reminder);
@@ -73,23 +73,20 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
             imagePlace = (ImageView) layoutPlace.findViewById(R.id.image_place);
             namePlace = (TextView) layoutPlace.findViewById(R.id.name_place);
             addressPlace = (TextView) layoutPlace.findViewById(R.id.address_place);
-            deleteReminderPlace = (ImageView) layoutPlace.findViewById(R.id.delete_reminder_back);
             placeRating = (RatingBar) layoutPlace.findViewById(R.id.rating_place);
 
-            deleteReminder.setOnClickListener(this);
-            deleteReminderPlace.setOnClickListener(this);
             front.setOnLongClickListener(this);
             back.setOnLongClickListener(this);
 
         }
 
-        @Override
+        /*@Override
         public void onClick(View view) {
             if(mOnItemClickListener!=null){
                 long id = reminders.get(getAdapterPosition()).getId();
                 mOnItemClickListener.onItemClick(id);
             }
-        }
+        }*/
 
         @Override
         public boolean onLongClick(View view) {
@@ -134,8 +131,7 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
         layerDrawable.getDrawable(2).setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
         Date now = new Date();
         if(reminder.getEndDate()<now.getTime()){
-            remindersViewHolder.deleteReminder.setVisibility(View.VISIBLE);
-            remindersViewHolder.deleteReminderPlace.setVisibility(View.VISIBLE);
+            reminders.get(position).setIsSwipe(true);
         }
 
     }
@@ -148,5 +144,8 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
     public void closeCursor(){
         this.reminderCursor.close();
+    }
+    public List<Reminder> getPlaces(){
+        return reminders;
     }
 }

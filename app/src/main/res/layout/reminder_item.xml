@@ -28,14 +28,7 @@
                 android:text="@string/event"
                 android:layout_alignParentLeft="true"/>
 
-            <ImageView
-                android:id="@+id/delete_reminder"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:visibility="gone"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:src="@android:drawable/ic_delete"/>
+
 
             <TextView
                 android:id="@+id/name_reminder"
@@ -80,14 +73,6 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp">
 
-            <ImageView
-                android:id="@+id/delete_reminder_back"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:visibility="gone"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:src="@android:drawable/ic_delete"/>
 
             <TextView
                 android:id="@+id/reminder_text"

@@ -1,13 +1,18 @@
 package com.unal.tuapp.recapp;
 
+import android.content.ContentValues;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +33,8 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
     private View root;
     private RecyclerView recyclerView;
     private RecycleRemindersAdapter recycleRemindersAdapter;
+    private static Reminder deleteReminder;
+    private static int positionReminder;
     private static int REMINDER = 25;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -39,9 +46,9 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
         }
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
-        List<Reminder> reminders = new ArrayList<>();
+        final List<Reminder> reminders = new ArrayList<>();
         recycleRemindersAdapter = new RecycleRemindersAdapter(reminders);
-        recycleRemindersAdapter.setOnItemClickListener(new RecycleRemindersAdapter.OnItemClickListener() {
+        /*recycleRemindersAdapter.setOnItemClickListener(new RecycleRemindersAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(long reminderId) {
                 getActivity().getContentResolver().delete(
@@ -50,9 +57,60 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
                         new String[]{"" + reminderId}
                 );
             }
-        });
+        });*/
         recyclerView.setAdapter(recycleRemindersAdapter);
+        ItemTouchHelper swipeToDismiss = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
+                0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
+
+            @Override
+            public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                if (!recycleRemindersAdapter.getPlaces().get(viewHolder.getAdapterPosition()).isSwipe()) return 0;
+                return super.getSwipeDirs(recyclerView, viewHolder);
+            }
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                positionReminder = viewHolder.getAdapterPosition();
+                deleteReminder = recycleRemindersAdapter.getPlaces().remove(viewHolder.getAdapterPosition());
+                getActivity().getContentResolver().delete(
+                        RecappContract.ReminderEntry.CONTENT_URI,
+                        RecappContract.ReminderEntry._ID + "= ?",
+                        new String[]{""+deleteReminder.getId()}
+                );
+                recycleRemindersAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+
+
+                Snackbar.make(getActivity().findViewById(R.id.user_detail_coordination),"the event "+deleteReminder.getName() +" was deleted",Snackbar.LENGTH_SHORT)
+                        .setAction("UNDO", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                ContentValues values = new ContentValues();
+                                values.put(RecappContract.ReminderEntry.COLUMN_NAME,deleteReminder.getName());
+                                values.put(RecappContract.ReminderEntry.COLUMN_DESCRIPTION,deleteReminder.getDescription());
+                                values.put(RecappContract.ReminderEntry.COLUMN_NOTIFICATION,deleteReminder.getNotificiation());
+                                values.put(RecappContract.ReminderEntry.COLUMN_END_DATE, deleteReminder.getEndDate());
+                                values.put(RecappContract.ReminderEntry.COLUMN_USER_KEY,deleteReminder.getUserId());
+                                values.put(RecappContract.ReminderEntry.COLUMN_PLACE_KEY,deleteReminder.getPlaceId());
+                                Uri uri = getActivity().getContentResolver().insert(
+                                        RecappContract.ReminderEntry.CONTENT_URI,
+                                        values
+
+                                );
+                                deleteReminder.setId(Long.parseLong(uri.getLastPathSegment()));
+                                recycleRemindersAdapter.getPlaces().add(positionReminder,deleteReminder);
+                                recycleRemindersAdapter.notifyItemInserted(positionReminder);
+                            }
+                        })
+                        .show();
+
+            }
+        });
+        swipeToDismiss.attachToRecyclerView(recyclerView);
         return root;
     }
 
@@ -88,7 +146,8 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
                         RecappContract.ReminderEntry.TABLE_NAME+"."+ RecappContract.ReminderEntry.COLUMN_DESCRIPTION,
                         RecappContract.ReminderEntry.TABLE_NAME+"."+ RecappContract.ReminderEntry.COLUMN_NOTIFICATION,
                         RecappContract.ReminderEntry.TABLE_NAME+"."+ RecappContract.ReminderEntry.COLUMN_END_DATE,
-                        RecappContract.ReminderEntry.TABLE_NAME+"."+ RecappContract.ReminderEntry.COLUMN_PLACE_KEY},
+                        RecappContract.ReminderEntry.TABLE_NAME+"."+ RecappContract.ReminderEntry.COLUMN_PLACE_KEY,
+                        RecappContract.ReminderEntry.TABLE_NAME+"."+RecappContract.ReminderEntry.COLUMN_USER_KEY},
                 null,
                 null,
                 sortOrder

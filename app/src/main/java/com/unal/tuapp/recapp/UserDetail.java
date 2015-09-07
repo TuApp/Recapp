@@ -221,6 +221,10 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
         if (id == R.id.action_settings) {
             return true;
         }
+        if(android.R.id.home==id){
+            Intent intentHome = new Intent(UserDetail.this, NavigationDrawer.class);
+            startActivity(intentHome);
+        }
 
         return super.onOptionsItemSelected(item);
     }

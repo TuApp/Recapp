@@ -6,7 +6,7 @@
     tools:context="com.unal.tuapp.recapp.DetailFragment"
     android:focusableInTouchMode="true"
     android:descendantFocusability="beforeDescendants"
-    >
+    android:id="@+id/fragment_detail">
     <android.support.v4.widget.NestedScrollView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -83,7 +83,20 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="SHARE"
-                        android:layout_margin="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:textColor="@color/my_accent"
+                        style="?android:attr/borderlessButtonStyle"/>
+
+                    <Button
+                        android:id="@+id/card_share_facebook"
+                        android:layout_below="@+id/card_share"
+                        android:layout_alignParentRight="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SHARE FACEBOOK"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
                         android:textColor="@color/my_accent"
                         style="?android:attr/borderlessButtonStyle"/>
 

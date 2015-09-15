@@ -141,6 +141,7 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
                         RecappContract.PlaceEntry.TABLE_NAME+"."+RecappContract.PlaceEntry.COLUMN_DESCRIPTION,
                         RecappContract.PlaceEntry.TABLE_NAME+"."+RecappContract.PlaceEntry.COLUMN_LAT,
                         RecappContract.PlaceEntry.TABLE_NAME+"."+RecappContract.PlaceEntry.COLUMN_LOG,
+                        RecappContract.PlaceEntry.TABLE_NAME+"."+RecappContract.PlaceEntry.COLUMN_WEB,
                         RecappContract.ReminderEntry.TABLE_NAME+"."+ RecappContract.ReminderEntry._ID,
                         RecappContract.ReminderEntry.TABLE_NAME+"."+ RecappContract.ReminderEntry.COLUMN_NAME,
                         RecappContract.ReminderEntry.TABLE_NAME+"."+ RecappContract.ReminderEntry.COLUMN_DESCRIPTION,

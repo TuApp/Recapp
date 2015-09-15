@@ -1,6 +1,10 @@
 package com.unal.tuapp.recapp;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.CursorLoader;
@@ -13,6 +17,7 @@ import android.os.Bundle;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,12 +29,31 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.share.ShareApi;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareOpenGraphAction;
+import com.facebook.share.model.ShareOpenGraphContent;
+import com.facebook.share.model.ShareOpenGraphObject;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.widget.ShareDialog;
+import com.google.android.gms.plus.PlusShare;
 import com.unal.tuapp.recapp.data.Comment;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -41,6 +65,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private long id;
     private ImageView favorite;
     private Button share;
+    private Button shareFacebook;
     private View root;
     private NestedScrollView nestedScrollView;
     private RecyclerView comment;
@@ -66,6 +91,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public static final int RATING = 3;
     public static final int USER_BY_PLACE = 4;
 
+    private CallbackManager callbackManager;
+    private ShareDialog shareDialog;
+
+
 
 
     @Override
@@ -73,6 +102,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                              Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_detail, container, false);
         count = 0;
+        FacebookSdk.sdkInitialize(getActivity());
+        initCallbackManager();
+        shareDialog = new ShareDialog(this);
+
         Bundle extras = getActivity().getIntent().getExtras();
         if(extras!=null){
             id = extras.getLong("id");
@@ -136,6 +169,31 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                PlusShare.Builder builder = new PlusShare.Builder(getActivity());
+
+                builder.addCallToAction("VIEW", Uri.parse(place.getWeb()), "/place/" + place.getId())
+                        .setContentUrl(Uri.parse(place.getWeb()))
+                        .setContentDeepLinkId("/place/" + place.getId(),null,null,null)
+                        .setText("This is a excellent place to recycle \n "+
+                        "Name: "+place.getName()+"\n"+
+                        "Address: "+place.getAddress()+"\n"+
+                        "#recycle");
+
+
+                startActivityForResult(builder.getIntent(), 0);
+
+            }
+        });
+        shareFacebook = (Button) root.findViewById(R.id.card_share_facebook);
+        shareFacebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(AccessToken.getCurrentAccessToken()!=null) { //If the user is logged we should log him/her out
+                    sharePlace();
+                }else {
+                    LoginManager.getInstance().logInWithPublishPermissions(DetailFragment.this, Arrays.asList("publish_actions"));
+                }
+
 
             }
         });
@@ -277,7 +335,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                             data.getDouble(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_LAT)),
                             data.getString(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_NAME)),
                             data.getDouble(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_RATING)),
-                            data.getBlob(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE)));
+                            data.getBlob(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE)),
+                            data.getString(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_WEB)));
                     card_title.setText(place.getName());
                     card_description.setText(place.getDescription());
                     card_address.setText(place.getAddress());
@@ -341,6 +400,77 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
 
+    }
+    public void initCallbackManager(){
+        callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                sharePlace();
+            }
+
+            @Override
+            public void onCancel() {
+                Log.e("algo", "cancel");
+            }
+
+            @Override
+            public void onError(FacebookException e) {
+                Log.e("algo", e.toString());
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+    public void sharePlace(){
+
+        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
+                .putString("og:type", "unalrecycle:recycle")
+                .putString("og:title", "Name: " + place.getName())
+                .putString("og:description","Description: " + place.getDescription())
+                .putString("og:url", place.getWeb())
+                .putString("place:location:latitude",""+place.getLat())
+                .putString("place:location:longitude",""+place.getLog())
+                .putString("unalrecyce:hastag","#recycle")
+                .putString("og:image","https://scontent-mia1-1.xx.fbcdn.net/hphotos-xtp1/v/t34.0-12/11922061_10206791589044848_1016804803_n.jpg?oh=e3900090e3ada42e02a62eadff90c700&oe=55FA5CE6")
+                .build();
+
+        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
+                .setActionType("unalrecycle:be")
+                .putObject("unalrecycle:recycle", object)
+                .build();
+
+        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
+                .setPreviewPropertyName("unalrecycle:recycle")
+                .setAction(action)
+                .build();
+
+
+        if(ShareDialog.canShow(ShareOpenGraphContent.class)){
+            Log.e("algo","algo");
+            shareDialog.show(content);
+        }else {
+            ShareApi.share(content, new FacebookCallback<Sharer.Result>() {
+                @Override
+                public void onSuccess(Sharer.Result result) {
+                    Snackbar.make(root.findViewById(R.id.fragment_detail), "successful", Snackbar.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onCancel() {
+
+                }
+
+                @Override
+                public void onError(FacebookException e) {
+
+                }
+            });
+        }
     }
 
 }

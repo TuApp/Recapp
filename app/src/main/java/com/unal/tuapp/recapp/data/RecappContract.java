@@ -73,6 +73,7 @@ public class RecappContract {
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_RATING = "rating"; //We use it to sort the results
         public static final String COLUMN_IMAGE_FAVORITE = "imageFavorite";
+        public static final String COLUMN_WEB = "web";
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_PLACE).build();
 

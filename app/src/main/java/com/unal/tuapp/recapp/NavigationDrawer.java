@@ -23,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.util.Rfc822Tokenizer;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,6 +36,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.PlusShare;
 import com.google.android.gms.plus.model.people.Person;
 import com.unal.tuapp.recapp.data.Category;
 import com.unal.tuapp.recapp.data.MySuggestionProvider;
@@ -91,8 +93,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private String[] selectionArgs=null;
     private String selectionPlaces =null;
     private String query;
-    private static MenuItem menuSearch;
+
     private static SearchView searchView;
+    private static String deepLink;
 
 
     @Override
@@ -315,6 +318,8 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 return false;
             }
         });
+        deepLink = PlusShare.getDeepLinkId(getIntent());
+
 
         //handleIntent(getIntent());
 
@@ -323,12 +328,12 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
         handleIntent(intent);
+        deepLinkIntent(PlusShare.getDeepLinkId(intent));
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_navigation_drawer, menu);
-        menuSearch = menu.findItem(R.id.search);
         //searchView.setIconifiedByDefault(false);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.search).getActionView();
@@ -591,6 +596,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                     if(user!=null) {
                         mapFragment.setUser(user);
                     }
+                    deepLinkIntent(deepLink);
                 }
                 break;
             case CATEGORY:
@@ -734,6 +740,16 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             } else {
                 getSupportLoaderManager().restartLoader(PLACE_FILTER, null, this);
             }
+        }
+    }
+    public void deepLinkIntent(String deepLink){
+        if(deepLink!=null && !deepLink.equals("")){
+            String [] segments = deepLink.split("/");
+            Intent intent = new Intent(NavigationDrawer.this, Detail.class);
+            intent.putExtra("id", Long.parseLong(segments[segments.length - 1]));
+            intent.putExtra("user", user);
+            startActivity(intent);
+
         }
     }
 }

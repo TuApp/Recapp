@@ -2,8 +2,10 @@ package com.unal.tuapp.recapp;
 
 import android.content.Context;
 
+
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
+
 
 /**
  * Created by andresgutierrez on 7/10/15.
@@ -55,6 +57,7 @@ public class GooglePlus {
         }
         return instance;
     }
+
 }
 
 

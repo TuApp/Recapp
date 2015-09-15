@@ -19,6 +19,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
         <provider
             android:authorities="com.unal.tuapp.recapp.data.MySuggestionProvider"
             android:name=".data.MySuggestionProvider" />
@@ -26,6 +27,11 @@
             android:name=".data.RecappProvider"
             android:authorities="com.unal.tuapp.recapp.app"
             android:exported="false" />
+        
+        <provider
+            android:authorities="com.facebook.app.FacebookContentProvider1674043846146726"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true"/>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -34,13 +40,21 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyCfb_U5Z6p2PBaDDhKjwf0CxqXNOcE1Acs" />
 
+        <meta-data android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
+        
+        <activity android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:label="@string/app_name"/>
+
         <activity
             android:name=".Recapp"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+
             </intent-filter>
         </activity>
         <activity
@@ -51,11 +65,18 @@
             <meta-data android:name="android.app.searchable"
                 android:resource="@xml/searchable"  />
             <intent-filter>
+                <action android:name="com.google.android.apps.plus.VIEW_DEEP_LINK" />
+                <data android:scheme="vnd.google.deeplink" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.SEARCH"/>
             </intent-filter>
 
 
         </activity>
+
         <activity
             android:name=".Detail"
             android:label="@string/title_activity_detail"

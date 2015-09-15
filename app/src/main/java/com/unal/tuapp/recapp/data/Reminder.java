@@ -119,7 +119,8 @@ public class Reminder {
                     RecappContract.PlaceEntry.COLUMN_LAT)),data.getString(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.TABLE_NAME + "." +
                     RecappContract.PlaceEntry.COLUMN_NAME)),data.getDouble(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.TABLE_NAME + "." +
                     RecappContract.PlaceEntry.COLUMN_RATING)),data.getBlob(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.TABLE_NAME+"."+
-                    RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE)));
+                    RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE)),
+                    data.getString(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_WEB)));
             Reminder reminder= new Reminder(
                     data.getString(data.getColumnIndexOrThrow(RecappContract.ReminderEntry.TABLE_NAME+"."+
                             RecappContract.ReminderEntry.COLUMN_DESCRIPTION)),

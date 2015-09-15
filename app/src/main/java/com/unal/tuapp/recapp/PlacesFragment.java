@@ -102,6 +102,7 @@ public class PlacesFragment extends Fragment {
         BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.ic_favorites).
                 compress(Bitmap.CompressFormat.PNG, 100, stream);
         values.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream.toByteArray());
+        values.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
 
         values1.put(RecappContract.PlaceEntry.COLUMN_NAME, "algo1");
         values1.put(RecappContract.PlaceEntry.COLUMN_LAT, 1.34234);
@@ -112,12 +113,14 @@ public class PlacesFragment extends Fragment {
         BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.background_material).
                 compress(Bitmap.CompressFormat.PNG, 100, stream1);
         values1.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream1.toByteArray());
+        values1.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
 
         values2.put(RecappContract.PlaceEntry.COLUMN_NAME, "algo2");
         values2.put(RecappContract.PlaceEntry.COLUMN_LAT, 0.34234);
         values2.put(RecappContract.PlaceEntry.COLUMN_LOG, 0.3242134);
         values2.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, " dfsdafaddress2");
         values2.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "alguna descripcioDSFn");
+        values2.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
 
         ByteArrayOutputStream stream2 =  new ByteArrayOutputStream();
         BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.ic_calendar).
@@ -134,6 +137,7 @@ public class PlacesFragment extends Fragment {
         BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.background_material).
                 compress(Bitmap.CompressFormat.PNG, 100, stream3);
         values3.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream3.toByteArray());
+        values3.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
 
         values4.put(RecappContract.PlaceEntry.COLUMN_NAME, "algo4");
         values4.put(RecappContract.PlaceEntry.COLUMN_LAT, 4.405637);
@@ -145,6 +149,7 @@ public class PlacesFragment extends Fragment {
         BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.ic_calendar).
                 compress(Bitmap.CompressFormat.PNG, 100, stream4);
         values4.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream4.toByteArray());
+        values4.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
 
         valuesVector.add(values);
         valuesVector.add(values1);

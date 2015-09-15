@@ -42,6 +42,7 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 PlaceEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                 PlaceEntry.COLUMN_LAT + " REAL NOT NULL, " +
                 PlaceEntry.COLUMN_LOG + " REAL NOT NULL, " +
+                PlaceEntry.COLUMN_WEB + " TEXT NOT NULL, "+
                 PlaceEntry.COLUMN_ADDRESS + " TEXT UNIQUE NOT NULL, " +
                 PlaceEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
                 PlaceEntry.COLUMN_RATING + " REAL DEFAULT 0.0 , "+

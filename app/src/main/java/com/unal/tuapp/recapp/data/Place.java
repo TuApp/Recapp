@@ -21,10 +21,11 @@ public class Place implements ClusterItem {
     private double log;
     private double rating;
     private byte[] imageFavorite;
+    private String web;
 
 
     public Place(String address, String description, long id,
-                 double log, double lat, String name, double rating,byte[] imageFavorite) {
+                 double log, double lat, String name, double rating,byte[] imageFavorite,String web) {
         this.address = address;
         this.description = description;
         this.id = id;
@@ -33,6 +34,7 @@ public class Place implements ClusterItem {
         this.lat = lat;
         this.name = name;
         this.rating = rating;
+        this.web = web;
     }
 
     public String getAddress() {
@@ -99,6 +101,14 @@ public class Place implements ClusterItem {
         this.imageFavorite = imageFavorite;
     }
 
+    public String getWeb() {
+        return web;
+    }
+
+    public void setWeb(String web) {
+        this.web = web;
+    }
+
     public static ArrayList<Place> allPlaces(Cursor cursor){
         ArrayList<Place> places = new ArrayList<Place>();
         while (cursor.moveToNext()){
@@ -109,11 +119,13 @@ public class Place implements ClusterItem {
                     cursor.getDouble(cursor.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_LAT)),
                     cursor.getString(cursor.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_NAME)),
                     cursor.getDouble(cursor.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_RATING)),
-                    cursor.getBlob(cursor.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE))));
+                    cursor.getBlob(cursor.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_WEB))));
         }
 
         return places;
     }
+
 
     @Override
     public LatLng getPosition() {

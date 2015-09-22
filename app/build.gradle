@@ -5,19 +5,13 @@ android {
         config {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
-            storeFile file('/Users/andresgutierrez/.android/debug.keystore')
+            storeFile file('/home/fabianlm17/Documents/StudioProjects/debug.keystore')
             storePassword 'android'
         }
 
-        configRelese {
-            keyAlias 'myAndroidKey'
-            keyPassword 'gutierrez2011'
-            storeFile file('/Users/andresgutierrez/Desktop/android.jks')
-            storePassword 'gutierrez2011'
-        }
     }
     compileSdkVersion 22
-    buildToolsVersion "23.0.0 rc3"
+    buildToolsVersion "23.0.0"
     defaultConfig {
         applicationId "com.unal.tuapp.recapp"
         minSdkVersion 15
@@ -26,11 +20,7 @@ android {
         versionName "1.0"
     }
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.configRelese
-        }
+
         debug {
             signingConfig signingConfigs.config
         }

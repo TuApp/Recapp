@@ -1,24 +1,22 @@
 package com.unal.tuapp.recapp;
 
-
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentManager;
-import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,26 +30,23 @@ import com.google.android.gms.plus.model.people.Person;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
 
-
-public class Detail extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class Gallery extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private Toolbar toolbar;
     private NavigationView navDrawer;
     private DrawerLayout navigationDrawer;
     private GooglePlus mGooglePlus;
     private View root;
-    private ImageView detail;
     private static final int PLACE = 5;
-    private User  user;
+    private User user;
     private long id;
     private ActionBarDrawerToggle actionBarDrawerToggle;
-    private FloatingActionButton reminder;
-    private DetailFragment detailFragment;
+    private GalleryFragment galleryFragment;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        root = getLayoutInflater().inflate(R.layout.activity_detail, null);
+        root = getLayoutInflater().inflate(R.layout.activity_gallery, null);
         setContentView(root);
         Bundle extras = getIntent().getExtras();
         if(extras!=null){
@@ -90,11 +85,11 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar);
+        /*final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle(getString(R.string.title_activity_detail));
         collapsingToolbarLayout.setExpandedTitleColor(
                 getResources().getColor(android.R.color.transparent)
-        );
+        );*/
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -132,23 +127,23 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.home:
-                        Intent intentHome = new Intent(Detail.this, NavigationDrawer.class);
+                        Intent intentHome = new Intent(Gallery.this, NavigationDrawer.class);
                         startActivity(intentHome);
                         break;
                     case R.id.favorites:
-                        Intent intentFavorite = new Intent(Detail.this, UserDetail.class);
+                        Intent intentFavorite = new Intent(Gallery.this, UserDetail.class);
                         intentFavorite.putExtra("user", user);
                         intentFavorite.putExtra("type", "favorite");
                         startActivity(intentFavorite);
                         break;
                     case R.id.appointments:
-                        Intent intentReminder = new Intent(Detail.this, UserDetail.class);
+                        Intent intentReminder = new Intent(Gallery.this, UserDetail.class);
                         intentReminder.putExtra("user", user);
                         intentReminder.putExtra("type", "reminder");
                         startActivity(intentReminder);
                         break;
                     case R.id.comments:
-                        Intent intentComment = new Intent(Detail.this, UserDetail.class);
+                        Intent intentComment = new Intent(Gallery.this, UserDetail.class);
                         intentComment.putExtra("user", user);
                         intentComment.putExtra("type", "comment");
                         startActivity(intentComment);
@@ -157,7 +152,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
                         if (mGooglePlus.mGoogleApiClient.isConnected()) {
                             Plus.AccountApi.clearDefaultAccount(mGooglePlus.mGoogleApiClient);
                             mGooglePlus.mGoogleApiClient.disconnect();
-                            Intent intent = new Intent(Detail.this, Recapp.class);
+                            Intent intent = new Intent(Gallery.this, Recapp.class);
                             startActivity(intent);
                             //animation = false;
 
@@ -168,7 +163,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
                             Plus.AccountApi.clearDefaultAccount(mGooglePlus.mGoogleApiClient);
                             Plus.AccountApi.revokeAccessAndDisconnect(mGooglePlus.mGoogleApiClient);
                             mGooglePlus.mGoogleApiClient.disconnect();
-                            Intent intent = new Intent(Detail.this, Recapp.class);
+                            Intent intent = new Intent(Gallery.this, Recapp.class);
                             startActivity(intent);
                             //animation = false;
 
@@ -180,35 +175,12 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
                 return false;
             }
         });
-        reminder = (FloatingActionButton) root.findViewById(R.id.reminder);
-        reminder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //reminder.setVisibility(view.GONE);
-                //We should to create other activity
-                Intent intent = new Intent(Detail.this,ReminderActivity.class);
-                intent.putExtra("id",id);
-                intent.putExtra("user",user);
-                startActivity(intent);
-
-            }
-        });
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        detailFragment = new DetailFragment();
-        detailFragment.setOnPlaceImagesListener(new DetailFragment.onPlaceImagesListener() {
-            @Override
-            public void onPlaceImages(View view, long position) {
-
-                Intent intent = new Intent(Detail.this, Gallery.class);
-                intent.putExtra("id", id);
-                intent.putExtra("user", user);
-                startActivity(intent);
-            }
-        });
-        fragmentTransaction.replace(R.id.detail_container, detailFragment);
+        galleryFragment = new GalleryFragment();
+        fragmentTransaction.replace(R.id.carousel_container, galleryFragment);
         fragmentTransaction.commit();
 
     }
@@ -223,7 +195,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_detail, menu);
+        getMenuInflater().inflate(R.menu.menu_gallery, menu);
         return true;
     }
 
@@ -242,7 +214,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
             return true;
         }
         if (id == android.R.id.home){
-            Intent intentHome = new Intent(Detail.this, NavigationDrawer.class);
+            Intent intentHome = new Intent(Gallery.this, NavigationDrawer.class);
             startActivity(intentHome);
         }
 
@@ -282,11 +254,11 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        detail = (ImageView) findViewById(R.id.detail_image);
+        /*detail = (ImageView) findViewById(R.id.detail_image);
         data.moveToFirst();
         detail.setImageBitmap(BitmapFactory.decodeByteArray(
                 data.getBlob(0),0,data.getBlob(0).length
-        ));
+        ));*/
 
     }
 
@@ -294,4 +266,5 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
+
 }

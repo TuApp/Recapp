@@ -22,6 +22,14 @@ public class PlaceImages {
                     RecappContract.PlaceImageEntry.COLUMN_IMAGE
             )));
         }
+    }
 
+    public static ArrayList<byte[]> allImages(Cursor cursor){
+        ArrayList<byte[]> placeImages = new ArrayList<>();
+        while (cursor.moveToNext()){
+            byte[] image = cursor.getBlob(cursor.getColumnIndexOrThrow(RecappContract.PlaceImageEntry.COLUMN_IMAGE));
+            placeImages.add(image);
+        }
+        return placeImages;
     }
 }

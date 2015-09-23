@@ -249,7 +249,50 @@ public class PlacesFragment extends Fragment {
                 compress(Bitmap.CompressFormat.PNG, 100, stream5);
         image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
         image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
-        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only a example
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.ic_calendar).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.ic_comments).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.ic_favorites).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.ic_help).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only an example
         getActivity().getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 image

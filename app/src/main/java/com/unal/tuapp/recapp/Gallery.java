@@ -90,7 +90,7 @@ public class Gallery extends AppCompatActivity implements LoaderManager.LoaderCa
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return  new CursorLoader(
                 this,
-                RecappContract.PlaceImageEntry.buildPlaceImageUri(this.id),
+                RecappContract.PlaceImageEntry.buildPlaceImagePlaceUri(this.id),
                 new String[]{RecappContract.PlaceImageEntry.COLUMN_IMAGE},
                 null,
                 null,

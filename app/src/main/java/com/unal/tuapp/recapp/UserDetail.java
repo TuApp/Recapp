@@ -57,10 +57,9 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
             de.hdodenhof.circleimageview.CircleImageView imageView;
             imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
             if(user.getProfileImage()!=null) {
-
                 imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
                         user.getProfileImage().length));
-            }else{
+            }else if(Utility.isNetworkAvailable(this)){
                 Person currentPerson = Plus.PeopleApi.getCurrentPerson(googlePlus.mGoogleApiClient);
                 String personPhotoUrl = currentPerson.getImage().getUrl();
                 //We try to request a image with major size, the new image will be of 600*600 pixels
@@ -102,6 +101,7 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                 switch (menuItem.getItemId()){
                     case R.id.home:
                         Intent intentHome = new Intent(UserDetail.this,NavigationDrawer.class);
+                        intentHome.putExtra("email",user.getEmail());
                         startActivity(intentHome);
                     case R.id.favorites:
                         getSupportActionBar().setTitle("My Favorites");
@@ -223,6 +223,7 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
         }
         if(android.R.id.home==id){
             Intent intentHome = new Intent(UserDetail.this, NavigationDrawer.class);
+            intentHome.putExtra("email",user.getEmail());
             startActivity(intentHome);
         }
 

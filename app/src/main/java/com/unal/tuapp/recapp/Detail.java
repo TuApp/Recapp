@@ -76,7 +76,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
             if(user.getProfileImage()!=null) {
                 imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
                         user.getProfileImage().length));
-            }else{
+            }else if(Utility.isNetworkAvailable(this)){
                 Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGooglePlus.mGoogleApiClient);
                 String personPhotoUrl = currentPerson.getImage().getUrl();
                 //We try to request a image with major size, the new image will be of 600*600 pixels
@@ -133,6 +133,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
                 switch (menuItem.getItemId()) {
                     case R.id.home:
                         Intent intentHome = new Intent(Detail.this, NavigationDrawer.class);
+                        intentHome.putExtra("email",user.getEmail());
                         startActivity(intentHome);
                         break;
                     case R.id.favorites:
@@ -233,6 +234,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
         }
         if (id == android.R.id.home){
             Intent intentHome = new Intent(Detail.this, NavigationDrawer.class);
+            intentHome.putExtra("email",user.getEmail());
             startActivity(intentHome);
         }
 

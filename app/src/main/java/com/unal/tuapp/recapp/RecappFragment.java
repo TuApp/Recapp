@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.PlusShare;
 
 
@@ -87,7 +88,9 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
     public void onConnected(Bundle bundle) {
         mSignInProgress = mGooglePlus.STATE_DEFAULT;
         //Toast.makeText(getActivity(),"User connected",Toast.LENGTH_SHORT).show();
+        String email = Plus.AccountApi.getAccountName(mGooglePlus.mGoogleApiClient);
         Intent intent = new Intent(getActivity(),NavigationDrawer.class);
+        intent.putExtra("email",email);
         startActivity(intent);
 
     }

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.design.widget.NavigationView;
@@ -93,9 +94,14 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private String[] selectionArgs=null;
     private String selectionPlaces =null;
     private String query;
+    private boolean savedInstance;
 
     private static SearchView searchView;
     private static String deepLink;
+    private TextView email;
+    private TextView name;
+    de.hdodenhof.circleimageview.CircleImageView imageView;
+
 
 
     @Override
@@ -107,20 +113,38 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         totalFilter = 0;
         mGooglePlus = GooglePlus.getInstance(this, null, null);
         filtersConstraint = new ArrayList<>();
+        savedInstance = false;
+        if(savedInstanceState!=null){
+            savedInstance = true;
+        }
+        email = (TextView) findViewById(R.id.user_email);
+        name = (TextView) findViewById(R.id.user_name);
 
+        imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
         if(mGooglePlus.mGoogleApiClient.isConnected()){
-            Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGooglePlus.mGoogleApiClient);
-            Account account = Plus.AccountApi;
-            String personPhotoUrl = currentPerson.getImage().getUrl();
+            if(Utility.isNetworkAvailable(this)) {
+                Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGooglePlus.mGoogleApiClient);
+                Account account = Plus.AccountApi;
+                String personPhotoUrl = currentPerson.getImage().getUrl();
+                //We try to request a image with major size, the new image will be of 600*600 pixels
+                personPhotoUrl = personPhotoUrl.substring(0,personPhotoUrl.length()-2) + mGooglePlus.PROFILE_PIC_SIZE;
 
-            //We try to request a image with major size, the new image will be of 600*600 pixels
-            personPhotoUrl = personPhotoUrl.substring(0,personPhotoUrl.length()-2) + mGooglePlus.PROFILE_PIC_SIZE;
 
-            TextView name = (TextView) findViewById(R.id.user_name);
-            name.setText(currentPerson.getDisplayName());
+                name.setText(currentPerson.getDisplayName());
 
-            TextView email = (TextView) findViewById(R.id.user_email);
-            emailUser = account.getAccountName(mGooglePlus.mGoogleApiClient);
+                emailUser = account.getAccountName(mGooglePlus.mGoogleApiClient);
+                email.setText(emailUser);
+
+                Utility.addUser(this,emailUser,
+                        currentPerson.getName().getGivenName(), currentPerson.getName().getFamilyName());
+                new LoadProfileImage(root, imageView).execute(personPhotoUrl, account.getAccountName(mGooglePlus.mGoogleApiClient));
+            }else {
+                emailUser = getIntent().getExtras().getString("email");
+                Utility.addUser(this,emailUser,"","");
+                email.setText(emailUser);
+
+            }
+
             if(getSupportLoaderManager().getLoader(USER)==null) {
                 getSupportLoaderManager().initLoader(USER, null, this);
             }else{
@@ -136,17 +160,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             }else{
                 getSupportLoaderManager().restartLoader(PLACE,null,this);
             }
-            if(getSupportLoaderManager().getLoader(PLACE_FILTER)==null){
-                getSupportLoaderManager().initLoader(PLACE_FILTER,null,this);
-            }else{
-                getSupportLoaderManager().restartLoader(PLACE_FILTER,null,this);
-            }
-            email.setText(emailUser);
-            de.hdodenhof.circleimageview.CircleImageView imageView;
-            imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
-            addUser(emailUser,
-                    currentPerson.getName().getGivenName(), currentPerson.getName().getFamilyName());
-            new LoadProfileImage(root, imageView).execute(personPhotoUrl, account.getAccountName(mGooglePlus.mGoogleApiClient));
+            resetLoaderFilter();
+
+
 
         }
         filterCategory = (MultiAutoCompleteTextView) findViewById(R.id.filter_text);
@@ -205,6 +221,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                             handleIntent(getIntent());
                         }else {
                             loadSelection();
+                            resetLoaderFilter();
                         }
                         //((PlacesFragment)(((ViewPagerAdapter) viewPager.getAdapter()).getItem(viewPager.getCurrentItem()))).setFilters(filtersConstraint);
 
@@ -303,6 +320,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                     handleIntent(getIntent());
                 }else if(filtersConstraint.size()>0) {
                     loadSelection();
+                    resetLoaderFilter();
                 }else{
                     selectionPlaces = null;
                     selectionArgs = null;
@@ -322,8 +340,27 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
 
 
         //handleIntent(getIntent());
-
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!savedInstance) {
+            loadFilters();
+            loadSelection();
+            resetLoaderFilter();
+        }
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(!savedInstance){
+            saveFilters();
+            savedInstance = true;
+        }
+    }
+
+
+
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
@@ -360,7 +397,6 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         if(id == R.id.action_navigation){
             navigationDrawer.openDrawer(navFilterDrawer);
         }
-
         return super.onOptionsItemSelected(item);
     }
     @Override
@@ -473,31 +509,15 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
 
     }
 
-    public void addUser(String email,String name, String lastname){
-        Cursor userCursor = getContentResolver().query(
-                RecappContract.UserEntry.buildUserEmail(email),
-                new String[]{RecappContract.UserEntry._ID},
-                null,
-                null,
-                null
-        );
-        if(!userCursor.moveToFirst()){ //New User so we can add him/her
-            ContentValues values = new ContentValues();
-            values.put(RecappContract.UserEntry.COLUMN_EMAIL,email);
-            values.put(RecappContract.UserEntry.COLUMN_USER_NAME,name);
-            values.put(RecappContract.UserEntry.COLUMN_USER_LASTNAME,lastname);
-            getContentResolver().insert(RecappContract.UserEntry.CONTENT_URI,values);
 
-        }
-        userCursor.close();
-
-
-    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        saveFilters();
+        if(!savedInstance) {
+            saveFilters();
+            savedInstance = true;
+        }
         outState.putString("query", query);
     }
 
@@ -505,11 +525,13 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         loadFilters();
+        savedInstance = false;
         query = savedInstanceState.getString("query");
         if(query!=null && query.length()>0) {
             handleIntent(getIntent());
         }else {
             loadSelection();
+            resetLoaderFilter();
         }
 
     }
@@ -569,7 +591,8 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                                 RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_ADDRESS,
                                 RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_DESCRIPTION,
                                 RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_RATING,
-                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE},
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_WEB},
                         selectionPlaces,
                         selectionArgs,
                         sortOrder
@@ -595,6 +618,13 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                     user.setLastName(data.getString(data.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_LASTNAME)));
                     if(user!=null) {
                         mapFragment.setUser(user);
+                    }
+                    if(!user.getLastName().equals("") && !user.getName().equals("")){
+                        name.setText(user.getName()+" "+user.getLastName());
+                    }
+                    if (user.getProfileImage()!=null){
+                        imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
+                                user.getProfileImage().length));
                     }
                     deepLinkIntent(deepLink);
                 }
@@ -676,11 +706,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             if(query.toUpperCase().equals("ALL PLACES") || query.toUpperCase().equals("TODOS LOS LUGARES")){
                 if(filtersConstraint.size()>0){
                     loadSelection();
-                    if (getSupportLoaderManager().getLoader(PLACE_FILTER) == null) {
-                        getSupportLoaderManager().initLoader(PLACE_FILTER, null, this);
-                    } else {
-                        getSupportLoaderManager().restartLoader(PLACE_FILTER, null, this);
-                    }
+                    resetLoaderFilter();
                 }else{
                     selectionArgs=null;
                     selectionPlaces = null;
@@ -707,11 +733,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                     selectionArgs[filtersConstraint.size()] = "%" + query + "%";
                     selectionPlaces += "  AND " + RecappContract.PlaceEntry.TABLE_NAME + "." + RecappContract.PlaceEntry.COLUMN_NAME + " LIKE ?";
 
-                    if (getSupportLoaderManager().getLoader(PLACE_FILTER) == null) {
-                        getSupportLoaderManager().initLoader(PLACE_FILTER, null, this);
-                    } else {
-                        getSupportLoaderManager().restartLoader(PLACE_FILTER, null, this);
-                    }
+                    resetLoaderFilter();
                 } else {
                     selectionPlaces = RecappContract.PlaceEntry.TABLE_NAME + "." + RecappContract.PlaceEntry.COLUMN_NAME + " LIKE ?";
                     selectionArgs = new String[1];
@@ -735,11 +757,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 filtersConstraint.toArray(selectionArgs);
                 selectionPlaces = buildSelectionPlaceFilters(selectionArgs);
             }
-            if (getSupportLoaderManager().getLoader(PLACE_FILTER) == null) {
-                getSupportLoaderManager().initLoader(PLACE_FILTER, null, this);
-            } else {
-                getSupportLoaderManager().restartLoader(PLACE_FILTER, null, this);
-            }
+
         }
     }
     public void deepLinkIntent(String deepLink){
@@ -750,6 +768,13 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             intent.putExtra("user", user);
             startActivity(intent);
 
+        }
+    }
+    public void resetLoaderFilter(){
+        if (getSupportLoaderManager().getLoader(PLACE_FILTER) == null) {
+            getSupportLoaderManager().initLoader(PLACE_FILTER, null, this);
+        } else {
+            getSupportLoaderManager().restartLoader(PLACE_FILTER, null, this);
         }
     }
 }

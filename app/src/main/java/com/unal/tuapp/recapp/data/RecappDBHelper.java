@@ -32,8 +32,8 @@ public class RecappDBHelper extends SQLiteOpenHelper{
         final String CREATE_USER_TABLE = "CREATE TABLE " + UserEntry.TABLE_NAME + " ( "+
                 UserEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
                 UserEntry.COLUMN_EMAIL + " TEXT UNIQUE NOT NULL ," +
-                UserEntry.COLUMN_USER_NAME + " TEXT NOT NULL, " +
-                UserEntry.COLUMN_USER_LASTNAME + " TEXT NOT NULL, " +
+                UserEntry.COLUMN_USER_NAME + " TEXT, " +
+                UserEntry.COLUMN_USER_LASTNAME + " TEXT, " +
                 UserEntry.COLUMN_USER_IMAGE + " BLOB," +
                 UserEntry.COLUMN_LAT + " REAL,"+
                 UserEntry.COLUMN_LOG + " REAL );";

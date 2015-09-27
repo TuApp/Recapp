@@ -66,6 +66,23 @@ public class GalleryFragment extends Fragment {
 
         viewPager = (ViewPager) root.findViewById(R.id.slider_images);
 
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                recyclerView.scrollToPosition(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         return root;
     }
 
@@ -146,6 +163,8 @@ public class GalleryFragment extends Fragment {
             ((ViewPager) container).removeView((ImageView) object);
 
         }
+
+
 
     }
 

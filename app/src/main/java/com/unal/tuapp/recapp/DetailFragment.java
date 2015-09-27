@@ -402,6 +402,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     }
     public void initCallbackManager(){
+
         callbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override

@@ -26,6 +26,8 @@ public class RecappContract {
     public static final String PATH_SUBCATEGORY_BY_PLACE = "subCategoryByPlace";
     public static final String PATH_SUBCATEGORY_BY_TUTORIAL = "subCategoryByTutorial";
     public static final String PATH_USERBYPLACE = "userByPlace";
+    public static final String PATH_EVENT = "event";
+    public static final String PATH_EVENTBYUSER = "eventByUser";
 
     public static class UserEntry implements BaseColumns {
         public static final String TABLE_NAME = "User";
@@ -482,5 +484,71 @@ public class RecappContract {
         }
 
     }
+    public static class Event implements BaseColumns{
+        public static final String TABLE_NAME ="Event";
+
+        public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_DESCRIPTION = "description";
+        public static final String COLUMN_IMAGE = "image";
+        public static final String COLUMN_CREATOR = "creator"; // This is the email of the user who creates the event
+        public static final String COLUMN_DATE = "start_Date";
+        public static final String COLUMN_ADDRESS  = "address";
+        public static final String COLUMN_LAT = "lat";
+        public static final String COLUMN_LOG = "log";
+
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_EVENT).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_EVENT;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_EVENT;
+
+        public static final Uri buildEventUri(long id){
+            return ContentUris.withAppendedId(CONTENT_URI,id);
+        }
+
+        public static long getIdFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(1));
+        }
+
+    }
+    public static class EventByUser implements BaseColumns{
+        public static final String TABLE_NAME = "EventByUser";
+
+        public static final String COLUMN_KEY_USER = "user_key";
+        public static final String COLUMN_KEY_EVENT = "evnet_key";
+
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_EVENTBYUSER).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_EVENTBYUSER;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_EVENTBYUSER;
+
+        public static final Uri buildEventByUser(long id){
+            return ContentUris.withAppendedId(CONTENT_URI,id);
+        }
+        public static final Uri buildEventByUserEvent(long id){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_EVENT)
+                    .appendPath(""+id).build();
+        }
+        public static final Uri buildEventByUserUser(long id){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_USER)
+                    .appendPath(""+id).build();
+        }
+
+        public static final long getIdFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(1));
+        }
+        public static final long getEventFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
+        public static final long getUserFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
+    }
+
 }
 

@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -100,7 +101,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private static String deepLink;
     private TextView email;
     private TextView name;
-    de.hdodenhof.circleimageview.CircleImageView imageView;
+    private de.hdodenhof.circleimageview.CircleImageView imageView;
+    private FloatingActionButton eventCreate;
+
 
 
 
@@ -109,6 +112,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         super.onCreate(savedInstanceState);
         root = getLayoutInflater().inflate(R.layout.activity_navigation_drawer, null);
         setContentView(root);
+        eventCreate = (FloatingActionButton) root.findViewById(R.id.event_create);
         query = "";
         totalFilter = 0;
         mGooglePlus = GooglePlus.getInstance(this, null, null);
@@ -185,13 +189,13 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         addCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String [] text = filterCategory.getText().toString().split(", ");
-                if(!Arrays.deepEquals(text,subCategory)){
+                String[] text = filterCategory.getText().toString().split(", ");
+                if (!Arrays.deepEquals(text, subCategory)) {
                     subCategory = text;
-                    if(getSupportLoaderManager().getLoader(SUB_CATEGORY)==null){
-                        getSupportLoaderManager().initLoader(SUB_CATEGORY,null,NavigationDrawer.this);
-                    }else{
-                        getSupportLoaderManager().restartLoader(SUB_CATEGORY,null,NavigationDrawer.this);
+                    if (getSupportLoaderManager().getLoader(SUB_CATEGORY) == null) {
+                        getSupportLoaderManager().initLoader(SUB_CATEGORY, null, NavigationDrawer.this);
+                    } else {
+                        getSupportLoaderManager().restartLoader(SUB_CATEGORY, null, NavigationDrawer.this);
                     }
                 }
             }
@@ -238,6 +242,26 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         setUpToolbar();
         setUpViewPager();
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if(position==2){
+                    eventCreate.setVisibility(View.VISIBLE);
+                }else{
+                    eventCreate.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         navigationDrawer = (DrawerLayout) findViewById(R.id.navigation_drawer);
         navDrawer = (NavigationView) findViewById(R.id.nav_drawer);
         drawerToggle = new ActionBarDrawerToggle(this,navigationDrawer,toolbar,R.string.drawer_open,R.string.drawer_close){

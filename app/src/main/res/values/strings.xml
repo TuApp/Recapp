@@ -38,4 +38,6 @@
     <string name="search_hint">Search...</string>
     <string name="filter">Filters</string>
     <string name="facebook_app_id">1674043846146726</string>
+    <string name="going">Are you going to?</string>
+    <string name="choose">Choose or take a picture</string>
 </resources>

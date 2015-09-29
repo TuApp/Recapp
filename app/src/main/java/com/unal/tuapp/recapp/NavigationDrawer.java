@@ -242,6 +242,13 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         setUpToolbar();
         setUpViewPager();
+        eventCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(NavigationDrawer.this,EventActivity.class);
+                startActivity(intent);
+            }
+        });
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

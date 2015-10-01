@@ -5,13 +5,13 @@ android {
         config {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
-            storeFile file('/home/fabianlm17/Documents/StudioProjects/debug.keystore')
+            storeFile file('/Users/andresgutierrez/.android/debug.keystore')
             storePassword 'android'
         }
 
     }
     compileSdkVersion 22
-    buildToolsVersion "23.0.0"
+    buildToolsVersion "23.0.0 rc3"
     defaultConfig {
         applicationId "com.unal.tuapp.recapp"
         minSdkVersion 15
@@ -19,6 +19,7 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
 
         debug {

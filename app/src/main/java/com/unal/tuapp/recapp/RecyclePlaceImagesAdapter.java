@@ -17,9 +17,10 @@ import java.util.List;
  * Created by fabianlm17 on 21/09/15.
  */
 public class RecyclePlaceImagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-private Cursor placeImagesCursor =null;
-private static List<byte[]> placeImages;
-public static OnItemClickListener mItemClickListener;
+    private Cursor placeImagesCursor =null;
+    private static List<byte[]> placeImages;
+    public static OnItemClickListener mItemClickListener;
+    private int currentSelectedPositionImage;
 
 public static class PlaceImagesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
     private ImageView placeImage;
@@ -33,7 +34,7 @@ public static class PlaceImagesViewHolder extends RecyclerView.ViewHolder implem
     @Override
     public void onClick(View view){
         if(mItemClickListener!=null){
-            //long id = placeImages.get(getAdapterPosition());
+            placeImage.setBackgroundColor(GalleryFragment.SELECTED_BORDER);
             long id = getAdapterPosition();
             mItemClickListener.onItemClick(view,id);
         }
@@ -42,9 +43,17 @@ public static class PlaceImagesViewHolder extends RecyclerView.ViewHolder implem
 
 }
 
-public interface OnItemClickListener{
-    void onItemClick(View view,long position);
-}
+    public int getCurrentSelectedPositionImage() {
+        return currentSelectedPositionImage;
+    }
+
+    public void setCurrentSelectedPositionImage(int currentSelectedPositionImage) {
+        this.currentSelectedPositionImage = currentSelectedPositionImage;
+    }
+
+    public interface OnItemClickListener{
+        void onItemClick(View view,long position);
+    }
     public void setOnItemClickListener(final OnItemClickListener mItemClickListener){
         this.mItemClickListener = mItemClickListener;
     }
@@ -86,6 +95,11 @@ public interface OnItemClickListener{
         byte[] image = placeImages.get(i);
         Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
         placeImagesViewHolder.placeImage.setImageBitmap(bitmap);
+        placeImagesViewHolder.placeImage.setPadding(1, 1, 1, 1);
+        int COLOR = GalleryFragment.NON_SELECTED_BORDER;
+        if(i == currentSelectedPositionImage)
+            COLOR = GalleryFragment.SELECTED_BORDER;
+        placeImagesViewHolder.placeImage.setBackgroundColor(COLOR);
     }
 
     public void swapData(List<byte[]> newPlaceImages){

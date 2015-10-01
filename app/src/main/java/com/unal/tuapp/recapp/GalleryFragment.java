@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
@@ -34,6 +35,10 @@ public class GalleryFragment extends Fragment {
     private View root;
     public static onPlaceImagesListener mOnPlaceImagesListener;
 
+    private LinearLayoutManager layoutManager;
+    public static  final int NON_SELECTED_BORDER = Color.BLACK;
+    public static final int SELECTED_BORDER = Color.argb(100,121,134,203);
+
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
@@ -46,8 +51,7 @@ public class GalleryFragment extends Fragment {
 
         List<byte[]> placesImages = new ArrayList<>();
 
-        LinearLayoutManager layoutManager
-                = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
 
         recyclerView.setLayoutManager(layoutManager);
         recyclePlaceImagesAdapter = new RecyclePlaceImagesAdapter(placesImages);
@@ -66,7 +70,32 @@ public class GalleryFragment extends Fragment {
 
         viewPager = (ViewPager) root.findViewById(R.id.slider_images);
 
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                setSelectedImage(position);
+                int size = layoutManager.getWidth();
+                layoutManager.scrollToPositionWithOffset(position,size/2);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         return root;
+    }
+
+    public void setSelectedImage(int currentPosition){
+        RecyclePlaceImagesAdapter adapter = (RecyclePlaceImagesAdapter)recyclerView.getAdapter();
+        adapter.setCurrentSelectedPositionImage(currentPosition);
+        adapter.notifyDataSetChanged();
     }
 
     @Override

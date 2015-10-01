@@ -94,7 +94,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private CallbackManager callbackManager;
     private ShareDialog shareDialog;
 
-
+    public static onPlaceImagesListener mOnPlaceImagesListener;
 
 
     @Override
@@ -162,7 +162,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             public void onClick(View view) {
 
-                Snackbar.make(getActivity().findViewById(R.id.detail_coordination), "Fabian aqui llame a la nueva intencion", Snackbar.LENGTH_SHORT).show();
+                mOnPlaceImagesListener.onPlaceImages(view, 0);
+
+
             }
         });
         share = (Button) root.findViewById(R.id.card_share);
@@ -471,6 +473,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 }
             });
         }
+    }
+
+    public interface onPlaceImagesListener{
+        void onPlaceImages(View view,long position);
+    }
+
+
+    public void setOnPlaceImagesListener(final onPlaceImagesListener mOnPlaceListener){
+        this.mOnPlaceImagesListener= mOnPlaceListener;
     }
 
 }

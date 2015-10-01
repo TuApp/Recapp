@@ -199,6 +199,16 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         detailFragment = new DetailFragment();
+        detailFragment.setOnPlaceImagesListener(new DetailFragment.onPlaceImagesListener() {
+            @Override
+            public void onPlaceImages(View view, long position) {
+
+                Intent intent = new Intent(Detail.this, Gallery.class);
+                intent.putExtra("id", id);
+                intent.putExtra("user", user);
+                startActivity(intent);
+            }
+        });
         fragmentTransaction.replace(R.id.detail_container, detailFragment);
         fragmentTransaction.commit();
 

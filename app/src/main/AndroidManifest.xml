@@ -19,19 +19,17 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-
         <provider
-            android:authorities="com.unal.tuapp.recapp.data.MySuggestionProvider"
-            android:name=".data.MySuggestionProvider" />
+            android:name=".data.MySuggestionProvider"
+            android:authorities="com.unal.tuapp.recapp.data.MySuggestionProvider" />
         <provider
             android:name=".data.RecappProvider"
             android:authorities="com.unal.tuapp.recapp.app"
             android:exported="false" />
-        
         <provider
-            android:authorities="com.facebook.app.FacebookContentProvider1674043846146726"
             android:name="com.facebook.FacebookContentProvider"
-            android:exported="true"/>
+            android:authorities="com.facebook.app.FacebookContentProvider1674043846146726"
+            android:exported="true" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -39,44 +37,45 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyCfb_U5Z6p2PBaDDhKjwf0CxqXNOcE1Acs" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
 
-        <meta-data android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"/>
-        
-        <activity android:name="com.facebook.FacebookActivity"
+        <activity
+            android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:label="@string/app_name"/>
-
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name=".Recapp"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".NavigationDrawer"
             android:label="@string/app_name"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan"
-            android:launchMode="singleTop">
-            <meta-data android:name="android.app.searchable"
-                android:resource="@xml/searchable"  />
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan" >
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
             <intent-filter>
                 <action android:name="com.google.android.apps.plus.VIEW_DEEP_LINK" />
+
                 <data android:scheme="vnd.google.deeplink" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
+                <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
-
         </activity>
-
         <activity
             android:name=".Detail"
             android:label="@string/title_activity_detail"
@@ -94,13 +93,24 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.unal.tuapp.recapp.NavigationDrawer" />
         </activity>
-        <activity android:name=".ReminderActivity"
+        <activity
+            android:name=".ReminderActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan" >
         </activity>
-        <receiver android:name=".MyAlarmReceiver"
-            android:process=":remote">
 
+        <receiver
+            android:name=".MyAlarmReceiver"
+            android:process=":remote" >
         </receiver>
+
+        <activity
+            android:name=".Gallery"
+            android:label="@string/title_activity_gallery"
+            android:parentActivityName=".Detail" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.unal.tuapp.recapp.Detail" />
+        </activity>
     </application>
 
 </manifest>

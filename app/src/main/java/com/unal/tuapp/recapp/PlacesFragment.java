@@ -8,10 +8,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -92,61 +90,61 @@ public class PlacesFragment extends Fragment {
         ContentValues values3 = new ContentValues();
         ContentValues values4 = new ContentValues();
 
-        values.put(RecappContract.PlaceEntry.COLUMN_NAME, "algo");
-        values.put(RecappContract.PlaceEntry.COLUMN_LAT, 2.34234);
-        values.put(RecappContract.PlaceEntry.COLUMN_LOG, 1.3242134);
-        values.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, "ALGO 1");
-        values.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "alguna descripcionDSFS");
+        values.put(RecappContract.PlaceEntry.COLUMN_NAME, "CC Unicentro");
+        values.put(RecappContract.PlaceEntry.COLUMN_LAT, 4.723904099999999);
+        values.put(RecappContract.PlaceEntry.COLUMN_LOG,  -74.11411179999999);
+        values.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, " Kr 103 # 1 - 89");
+        values.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "Shopping center in Bogota");
 
         ByteArrayOutputStream stream =  new ByteArrayOutputStream();
-        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.ic_favorites).
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.unicentrologo).
                 compress(Bitmap.CompressFormat.PNG, 100, stream);
         values.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream.toByteArray());
         values.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
 
-        values1.put(RecappContract.PlaceEntry.COLUMN_NAME, "algo1");
-        values1.put(RecappContract.PlaceEntry.COLUMN_LAT, 1.34234);
-        values1.put(RecappContract.PlaceEntry.COLUMN_LOG, -1.3242134);
+        values1.put(RecappContract.PlaceEntry.COLUMN_NAME, "CC Gran Estacion");
+        values1.put(RecappContract.PlaceEntry.COLUMN_LAT, 4.648128);
+        values1.put(RecappContract.PlaceEntry.COLUMN_LOG, -74.101848);
         values1.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, " ADD AS");
-        values1.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "alguna descripcion DSFAS");
+        values1.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "Shopping center in Bogota");
         ByteArrayOutputStream stream1 =  new ByteArrayOutputStream();
-        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.background_material).
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.gelogo).
                 compress(Bitmap.CompressFormat.PNG, 100, stream1);
         values1.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream1.toByteArray());
         values1.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
 
-        values2.put(RecappContract.PlaceEntry.COLUMN_NAME, "algo2");
-        values2.put(RecappContract.PlaceEntry.COLUMN_LAT, 0.34234);
-        values2.put(RecappContract.PlaceEntry.COLUMN_LOG, 0.3242134);
+        values2.put(RecappContract.PlaceEntry.COLUMN_NAME, "TM Station Ricaurte");
+        values2.put(RecappContract.PlaceEntry.COLUMN_LAT, 4.611586);
+        values2.put(RecappContract.PlaceEntry.COLUMN_LOG, -74.094059);
         values2.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, " dfsdafaddress2");
         values2.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "alguna descripcioDSFn");
         values2.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
 
         ByteArrayOutputStream stream2 =  new ByteArrayOutputStream();
-        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.ic_calendar).
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.tmricaurtelogo).
                 compress(Bitmap.CompressFormat.PNG, 100, stream2);
         values2.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream2.toByteArray());
 
-        values3.put(RecappContract.PlaceEntry.COLUMN_NAME, "algo3");
-        values3.put(RecappContract.PlaceEntry.COLUMN_LAT, 2.14234);
-        values3.put(RecappContract.PlaceEntry.COLUMN_LOG, 1.9242134);
+        values3.put(RecappContract.PlaceEntry.COLUMN_NAME, "CC Salitre Plaza");
+        values3.put(RecappContract.PlaceEntry.COLUMN_LAT, 4.6529149);
+        values3.put(RecappContract.PlaceEntry.COLUMN_LOG, -74.1102505);
         values3.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, "nueva direcion");
-        values3.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "alguna descripcioDSFn");
+        values3.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "Shopping center in Bogota");
 
         ByteArrayOutputStream stream3 =  new ByteArrayOutputStream();
-        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.background_material).
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.salitreplace1).
                 compress(Bitmap.CompressFormat.PNG, 100, stream3);
         values3.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream3.toByteArray());
         values3.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
 
-        values4.put(RecappContract.PlaceEntry.COLUMN_NAME, "algo4");
-        values4.put(RecappContract.PlaceEntry.COLUMN_LAT, 4.405637);
-        values4.put(RecappContract.PlaceEntry.COLUMN_LOG, -73.946686);
+        values4.put(RecappContract.PlaceEntry.COLUMN_NAME, "UN C. y T.");
+        values4.put(RecappContract.PlaceEntry.COLUMN_LAT, 4.638242);
+        values4.put(RecappContract.PlaceEntry.COLUMN_LOG, -74.083961);
         values4.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, "234ad");
-        values4.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "alguna descripcioDSFn");
+        values4.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "Building at National University of Colombia, Bogota");
 
         ByteArrayOutputStream stream4 =  new ByteArrayOutputStream();
-        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.ic_calendar).
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.cytplace1).
                 compress(Bitmap.CompressFormat.PNG, 100, stream4);
         values4.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream4.toByteArray());
         values4.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
@@ -243,13 +241,139 @@ public class PlacesFragment extends Fragment {
         );
 
 
+
+        //Unicentro's pictures
         ContentValues image = new ContentValues();
         ByteArrayOutputStream stream5 =  new ByteArrayOutputStream();
-        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.background_material).
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.unicentrologo).
                 compress(Bitmap.CompressFormat.PNG, 100, stream5);
         image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
         image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
-        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only a example
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.unicentroplace1).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.unicentroplace2).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.unicentroplace3).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+
+
+        //GE's pictures
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.gelogo).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,2); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.geplace1).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,2); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.geplace2).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,2); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.geplace3).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,2); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+
+
+        //TM Ricaurte pictures
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.tmricaurtelogo).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,3); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.tmricaurteplace1).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,3); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+
+        //Salitre Plaza pictures
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.salitreplace1).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,4); //This is only an example
+        getActivity().getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                image
+        );
+
+        //UN CyT pictures
+        stream5 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.cytplace1).
+                compress(Bitmap.CompressFormat.PNG, 100, stream5);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
+        image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,5); //This is only an example
         getActivity().getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 image

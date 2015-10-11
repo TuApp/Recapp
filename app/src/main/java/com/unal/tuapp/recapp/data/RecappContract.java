@@ -484,7 +484,7 @@ public class RecappContract {
         }
 
     }
-    public static class Event implements BaseColumns{
+    public static class EventEntry implements BaseColumns{
         public static final String TABLE_NAME ="Event";
 
         public static final String COLUMN_NAME = "name";
@@ -512,11 +512,11 @@ public class RecappContract {
         }
 
     }
-    public static class EventByUser implements BaseColumns{
+    public static class EventByUserEntry implements BaseColumns{
         public static final String TABLE_NAME = "EventByUser";
 
         public static final String COLUMN_KEY_USER = "user_key";
-        public static final String COLUMN_KEY_EVENT = "evnet_key";
+        public static final String COLUMN_KEY_EVENT = "event_key";
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_EVENTBYUSER).build();
 

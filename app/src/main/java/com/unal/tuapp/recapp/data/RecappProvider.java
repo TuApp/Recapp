@@ -206,17 +206,17 @@ public class RecappProvider extends ContentProvider {
         );
         eventByUserEvent = new SQLiteQueryBuilder();
         eventByUserEvent.setTables(
-                EventByUser.TABLE_NAME + " INNER JOIN " +
-                        Event.TABLE_NAME + " ON "+
-                        EventByUser.TABLE_NAME+"."+EventByUser.COLUMN_KEY_EVENT+
-                        " = " + Event.TABLE_NAME+"."+Event._ID
+                EventByUserEntry.TABLE_NAME + " INNER JOIN " +
+                        EventEntry.TABLE_NAME + " ON "+
+                        EventByUserEntry.TABLE_NAME+"."+ EventByUserEntry.COLUMN_KEY_EVENT+
+                        " = " + EventEntry.TABLE_NAME+"."+ EventEntry._ID
         );
         eventByUserUser = new SQLiteQueryBuilder();
         eventByUserUser.setTables(
-                EventByUser.TABLE_NAME + " INNER JOIN " +
-                        Event.TABLE_NAME + " ON "+
-                        EventByUser.TABLE_NAME+"."+EventByUser.COLUMN_KEY_USER+
-                        " = "+ Event.TABLE_NAME+"."+Event._ID
+                EventByUserEntry.TABLE_NAME + " INNER JOIN " +
+                        UserEntry.TABLE_NAME + " ON "+
+                        EventByUserEntry.TABLE_NAME+"."+ EventByUserEntry.COLUMN_KEY_USER+
+                        " = "+ UserEntry.TABLE_NAME+"."+UserEntry._ID
         );
 
     }
@@ -416,17 +416,17 @@ public class RecappProvider extends ContentProvider {
             case USER_BY_PLACE_ID:
                 return UserByPlaceEntry.CONTENT_ITEM_TYPE;
             case EVENT:
-                return Event.CONTENT_TYPE;
+                return EventEntry.CONTENT_TYPE;
             case EVENT_ID:
-                return Event.CONTENT_ITEM_TYPE;
+                return EventEntry.CONTENT_ITEM_TYPE;
             case EVENT_BY_USER:
-                return EventByUser.CONTENT_TYPE;
+                return EventByUserEntry.CONTENT_TYPE;
             case EVENT_BY_USER_EVENT:
-                return EventByUser.CONTENT_TYPE;
+                return EventByUserEntry.CONTENT_TYPE;
             case EVENT_BY_USER_USER:
-                return EventByUser.CONTENT_TYPE;
+                return EventByUserEntry.CONTENT_TYPE;
             case EVENT_BY_USER_ID:
-                return EventByUser.CONTENT_ITEM_TYPE;
+                return EventByUserEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
@@ -1014,7 +1014,7 @@ public class RecappProvider extends ContentProvider {
                 break;
             case EVENT:
                 retCursor = recappDBHelper.getReadableDatabase().query(
-                        Event.TABLE_NAME,
+                        EventEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -1024,10 +1024,10 @@ public class RecappProvider extends ContentProvider {
                 );
                 break;
             case EVENT_ID:
-                long eventId = Event.getIdFromUri(uri);
-                selection = Event._ID + " = ?";
+                long eventId = EventEntry.getIdFromUri(uri);
+                selection = EventEntry._ID + " = ?";
                 retCursor = recappDBHelper.getReadableDatabase().query(
-                        Event.TABLE_NAME,
+                        EventEntry.TABLE_NAME,
                         projection,
                         selection,
                         new String[]{""+eventId},
@@ -1038,7 +1038,7 @@ public class RecappProvider extends ContentProvider {
                 break;
             case EVENT_BY_USER:
                 retCursor = recappDBHelper.getReadableDatabase().query(
-                        EventByUser.TABLE_NAME,
+                        EventByUserEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -1048,8 +1048,8 @@ public class RecappProvider extends ContentProvider {
                 );
                 break;
             case EVENT_BY_USER_EVENT:
-                eventId = EventByUser.getEventFromUri(uri);
-                selection =  EventByUser.COLUMN_KEY_EVENT +" = ? ";
+                eventId = EventByUserEntry.getEventFromUri(uri);
+                selection =  EventByUserEntry.COLUMN_KEY_EVENT +" = ? ";
                 retCursor = eventByUserUser.query(
                         recappDBHelper.getReadableDatabase(),
                         projection,
@@ -1061,8 +1061,8 @@ public class RecappProvider extends ContentProvider {
                 );
                 break;
             case EVENT_BY_USER_USER:
-                userId = EventByUser.getUserFromUri(uri);
-                selection =  EventByUser.COLUMN_KEY_USER+ " = ?";
+                userId = EventByUserEntry.getUserFromUri(uri);
+                selection =  EventByUserEntry.COLUMN_KEY_USER+ " = ?";
                 retCursor = eventByUserEvent.query(
                         recappDBHelper.getReadableDatabase(),
                         projection,
@@ -1187,17 +1187,17 @@ public class RecappProvider extends ContentProvider {
                 }
                 break;
             case EVENT:
-                id = db.insert(Event.TABLE_NAME,null,values);
+                id = db.insert(EventEntry.TABLE_NAME,null,values);
                 if(id>0){
-                    returnUri = Event.buildEventUri(id);
+                    returnUri = EventEntry.buildEventUri(id);
                 }else{
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
                 break;
             case EVENT_BY_USER:
-                id = db.insert(EventByUser.TABLE_NAME,null,values);
+                id = db.insert(EventByUserEntry.TABLE_NAME,null,values);
                 if(id>0){
-                    returnUri = EventByUser.buildEventByUser(id);
+                    returnUri = EventByUserEntry.buildEventByUser(id);
                 }else{
                     throw new android.database.SQLException("Failed to insert row into "+ uri);
                 }
@@ -1256,10 +1256,10 @@ public class RecappProvider extends ContentProvider {
                 rowsDeleted = db.delete(UserByPlaceEntry.TABLE_NAME,selection,selectionArgs);
                 break;
             case EVENT:
-                rowsDeleted = db.delete(Event.TABLE_NAME,selection,selectionArgs);
+                rowsDeleted = db.delete(EventEntry.TABLE_NAME,selection,selectionArgs);
                 break;
             case EVENT_BY_USER:
-                rowsDeleted = db.delete(EventByUser.TABLE_NAME,selection,selectionArgs);
+                rowsDeleted = db.delete(EventByUserEntry.TABLE_NAME,selection,selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -1316,10 +1316,10 @@ public class RecappProvider extends ContentProvider {
                 rowUpdated = db.update(UserByPlaceEntry.TABLE_NAME,values,selection,selectionArgs);
                 break;
             case EVENT:
-                rowUpdated = db.update(Event.TABLE_NAME,values,selection,selectionArgs);
+                rowUpdated = db.update(EventEntry.TABLE_NAME,values,selection,selectionArgs);
                 break;
             case EVENT_BY_USER:
-                rowUpdated = db.update(EventByUser.TABLE_NAME,values,selection,selectionArgs);
+                rowUpdated = db.update(EventByUserEntry.TABLE_NAME,values,selection,selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -1543,7 +1543,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try{
                     for(ContentValues value:values){
-                        long id = db.insert(Event.TABLE_NAME,null,value);
+                        long id = db.insert(EventEntry.TABLE_NAME,null,value);
                         if(id!=-1){
                             returnCount++;
                         }
@@ -1559,7 +1559,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try{
                     for(ContentValues value:values){
-                        long id = db.insert(EventByUser.TABLE_NAME,null,value);
+                        long id = db.insert(EventByUserEntry.TABLE_NAME,null,value);
                         if(id!=-1){
                             returnCount++;
                         }

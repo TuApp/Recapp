@@ -83,6 +83,22 @@
 
         </LinearLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/place"/>
+
+        <EditText
+            android:id="@+id/event_dialog_place"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:drawableRight="@android:drawable/arrow_down_float"
+            android:editable="false"
+            android:textSize="15sp"/>
+
        <!-- <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

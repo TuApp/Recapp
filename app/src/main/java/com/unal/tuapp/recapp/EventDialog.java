@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Address;
@@ -15,6 +16,9 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -30,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.TimePicker;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.unal.tuapp.recapp.data.RecappContract;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -42,7 +47,7 @@ import java.util.List;
 /**
  * Created by andresgutierrez on 9/28/15.
  */
-public class EventDialog extends DialogFragment {
+public class EventDialog extends DialogFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private View root;
     private ImageView eventImage;
     private EditText eventName;
@@ -66,10 +71,15 @@ public class EventDialog extends DialogFragment {
     private String address;
     private Double lat;
     private Double lng;
+    private long eventId;
+    private static int EVENT = 3872;
 
 
     public interface OnEventListener{
         void onAction(String action,Object...objects);
+    }
+    public void setOnEventListener(OnEventListener onEventListener){
+        this.onEventListener = onEventListener;
     }
 
     @Override
@@ -88,7 +98,17 @@ public class EventDialog extends DialogFragment {
                 android.R.drawable.ic_menu_close_clear_cancel
         );
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.newEvent);
-
+        Bundle extras = getActivity().getIntent().getExtras();
+        if(extras!=null){
+            eventId = extras.getLong("event",-1);
+            if(eventId!=-1){
+                if(getLoaderManager().getLoader(EVENT)==null){
+                    getLoaderManager().initLoader(EVENT,null,this);
+                }else{
+                    getLoaderManager().initLoader(EVENT,null,this);
+                }
+            }
+        }
         eventImage = (ImageView) root.findViewById(R.id.event_dialog_image);
         eventName = (EditText) root.findViewById(R.id.event_dialog_title);
         eventDescription = (EditText) root.findViewById(R.id.event_dialog_description);
@@ -197,6 +217,7 @@ public class EventDialog extends DialogFragment {
                         address = list.get(0).getAddressLine(0);
                         lat = place.latitude;
                         lng = place.longitude;
+
                     }
                 });
 
@@ -209,7 +230,10 @@ public class EventDialog extends DialogFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.reminder_dialog, menu);
+        inflater.inflate(R.menu.event_dialog, menu);
+        if(eventId!=-1){
+            menu.findItem(R.id.delete_event).setVisible(true);
+        }
     }
 
     @Override
@@ -264,7 +288,10 @@ public class EventDialog extends DialogFragment {
                         }else{
                             image = this.image;
                         }
-                        onEventListener.onAction("save",name,description,event,address,lat,lng,image);
+                        if(address==null){
+                            address = eventPlace.getText().toString().split("Lat")[0].trim();
+                        }
+                        onEventListener.onAction("save",name,description,event,address,latLng.latitude,latLng.longitude,image);
                     }else{
                         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
                         alertDialog.setTitle("Invalid date").setMessage("The date should be greater than now")
@@ -296,6 +323,27 @@ public class EventDialog extends DialogFragment {
                 AlertDialog dialog = alertDialog.create();
                 dialog.show();
             }
+        }
+        if(item.getItemId()==R.id.delete_event){
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+            alertDialog.setTitle("Delete")
+                    .setMessage("Do you want to delete the event")
+                    .setCancelable(false)
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            onEventListener.onAction("delete");
+                        }
+
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+            AlertDialog dialog = alertDialog.create();
+            dialog.show();
         }
         return true;
     }
@@ -341,52 +389,48 @@ public class EventDialog extends DialogFragment {
         return image;
     }
 
+
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try{
-            onEventListener = (OnEventListener) activity;
-        }catch (ClassCastException e){
-            throw new ClassCastException(activity.toString());
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        if(id==EVENT){
+            return new CursorLoader(
+                    getActivity(),
+                    RecappContract.EventEntry.buildEventUri(eventId),
+                    null,
+                    null,
+                    null,
+                    null
+            );
+        }
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if(loader.getId()==EVENT){
+            if(data.moveToFirst()){
+                eventName.setText(data.getString(data.getColumnIndexOrThrow(RecappContract.EventEntry.COLUMN_NAME)));
+                eventDescription.setText(data.getString(data.getColumnIndexOrThrow(RecappContract.EventEntry.COLUMN_DESCRIPTION)));
+                String dateTime = Utility.getDateTime(data.getLong(data.getColumnIndexOrThrow(RecappContract.EventEntry.COLUMN_DATE)));
+                String []time = dateTime.split("-");
+                eventDate.setText(time[0]);
+                eventTime.setText(time[1]);
+                double lat = data.getDouble(data.getColumnIndexOrThrow(RecappContract.EventEntry.COLUMN_LAT));
+                double lng = data.getDouble(data.getColumnIndexOrThrow(RecappContract.EventEntry.COLUMN_LOG));
+                String address = data.getString(data.getColumnIndexOrThrow(RecappContract.EventEntry.COLUMN_ADDRESS));
+                eventPlace.setText(address + "\nLat: " + lat + " Lng: " + lng);
+                byte [] image = data.getBlob(data.getColumnIndexOrThrow(RecappContract.EventEntry.COLUMN_IMAGE));
+                this.image = BitmapFactory.decodeByteArray(image,0,image.length);
+                eventImage.setImageBitmap(this.image);
+                latLng = new LatLng(lat,lng);
+                isNewImage = true;
+
+            }
         }
     }
 
-    /*@Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        //There is a issue with the textView
-        super.onActivityCreated(savedInstanceState);
-        if(savedInstanceState!=null){
-            name = savedInstanceState.getString("name");
-            description = savedInstanceState.getString("description");
-            date = savedInstanceState.getString("date");
-            time = savedInstanceState.getString("time");
-            place = savedInstanceState.getString("place");
-            if(savedInstanceState.getBoolean("isImage")) {
-                image = BitmapFactory.decodeByteArray(savedInstanceState.getByteArray("image"),
-                        savedInstanceState.getByteArray("image").length, 0);
-            }
-        }
-    }*/
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
 
-
-
-    /*@Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString("name", eventName.getText().toString());
-        outState.putString("description", eventDescription.getText().toString());
-        outState.putString("date", eventDate.getText().toString());
-        outState.putString("time", eventTime.getText().toString());
-        outState.putString("place", eventPlace.getText().toString());
-        if(image!=null) {
-            outState.putBoolean("isImage",true);
-            ByteArrayOutputStream bs = new ByteArrayOutputStream();
-            image.compress(Bitmap.CompressFormat.PNG, 50, bs);
-            outState.putByteArray("image", bs.toByteArray());
-        }else{
-            outState.putBoolean("isImage",false);
-        }
-    }*/
-
-
+    }
 }

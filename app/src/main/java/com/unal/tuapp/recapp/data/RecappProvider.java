@@ -66,8 +66,7 @@ public class RecappProvider extends ContentProvider {
     static final int USER_BY_PLACE_PLACE = 1220;
     static final int USER_BY_PLACE_ID = 1230;
     static final int EVENT = 1300;
-    static final int EVENT_EMAIL = 1310;
-    static final int EVENT_ID = 1320;
+    static final int EVENT_ID = 1310;
     static final int EVENT_BY_USER = 1400;
     static final int EVENT_BY_USER_EVENT = 1410;
     static final int EVENT_BY_USER_USER = 1420;

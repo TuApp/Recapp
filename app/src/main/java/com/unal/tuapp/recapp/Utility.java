@@ -20,6 +20,11 @@ public class Utility {
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
         return format.format(date);
     }
+    public static String getDateTime(long time){
+        Date date = new Date(time);
+        SimpleDateFormat  format = new SimpleDateFormat("EEE, MM d, yyyy - HH:mm");
+        return format.format(date);
+    }
     public static boolean isNetworkAvailable(Context context){
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();

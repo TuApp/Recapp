@@ -112,6 +112,18 @@ public class MapDialog extends DialogFragment {
 
         return root;
     }
+    public void changePlace(double lat,double lng){
+        if(place!=null){
+            place.remove();
+        }
+        if(map!=null) {
+            place = map.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
+            CameraPosition cameraPosition = CameraPosition.builder()
+                    .target(new LatLng(lat, lng))
+                    .build();
+            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 1500, null);
+        }
+    }
 
 
 }

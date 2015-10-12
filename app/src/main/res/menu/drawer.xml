@@ -24,6 +24,10 @@
             android:icon="@drawable/ic_comments">
 
         </item>
+        <item android:id="@+id/events"
+            android:title="@string/my_events"
+            android:icon="@drawable/ic_calendar">
+        </item>
         <item android:id="@+id/account"
             android:title="@string/my_account">
             <menu>

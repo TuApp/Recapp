@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dp">
+
+    <LinearLayout
+        android:id="@+id/event_dialog"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/event_dialog_image"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:src="@android:drawable/ic_input_add"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"/>
+        <EditText
+            android:id="@+id/event_dialog_title"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:singleLine="true"
+            android:layout_marginBottom="8dp"
+            android:textSize="25sp"
+            android:hint="@string/eventName"
+            android:textStyle="bold"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:paddingLeft="8dp"/>
+        <EditText
+            android:id="@+id/event_dialog_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:minLines="1"
+            android:lines="4"
+            android:maxLines="8"
+            android:hint="@string/description"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:paddingLeft="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:text="@string/to"
+            android:layout_marginLeft="8dp"/>
+
+        <LinearLayout
+            android:id="@+id/event_dialog_to"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/event_dialog_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:layout_weight="4"
+                android:drawableRight="@android:drawable/arrow_down_float"
+                android:editable="false"
+                android:paddingLeft="8dp"
+                android:layout_marginLeft="8dp"/>
+
+            <EditText
+                android:id="@+id/event_dialog_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:layout_weight="2"
+                android:drawableRight="@android:drawable/arrow_down_float"
+                android:editable="false"
+                android:paddingLeft="8dp"
+                android:layout_marginRight="8dp"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/place"/>
+
+        <EditText
+            android:id="@+id/event_dialog_place"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:drawableRight="@android:drawable/arrow_down_float"
+            android:editable="false"
+            android:textSize="15sp"/>
+
+       <!-- <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/going"
+            android:textSize="15sp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"/> -->
+
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

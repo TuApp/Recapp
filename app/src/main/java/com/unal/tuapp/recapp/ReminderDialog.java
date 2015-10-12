@@ -55,6 +55,7 @@ public class ReminderDialog extends DialogFragment implements LoaderManager.Load
     private EditText time;
     private long id;
 
+
     public interface OnDialogListener{
         void onAction(String action,Object...values);
     }

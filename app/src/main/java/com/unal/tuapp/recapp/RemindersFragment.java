@@ -158,7 +158,7 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         List<Reminder> reminders = Reminder.allReminder(data);
-        recycleRemindersAdapter.swapDate(reminders);
+        recycleRemindersAdapter.swapData(reminders);
         recycleRemindersAdapter.setReminderCursor(data);
     }
 

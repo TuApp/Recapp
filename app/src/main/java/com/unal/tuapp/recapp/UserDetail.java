@@ -11,6 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +31,7 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
     private Fragment fragmentPlace;
     private Fragment fragmentComment;
     private Fragment fragmentReminder;
+    private Fragment fragmentEvents;
     private String newType;
 
     @Override
@@ -94,6 +96,16 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
         });
         fragmentComment = new CommentsFragment();
         fragmentReminder = new RemindersFragment();
+        fragmentEvents = new MyEventsFragment();
+        ((MyEventsFragment)fragmentEvents).setOnEventListener(new MyEventsFragment.OnEventListener() {
+            @Override
+            public void onAction(long id) {
+                Intent intent = new Intent(UserDetail.this,EventUpdateActivity.class);
+                intent.putExtra("event",id);
+                intent.putExtra("user",user);
+                startActivity(intent);
+            }
+        });
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -101,7 +113,7 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                 switch (menuItem.getItemId()){
                     case R.id.home:
                         Intent intentHome = new Intent(UserDetail.this,NavigationDrawer.class);
-                        intentHome.putExtra("email",user.getEmail());
+                        intentHome.putExtra("email", user.getEmail());
                         startActivity(intentHome);
                     case R.id.favorites:
                         getSupportActionBar().setTitle("My Favorites");
@@ -112,6 +124,7 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
 
                         fragmentTransaction.hide(fragmentComment);
                         fragmentTransaction.hide(fragmentReminder);
+                        fragmentTransaction.hide(fragmentEvents);
                         fragmentTransaction.commit();
                         break;
                     case R.id.appointments:
@@ -122,6 +135,7 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                         }
                         fragmentTransaction.hide(fragmentPlace);
                         fragmentTransaction.hide(fragmentComment);
+                        fragmentTransaction.hide(fragmentEvents);
                         fragmentTransaction.commit();
                         break;
                     case R.id.comments:
@@ -132,8 +146,20 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                         }
                         fragmentTransaction.hide(fragmentPlace);
                         fragmentTransaction.hide(fragmentReminder);
+                        fragmentTransaction.hide(fragmentEvents);
                         fragmentTransaction.commit();
 
+                        break;
+                    case R.id.events:
+                        getSupportActionBar().setTitle("My Events");
+                        newType = "event";
+                        if(fragmentEvents.isAdded()){
+                            fragmentTransaction.show(fragmentEvents);
+                        }
+                        fragmentTransaction.hide(fragmentPlace);
+                        fragmentTransaction.hide(fragmentReminder);
+                        fragmentTransaction.hide(fragmentComment);
+                        fragmentTransaction.commit();
                         break;
                     case R.id.sign_out:
                         if(GooglePlus.mGoogleApiClient.isConnected()){
@@ -170,8 +196,10 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                 fragmentTransaction.replace(R.id.user_detail_container, fragmentPlace, "favorite");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentComment, "comment");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentReminder, "reminder");
+                fragmentTransaction.add(R.id.user_detail_container,fragmentEvents,"event");
                 fragmentTransaction.hide(fragmentComment);
                 fragmentTransaction.hide(fragmentReminder);
+                fragmentTransaction.hide(fragmentEvents);
                 fragmentTransaction.commit();
                 navigationView.getMenu().findItem(R.id.favorites).setChecked(true);
                 break;
@@ -180,8 +208,10 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                 fragmentTransaction.replace(R.id.user_detail_container, fragmentComment, "comment");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentPlace, "favorite");
                 fragmentTransaction.add(R.id.user_detail_container,fragmentReminder,"reminder");
+                fragmentTransaction.add(R.id.user_detail_container,fragmentEvents,"event");
                 fragmentTransaction.hide(fragmentPlace);
                 fragmentTransaction.hide(fragmentReminder);
+                fragmentTransaction.hide(fragmentEvents);
                 fragmentTransaction.commit();
                 navigationView.getMenu().findItem(R.id.comments).setChecked(true);
                 break;
@@ -191,11 +221,26 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                 fragmentTransaction.replace(R.id.user_detail_container, fragmentReminder, "reminder");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentPlace, "favorite");
                 fragmentTransaction.add(R.id.user_detail_container,fragmentComment,"comment");
+                fragmentTransaction.add(R.id.user_detail_container,fragmentEvents,"event");
                 fragmentTransaction.hide(fragmentPlace);
                 fragmentTransaction.hide(fragmentComment);
+                fragmentTransaction.hide(fragmentEvents);
                 fragmentTransaction.commit();
                 navigationView.getMenu().findItem(R.id.appointments).setChecked(true);
                 break;
+            case "event":
+                getSupportActionBar().setTitle("My events");
+                fragmentTransaction.replace(R.id.user_detail_container, fragmentReminder, "reminder");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentPlace, "favorite");
+                fragmentTransaction.add(R.id.user_detail_container,fragmentComment,"comment");
+                fragmentTransaction.add(R.id.user_detail_container,fragmentEvents,"event");
+                fragmentTransaction.hide(fragmentPlace);
+                fragmentTransaction.hide(fragmentComment);
+                fragmentTransaction.hide(fragmentReminder);
+                fragmentTransaction.commit();
+                navigationView.getMenu().findItem(R.id.events).setChecked(true);
+                break;
+
 
 
         }

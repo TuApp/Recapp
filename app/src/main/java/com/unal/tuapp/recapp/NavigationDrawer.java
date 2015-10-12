@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -40,6 +41,7 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.PlusShare;
 import com.google.android.gms.plus.model.people.Person;
 import com.unal.tuapp.recapp.data.Category;
+import com.unal.tuapp.recapp.data.Event;
 import com.unal.tuapp.recapp.data.MySuggestionProvider;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
@@ -82,9 +84,12 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private static final int SUB_CATEGORY = 299;
     private static final int PLACE = 345;
     private static final int PLACE_FILTER = 467;
+    private static final int EVENT = 579;
+    private static final int EVENT_GOING = 591;
     private Cursor userCursor;
     private MapFragment mapFragment;
-    private  PlacesFragment placesFragment;
+    private PlacesFragment placesFragment;
+    private EventsFragment eventsFragment;
     private MultiAutoCompleteTextView filterCategory;
     private LimitArrayAdapterCategory adapter;
     private LimitArrayAdapterSubCategory adapterSubCategory;
@@ -100,7 +105,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private static String deepLink;
     private TextView email;
     private TextView name;
-    de.hdodenhof.circleimageview.CircleImageView imageView;
+    private de.hdodenhof.circleimageview.CircleImageView imageView;
+    private FloatingActionButton eventCreate;
+
 
 
 
@@ -109,6 +116,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         super.onCreate(savedInstanceState);
         root = getLayoutInflater().inflate(R.layout.activity_navigation_drawer, null);
         setContentView(root);
+        eventCreate = (FloatingActionButton) root.findViewById(R.id.event_create);
         query = "";
         totalFilter = 0;
         mGooglePlus = GooglePlus.getInstance(this, null, null);
@@ -160,6 +168,17 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             }else{
                 getSupportLoaderManager().restartLoader(PLACE,null,this);
             }
+            if(getSupportLoaderManager().getLoader(EVENT)==null){
+                getSupportLoaderManager().initLoader(EVENT,null,this);
+            }else{
+                getSupportLoaderManager().restartLoader(EVENT,null,this);
+            }
+            if(getSupportLoaderManager().getLoader(EVENT_GOING)==null){
+                getSupportLoaderManager().initLoader(EVENT_GOING,null,this);
+            }else{
+                getSupportLoaderManager().restartLoader(EVENT_GOING,null,this);
+            }
+
             resetLoaderFilter();
 
 
@@ -185,13 +204,13 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         addCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String [] text = filterCategory.getText().toString().split(", ");
-                if(!Arrays.deepEquals(text,subCategory)){
+                String[] text = filterCategory.getText().toString().split(", ");
+                if (!Arrays.deepEquals(text, subCategory)) {
                     subCategory = text;
-                    if(getSupportLoaderManager().getLoader(SUB_CATEGORY)==null){
-                        getSupportLoaderManager().initLoader(SUB_CATEGORY,null,NavigationDrawer.this);
-                    }else{
-                        getSupportLoaderManager().restartLoader(SUB_CATEGORY,null,NavigationDrawer.this);
+                    if (getSupportLoaderManager().getLoader(SUB_CATEGORY) == null) {
+                        getSupportLoaderManager().initLoader(SUB_CATEGORY, null, NavigationDrawer.this);
+                    } else {
+                        getSupportLoaderManager().restartLoader(SUB_CATEGORY, null, NavigationDrawer.this);
                     }
                 }
             }
@@ -238,6 +257,34 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         setUpToolbar();
         setUpViewPager();
+        eventCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(NavigationDrawer.this,EventActivity.class);
+                intent.putExtra("user",user);
+                startActivity(intent);
+            }
+        });
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if(position==2){
+                    eventCreate.setVisibility(View.VISIBLE);
+                }else{
+                    eventCreate.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         navigationDrawer = (DrawerLayout) findViewById(R.id.navigation_drawer);
         navDrawer = (NavigationView) findViewById(R.id.nav_drawer);
         drawerToggle = new ActionBarDrawerToggle(this,navigationDrawer,toolbar,R.string.drawer_open,R.string.drawer_close){
@@ -282,6 +329,12 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         intentComment.putExtra("user",user);
                         intentComment.putExtra("type","comment");
                         startActivity(intentComment);
+                        break;
+                    case R.id.events:
+                        Intent intentEvent = new Intent(NavigationDrawer.this,UserDetail.class);
+                        intentEvent.putExtra("user",user);
+                        intentEvent.putExtra("type","event");
+                        startActivity(intentEvent);
                         break;
                     case R.id.sign_out:
                         if(mGooglePlus.mGoogleApiClient.isConnected()){
@@ -451,9 +504,20 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             }
         });
 
+        eventsFragment = new EventsFragment();
+        eventsFragment.setOnEventListener(new EventsFragment.OnEventListener() {
+            @Override
+            public void onAction(long id) {
+                //We should open an activity to the user can sign up in the event
+                Intent intent = new Intent(NavigationDrawer.this,EventActivityGoing.class);
+                intent.putExtra("user",user);
+                intent.putExtra("event",id);
+                startActivity(intent);
+            }
+        });
         viewPagerAdapter.addFragment(placesFragment, getResources().getString(R.string.places));
         viewPagerAdapter.addFragment(mapFragment, getResources().getString(R.string.map));
-        viewPagerAdapter.addFragment(new EventsFragment(), getResources().getString(R.string.events));
+        viewPagerAdapter.addFragment(eventsFragment, getResources().getString(R.string.events));
         viewPagerAdapter.addFragment(new TutorialFragment(), getResources().getString(R.string.tutorial));
         viewPager.setOffscreenPageLimit(4);
         viewPager.setAdapter(viewPagerAdapter);
@@ -539,6 +603,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String sortOrder = RecappContract.PlaceEntry.COLUMN_RATING + " DESC ";
+        String sortOrderEvent = RecappContract.EventEntry.COLUMN_DATE + " ASC ";
         switch(id){
             case USER:
                 return new CursorLoader(
@@ -597,6 +662,33 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         selectionArgs,
                         sortOrder
                 );
+            case EVENT:
+                //This show the events which the user isn't going to
+                return new CursorLoader(
+                        this,
+                        RecappContract.EventEntry.CONTENT_URI,
+                        null,
+                        null,
+                        null,
+                        sortOrderEvent
+                );
+            case EVENT_GOING:
+                return new CursorLoader(
+                        this,
+                        RecappContract.EventByUserEntry.buildEventByUserUser(emailUser),
+                        new String[]{RecappContract.EventEntry.TABLE_NAME+"."+RecappContract.EventEntry._ID,
+                                RecappContract.EventEntry.TABLE_NAME+"."+RecappContract.EventEntry.COLUMN_ADDRESS,
+                                RecappContract.EventEntry.TABLE_NAME+"."+RecappContract.EventEntry.COLUMN_DATE,
+                                RecappContract.EventEntry.TABLE_NAME+"."+RecappContract.EventEntry.COLUMN_DESCRIPTION,
+                                RecappContract.EventEntry.TABLE_NAME+"."+RecappContract.EventEntry.COLUMN_NAME,
+                                RecappContract.EventEntry.TABLE_NAME+"."+RecappContract.EventEntry.COLUMN_CREATOR,
+                                RecappContract.EventEntry.TABLE_NAME+"."+RecappContract.EventEntry.COLUMN_LAT,
+                                RecappContract.EventEntry.TABLE_NAME+"."+RecappContract.EventEntry.COLUMN_LOG,
+                                RecappContract.EventEntry.TABLE_NAME+"."+RecappContract.EventEntry.COLUMN_IMAGE},
+                        null,
+                        null,
+                        sortOrderEvent
+                );
 
         }
         return null;
@@ -606,6 +698,8 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         List<Place> places;
+        List<Event> events;
+        List<Event> eventsGoing;
         switch (loader.getId()){
             case USER:
                 if(data.moveToFirst()){
@@ -626,6 +720,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
                                 user.getProfileImage().length));
                     }
+
                     deepLinkIntent(deepLink);
                 }
                 break;
@@ -657,7 +752,14 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                     mapFragment.setDate(places,data);
                 }
                 break;
-
+            case EVENT:
+                events = Event.allEvents(data);
+                eventsFragment.setDataEvents(events,data);
+                break;
+            case EVENT_GOING:
+                eventsGoing = Event.allEvents(data);
+                eventsFragment.setDataEventsGoing(eventsGoing, data);
+                break;
 
         }
 
@@ -668,6 +770,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         userCursor.close();
         placesFragment.closeData();
         mapFragment.closeData();
+        eventsFragment.closeData();
     }
     public String buildSelection(String [] category){
         String where = null;

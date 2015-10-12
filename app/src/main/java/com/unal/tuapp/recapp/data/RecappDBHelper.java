@@ -124,6 +124,25 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 UserEntry.TABLE_NAME + "(" + UserEntry._ID+"), " +
                 "FOREIGN KEY (" + UserByPlaceEntry.COLUMN_PLACE_KEY +") REFERENCES " +
                 PlaceEntry.TABLE_NAME + "(" + PlaceEntry._ID+") );";
+        final String CREATE_EVENT_TABLE = "CREATE TABLE " + EventEntry.TABLE_NAME + "(" +
+                EventEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                EventEntry.COLUMN_NAME + " TEXT NOT NULL, "+
+                EventEntry.COLUMN_DESCRIPTION + " TEXT, "+
+                EventEntry.COLUMN_ADDRESS +" TEXT NOT NULL, "+
+                EventEntry.COLUMN_CREATOR+ " TEXT NOT NULL, "+
+                EventEntry.COLUMN_DATE + " INTEGER NOT NULL, "+
+                EventEntry.COLUMN_IMAGE + " BLOB , "+
+                EventEntry.COLUMN_LAT + " REAL NOT NULL, "+
+                EventEntry.COLUMN_LOG +" REAL NOT NULL );";
+
+        final String CREATE_EVENT_BY_USER_TABLE = "CREATE TABLE " + EventByUserEntry.TABLE_NAME+ "(" +
+                EventByUserEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                EventByUserEntry.COLUMN_KEY_EVENT +" INTEGER NOT NULL,  "+
+                EventByUserEntry.COLUMN_KEY_USER + " TEXT NOT NULL, "+
+                "FOREIGN KEY ("+ EventByUserEntry.COLUMN_KEY_USER +") REFERENCES " +
+                UserEntry.TABLE_NAME +" ( "+ UserEntry.COLUMN_EMAIL +"), "+
+                "FOREIGN KEY (" + EventByUserEntry.COLUMN_KEY_EVENT + ") REFERENCES "+
+                EventEntry.TABLE_NAME + " (" + EventEntry._ID+") );";
         sqLiteDatabase.execSQL(CREATE_USER_TABLE);
         sqLiteDatabase.execSQL(CREATE_PLACE_TABLE);
         sqLiteDatabase.execSQL(CREATE_REMINDER_TABLE);
@@ -136,6 +155,8 @@ public class RecappDBHelper extends SQLiteOpenHelper{
         sqLiteDatabase.execSQL(CREATE_SUB_CATEGORY_BY_PLACE);
         sqLiteDatabase.execSQL(CREATE_SUB_CATEGORY_BY_TUTORIAL);
         sqLiteDatabase.execSQL(CREATE_USER_BY_PLACE_TABLE);
+        sqLiteDatabase.execSQL(CREATE_EVENT_TABLE);
+        sqLiteDatabase.execSQL(CREATE_EVENT_BY_USER_TABLE);
 
 
     }
@@ -154,7 +175,9 @@ public class RecappDBHelper extends SQLiteOpenHelper{
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + SubCategoryByPlaceEntry.TABLE_NAME );
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + SubCategoryByTutorialEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + UserByPlaceEntry.TABLE_NAME);
-        onCreate(sqLiteDatabase);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + EventEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + EventByUserEntry.TABLE_NAME);
+        //onCreate(sqLiteDatabase);
 
     }
 

@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 
 import android.support.v7.app.AppCompatActivity;
@@ -91,6 +92,8 @@ public class ReminderActivity extends AppCompatActivity implements ReminderDialo
                     RecappContract.ReminderEntry.CONTENT_URI,
                     valuesReminder
             );
+
+
 
         }
         Intent intent = new Intent(ReminderActivity.this, Detail.class);

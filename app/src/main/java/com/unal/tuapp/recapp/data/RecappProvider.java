@@ -65,6 +65,12 @@ public class RecappProvider extends ContentProvider {
     static final int USER_BY_PLACE_USER = 1210;
     static final int USER_BY_PLACE_PLACE = 1220;
     static final int USER_BY_PLACE_ID = 1230;
+    static final int EVENT = 1300;
+    static final int EVENT_ID = 1310;
+    static final int EVENT_BY_USER = 1400;
+    static final int EVENT_BY_USER_EVENT = 1410;
+    static final int EVENT_BY_USER_USER = 1420;
+    static final int EVENT_BY_USER_ID = 1430;
 
     private static final SQLiteQueryBuilder reminderByUser;
     private static final SQLiteQueryBuilder reminderByPlace;
@@ -81,6 +87,8 @@ public class RecappProvider extends ContentProvider {
     private static final SQLiteQueryBuilder subCategoryByTutorialTutorialSubCategory;
     private static final SQLiteQueryBuilder userByPlaceUser;
     private static final SQLiteQueryBuilder userByPlacePlace;
+    private static final SQLiteQueryBuilder eventByUserEvent;
+    private static final SQLiteQueryBuilder eventByUserUser;
 
     static {
 
@@ -196,6 +204,20 @@ public class RecappProvider extends ContentProvider {
                         UserByPlaceEntry.TABLE_NAME+"."+UserByPlaceEntry.COLUMN_PLACE_KEY+
                         " = "+ PlaceEntry.TABLE_NAME+"."+PlaceEntry._ID
         );
+        eventByUserEvent = new SQLiteQueryBuilder();
+        eventByUserEvent.setTables(
+                EventByUserEntry.TABLE_NAME + " INNER JOIN " +
+                        EventEntry.TABLE_NAME + " ON "+
+                        EventByUserEntry.TABLE_NAME+"."+ EventByUserEntry.COLUMN_KEY_EVENT+
+                        " = " + EventEntry.TABLE_NAME+"."+ EventEntry._ID
+        );
+        eventByUserUser = new SQLiteQueryBuilder();
+        eventByUserUser.setTables(
+                EventByUserEntry.TABLE_NAME + " INNER JOIN " +
+                        UserEntry.TABLE_NAME + " ON "+
+                        EventByUserEntry.TABLE_NAME+"."+ EventByUserEntry.COLUMN_KEY_USER+
+                        " = "+ UserEntry.TABLE_NAME+"."+UserEntry._ID
+        );
 
     }
 
@@ -276,6 +298,17 @@ public class RecappProvider extends ContentProvider {
         matcher.addURI(authority,RecappContract.PATH_USERBYPLACE+"/"+RecappContract.PATH_USER+"/#",USER_BY_PLACE_USER);
         matcher.addURI(authority,RecappContract.PATH_USERBYPLACE+"/"+RecappContract.PATH_PLACE+"/#",USER_BY_PLACE_PLACE);
         matcher.addURI(authority,RecappContract.PATH_USERBYPLACE+"/#",USER_BY_PLACE_ID);
+
+        //Mathcers for event
+        matcher.addURI(authority,RecappContract.PATH_EVENT,EVENT);
+        matcher.addURI(authority,RecappContract.PATH_EVENT+"/#",EVENT_ID);
+
+        //Mathcers for event by user
+        matcher.addURI(authority,RecappContract.PATH_EVENTBYUSER,EVENT_BY_USER);
+        matcher.addURI(authority,RecappContract.PATH_EVENTBYUSER+"/"+RecappContract.PATH_EVENT+"/#",EVENT_BY_USER_EVENT);
+        matcher.addURI(authority,RecappContract.PATH_EVENTBYUSER+"/"+RecappContract.PATH_USER+"/*",EVENT_BY_USER_USER);
+        matcher.addURI(authority,RecappContract.PATH_EVENTBYUSER+"/#",EVENT_BY_USER_ID);
+
         return matcher;
 
     }
@@ -382,6 +415,18 @@ public class RecappProvider extends ContentProvider {
                 return UserByPlaceEntry.CONTENT_TYPE;
             case USER_BY_PLACE_ID:
                 return UserByPlaceEntry.CONTENT_ITEM_TYPE;
+            case EVENT:
+                return EventEntry.CONTENT_TYPE;
+            case EVENT_ID:
+                return EventEntry.CONTENT_ITEM_TYPE;
+            case EVENT_BY_USER:
+                return EventByUserEntry.CONTENT_TYPE;
+            case EVENT_BY_USER_EVENT:
+                return EventByUserEntry.CONTENT_TYPE;
+            case EVENT_BY_USER_USER:
+                return EventByUserEntry.CONTENT_TYPE;
+            case EVENT_BY_USER_ID:
+                return EventByUserEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
@@ -967,6 +1012,69 @@ public class RecappProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
+            case EVENT:
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        EventEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case EVENT_ID:
+                long eventId = EventEntry.getIdFromUri(uri);
+                selection = EventEntry._ID + " = ?";
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        EventEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        new String[]{""+eventId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case EVENT_BY_USER:
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        EventByUserEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case EVENT_BY_USER_EVENT:
+                eventId = EventByUserEntry.getEventFromUri(uri);
+                selection =  EventByUserEntry.COLUMN_KEY_EVENT +" = ? ";
+                retCursor = eventByUserUser.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{""+eventId},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case EVENT_BY_USER_USER:
+                String userEmail = EventByUserEntry.getUserFromUri(uri);
+                if(selection==null) {
+                    selection = EventByUserEntry.COLUMN_KEY_USER + " = ?";
+                }
+                retCursor = eventByUserEvent.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        new String[]{userEmail},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
@@ -1080,6 +1188,22 @@ public class RecappProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
                 break;
+            case EVENT:
+                id = db.insert(EventEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    returnUri = EventEntry.buildEventUri(id);
+                }else{
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            case EVENT_BY_USER:
+                id = db.insert(EventByUserEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    returnUri = EventByUserEntry.buildEventByUser(id);
+                }else{
+                    throw new android.database.SQLException("Failed to insert row into "+ uri);
+                }
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
@@ -1129,8 +1253,15 @@ public class RecappProvider extends ContentProvider {
                 break;
             case SUB_CATEGORY_BY_TUTORIAL:
                 rowsDeleted = db.delete(SubCategoryByTutorialEntry.TABLE_NAME,selection,selectionArgs);
+                break;
             case USER_BY_PLACE:
                 rowsDeleted = db.delete(UserByPlaceEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            case EVENT:
+                rowsDeleted = db.delete(EventEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            case EVENT_BY_USER:
+                rowsDeleted = db.delete(EventByUserEntry.TABLE_NAME,selection,selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -1186,7 +1317,12 @@ public class RecappProvider extends ContentProvider {
             case USER_BY_PLACE:
                 rowUpdated = db.update(UserByPlaceEntry.TABLE_NAME,values,selection,selectionArgs);
                 break;
-
+            case EVENT:
+                rowUpdated = db.update(EventEntry.TABLE_NAME,values,selection,selectionArgs);
+                break;
+            case EVENT_BY_USER:
+                rowUpdated = db.update(EventByUserEntry.TABLE_NAME,values,selection,selectionArgs);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
@@ -1386,12 +1522,46 @@ public class RecappProvider extends ContentProvider {
                 }finally {
                     db.endTransaction();
                 }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
             case USER_BY_PLACE:
                 db.beginTransaction();
                 returnCount = 0;
                 try{
                     for (ContentValues value:values){
                         long id = db.insert(UserByPlaceEntry.TABLE_NAME,null,value);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
+            case EVENT:
+                db.beginTransaction();
+                returnCount = 0;
+                try{
+                    for(ContentValues value:values){
+                        long id = db.insert(EventEntry.TABLE_NAME,null,value);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
+            case EVENT_BY_USER:
+                db.beginTransaction();
+                returnCount = 0;
+                try{
+                    for(ContentValues value:values){
+                        long id = db.insert(EventByUserEntry.TABLE_NAME,null,value);
                         if(id!=-1){
                             returnCount++;
                         }

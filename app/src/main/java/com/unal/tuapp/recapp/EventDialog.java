@@ -189,7 +189,11 @@ public class EventDialog extends DialogFragment {
                         try {
                             list = gc.getFromLocation(place.latitude, place.longitude, 3);
                         } catch (Exception e) {}
-                        eventPlace.setText(list.get(0).getAddressLine(0) + "\nLat: "+place.latitude+" Lng: "+place.longitude);
+                        if(list!=null) {
+                            eventPlace.setText(list.get(0).getAddressLine(0) + "\nLat: " + place.latitude + " Lng: " + place.longitude);
+                        }else{
+                            eventPlace.setText("Lat: " + place.latitude + " Lng: " + place.longitude);
+                        }
                         address = list.get(0).getAddressLine(0);
                         lat = place.latitude;
                         lng = place.longitude;
@@ -255,7 +259,7 @@ public class EventDialog extends DialogFragment {
                     if(event.compareTo(now)>0){//This date is valid
                         //We should check if the user change the image because if the user didn't change it, we should use the default image
                         Bitmap image;
-                        if(isNewImage){
+                        if(!isNewImage){
                             image = BitmapFactory.decodeResource(getResources(),R.drawable.image_available);
                         }else{
                             image = this.image;
@@ -347,7 +351,7 @@ public class EventDialog extends DialogFragment {
         }
     }
 
-    @Override
+    /*@Override
     public void onActivityCreated(Bundle savedInstanceState) {
         //There is a issue with the textView
         super.onActivityCreated(savedInstanceState);
@@ -362,7 +366,7 @@ public class EventDialog extends DialogFragment {
                         savedInstanceState.getByteArray("image").length, 0);
             }
         }
-    }
+    }*/
 
 
 

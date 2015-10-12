@@ -102,6 +102,7 @@
         <activity android:name=".EventActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan">
         </activity>
+        <activity android:name=".EventActivityGoing" />
         <receiver android:name=".MyAlarmReceiver"
             android:process=":remote">
 

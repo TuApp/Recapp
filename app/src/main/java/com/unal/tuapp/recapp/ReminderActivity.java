@@ -88,18 +88,11 @@ public class ReminderActivity extends AppCompatActivity implements ReminderDialo
             }
             valuesReminder.put(RecappContract.ReminderEntry.COLUMN_USER_KEY,user.getId());
             valuesReminder.put(RecappContract.ReminderEntry.COLUMN_PLACE_KEY,this.id);
-            Uri uri =getContentResolver().insert(
+            getContentResolver().insert(
                     RecappContract.ReminderEntry.CONTENT_URI,
                     valuesReminder
             );
-            //The user who creates the event also should attend to it
-            ContentValues values1 = new ContentValues();
-            values1.put(RecappContract.EventByUserEntry.COLUMN_KEY_USER,user.getId());
-            values1.put(RecappContract.EventByUserEntry.COLUMN_KEY_EVENT, RecappContract.EventEntry.getIdFromUri(uri));
-            getContentResolver().insert(
-                    RecappContract.EventByUserEntry.CONTENT_URI,
-                    values1
-            );
+
 
 
         }

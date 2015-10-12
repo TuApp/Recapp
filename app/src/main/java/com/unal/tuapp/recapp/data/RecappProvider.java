@@ -66,7 +66,8 @@ public class RecappProvider extends ContentProvider {
     static final int USER_BY_PLACE_PLACE = 1220;
     static final int USER_BY_PLACE_ID = 1230;
     static final int EVENT = 1300;
-    static final int EVENT_ID = 1310;
+    static final int EVENT_EMAIL = 1310;
+    static final int EVENT_ID = 1320;
     static final int EVENT_BY_USER = 1400;
     static final int EVENT_BY_USER_EVENT = 1410;
     static final int EVENT_BY_USER_USER = 1420;
@@ -306,7 +307,7 @@ public class RecappProvider extends ContentProvider {
         //Mathcers for event by user
         matcher.addURI(authority,RecappContract.PATH_EVENTBYUSER,EVENT_BY_USER);
         matcher.addURI(authority,RecappContract.PATH_EVENTBYUSER+"/"+RecappContract.PATH_EVENT+"/#",EVENT_BY_USER_EVENT);
-        matcher.addURI(authority,RecappContract.PATH_EVENTBYUSER+"/"+RecappContract.PATH_USER+"/#",EVENT_BY_USER_USER);
+        matcher.addURI(authority,RecappContract.PATH_EVENTBYUSER+"/"+RecappContract.PATH_USER+"/*",EVENT_BY_USER_USER);
         matcher.addURI(authority,RecappContract.PATH_EVENTBYUSER+"/#",EVENT_BY_USER_ID);
 
         return matcher;
@@ -1061,13 +1062,15 @@ public class RecappProvider extends ContentProvider {
                 );
                 break;
             case EVENT_BY_USER_USER:
-                userId = EventByUserEntry.getUserFromUri(uri);
-                selection =  EventByUserEntry.COLUMN_KEY_USER+ " = ?";
+                String userEmail = EventByUserEntry.getUserFromUri(uri);
+                if(selection==null) {
+                    selection = EventByUserEntry.COLUMN_KEY_USER + " = ?";
+                }
                 retCursor = eventByUserEvent.query(
                         recappDBHelper.getReadableDatabase(),
                         projection,
                         selection,
-                        new String[]{""+userId},
+                        new String[]{userEmail},
                         null,
                         null,
                         sortOrder

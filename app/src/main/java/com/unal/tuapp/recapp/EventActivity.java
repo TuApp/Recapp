@@ -3,6 +3,7 @@ package com.unal.tuapp.recapp;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -55,9 +56,18 @@ public class EventActivity extends AppCompatActivity implements EventDialog.OnEv
             image.compress(Bitmap.CompressFormat.PNG, 100, stream);
             values.put(RecappContract.EventEntry.COLUMN_IMAGE, stream.toByteArray());
 
-            getContentResolver().insert(
+            Uri uri = getContentResolver().insert(
                     RecappContract.EventEntry.CONTENT_URI,
                     values
+            );
+
+            //The user who creates the event also should attend to it
+            ContentValues values1 = new ContentValues();
+            values1.put(RecappContract.EventByUserEntry.COLUMN_KEY_USER, user.getEmail());
+            values1.put(RecappContract.EventByUserEntry.COLUMN_KEY_EVENT, RecappContract.EventEntry.getIdFromUri(uri));
+            getContentResolver().insert(
+                    RecappContract.EventByUserEntry.CONTENT_URI,
+                    values1
             );
         }
         Intent intent = new Intent(EventActivity.this,NavigationDrawer.class);

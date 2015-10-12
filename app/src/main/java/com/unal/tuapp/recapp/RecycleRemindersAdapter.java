@@ -54,8 +54,6 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
         private ImageView imagePlace;
         private TextView namePlace;
         private TextView addressPlace;
-        private ImageView deleteReminder;
-        private ImageView deleteReminderPlace;
         private RatingBar placeRating;
 
         public RemindersViewHolder(View itemView){
@@ -135,7 +133,7 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
     }
-    public void swapDate(List<Reminder> reminders){
+    public void swapData(List<Reminder> reminders){
         this.reminders = reminders;
         notifyDataSetChanged();
     }
@@ -143,7 +141,9 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
         this.reminderCursor = cursor;
     }
     public void closeCursor(){
-        this.reminderCursor.close();
+        if(this.reminderCursor!=null) {
+            this.reminderCursor.close();
+        }
     }
     public List<Reminder> getPlaces(){
         return reminders;

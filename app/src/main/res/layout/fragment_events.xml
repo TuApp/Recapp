@@ -24,9 +24,8 @@
             android:layout_marginTop="4dp"/>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/event_going_recycler"
-            android:layout_height="0dp"
             android:layout_width="match_parent"
-            android:layout_weight="3"
+            android:layout_height="100dp"
             android:layout_margin="8dp" />
         <TextView
             android:layout_width="match_parent"
@@ -39,8 +38,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/event_recycler"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="8"
+            android:layout_height="wrap_content"
             android:layout_margin="8dp"/>
 
     </LinearLayout>

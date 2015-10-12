@@ -533,10 +533,10 @@ public class RecappContract {
                     .appendPath(PATH_EVENT)
                     .appendPath(""+id).build();
         }
-        public static final Uri buildEventByUserUser(long id){
+        public static final Uri buildEventByUserUser(String email){
             return CONTENT_URI.buildUpon()
                     .appendPath(PATH_USER)
-                    .appendPath(""+id).build();
+                    .appendPath(email).build();
         }
 
         public static final long getIdFromUri(Uri uri){
@@ -545,8 +545,8 @@ public class RecappContract {
         public static final long getEventFromUri(Uri uri){
             return Long.parseLong(uri.getPathSegments().get(2));
         }
-        public static final long getUserFromUri(Uri uri){
-            return Long.parseLong(uri.getPathSegments().get(2));
+        public static final String getUserFromUri(Uri uri){
+            return uri.getPathSegments().get(2);
         }
     }
 

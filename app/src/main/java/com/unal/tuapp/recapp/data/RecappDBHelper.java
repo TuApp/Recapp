@@ -137,10 +137,10 @@ public class RecappDBHelper extends SQLiteOpenHelper{
 
         final String CREATE_EVENT_BY_USER_TABLE = "CREATE TABLE " + EventByUserEntry.TABLE_NAME+ "(" +
                 EventByUserEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
-                EventByUserEntry.COLUMN_KEY_EVENT +" INTEGER NOT  NULL,  "+
-                EventByUserEntry.COLUMN_KEY_USER + " INTEGER NOT NULL, "+
+                EventByUserEntry.COLUMN_KEY_EVENT +" INTEGER NOT NULL,  "+
+                EventByUserEntry.COLUMN_KEY_USER + " TEXT NOT NULL, "+
                 "FOREIGN KEY ("+ EventByUserEntry.COLUMN_KEY_USER +") REFERENCES " +
-                UserEntry.TABLE_NAME +" ( "+ UserEntry._ID +"), "+
+                UserEntry.TABLE_NAME +" ( "+ UserEntry.COLUMN_EMAIL +"), "+
                 "FOREIGN KEY (" + EventByUserEntry.COLUMN_KEY_EVENT + ") REFERENCES "+
                 EventEntry.TABLE_NAME + " (" + EventEntry._ID+") );";
         sqLiteDatabase.execSQL(CREATE_USER_TABLE);

@@ -46,6 +46,14 @@
             app:elevation="6dp"
             android:visibility="gone"/>
 
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            app:adSize="BANNER"
+            app:adUnitId="@string/banner_ad_unit_id"/>
+
     </android.support.design.widget.CoordinatorLayout>
 
 

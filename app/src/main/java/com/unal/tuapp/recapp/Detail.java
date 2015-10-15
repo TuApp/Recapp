@@ -27,6 +27,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.unal.tuapp.recapp.data.RecappContract;
@@ -46,6 +49,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private FloatingActionButton reminder;
     private DetailFragment detailFragment;
+    private InterstitialAd mInterstitialAd;
 
 
     @Override
@@ -53,6 +57,20 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
         super.onCreate(savedInstanceState);
         root = getLayoutInflater().inflate(R.layout.activity_detail, null);
         setContentView(root);
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id));
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+                Intent intent = new Intent(Detail.this, Gallery.class);
+                intent.putExtra("id", id);
+                intent.putExtra("user", user);
+                startActivity(intent);
+            }
+        });
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mInterstitialAd.loadAd(adRequest);
         Bundle extras = getIntent().getExtras();
         if(extras!=null){
             id = extras.getLong("id");
@@ -154,6 +172,12 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
                         intentComment.putExtra("type", "comment");
                         startActivity(intentComment);
                         break;
+                    case R.id.events:
+                        Intent intentEvent = new Intent(Detail.this,UserDetail.class);
+                        intentEvent.putExtra("user",user);
+                        intentEvent.putExtra("type","event");
+                        startActivity(intentEvent);
+                        break;
                     case R.id.sign_out:
                         if (mGooglePlus.mGoogleApiClient.isConnected()) {
                             Plus.AccountApi.clearDefaultAccount(mGooglePlus.mGoogleApiClient);
@@ -202,11 +226,15 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
         detailFragment.setOnPlaceImagesListener(new DetailFragment.onPlaceImagesListener() {
             @Override
             public void onPlaceImages(View view, long position) {
+                if(mInterstitialAd.isLoaded()){
+                    mInterstitialAd.show();
+                }else{
+                    Intent intent = new Intent(Detail.this, Gallery.class);
+                    intent.putExtra("id", id);
+                    intent.putExtra("user", user);
+                    startActivity(intent);
+                }
 
-                Intent intent = new Intent(Detail.this, Gallery.class);
-                intent.putExtra("id", id);
-                intent.putExtra("user", user);
-                startActivity(intent);
             }
         });
         fragmentTransaction.replace(R.id.detail_container, detailFragment);

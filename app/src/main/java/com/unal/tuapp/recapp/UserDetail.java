@@ -17,6 +17,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.unal.tuapp.recapp.data.User;
@@ -33,12 +35,17 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
     private Fragment fragmentReminder;
     private Fragment fragmentEvents;
     private String newType;
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         root = getLayoutInflater().inflate(R.layout.activity_user_detail,null);
         setContentView(root);
+        mAdView = (AdView) root.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .build();
+        mAdView.loadAd(adRequest);
         Bundle extras = getIntent().getExtras();
         if(extras!=null){
             user = extras.getParcelable("user");

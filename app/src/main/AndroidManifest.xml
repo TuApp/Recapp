@@ -119,6 +119,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.unal.tuapp.recapp.Detail" />
         </activity>
+
+        <activity android:name="com.google.android.gms.adds.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
     </application>
 
 </manifest>

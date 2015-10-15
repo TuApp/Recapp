@@ -18,18 +18,28 @@
         <ImageView
             android:layout_alignParentLeft="true"
             android:id="@+id/card_image_favorite"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:scaleType="centerCrop" />
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="8dp"/>
 
         <TextView android:id="@+id/place_item_favorite"
-            android:layout_toRightOf="@+id/card_image_favorite"
+            android:layout_below="@+id/card_image_favorite"
             android:layout_centerVertical="true"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_margin="16dp"
             android:textSize="25dp"
             />
+        <TextView
+            android:id="@+id/place_address_favorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:layout_below="@+id/place_item_favorite"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="8dp"/>
     </RelativeLayout>
 
 

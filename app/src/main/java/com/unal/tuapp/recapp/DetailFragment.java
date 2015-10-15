@@ -454,7 +454,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
 
         if(ShareDialog.canShow(ShareOpenGraphContent.class)){
-            Log.e("algo","algo");
             shareDialog.show(content);
         }else {
             ShareApi.share(content, new FacebookCallback<Sharer.Result>() {

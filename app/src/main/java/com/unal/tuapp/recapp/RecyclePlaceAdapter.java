@@ -25,12 +25,14 @@ public class RecyclePlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public static class  PlaceViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private TextView name;
+        private ImageView image;
         private CardView cardView;
 
         public PlaceViewHolder(View itemView){
             super(itemView);
             cardView = (CardView) itemView.findViewById(R.id.place_card);
             name = (TextView) itemView.findViewById(R.id.place_item);
+            image = (ImageView) itemView.findViewById(R.id.card_image);
 
             itemView.setOnClickListener(this);
         }
@@ -48,12 +50,14 @@ public class RecyclePlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         private TextView name;
         private CardView cardView;
         private ImageView imageView;
+        private TextView address;
 
         public  PlaceViewHolderFavorite (View itemView){
             super(itemView);
             cardView = (CardView) itemView.findViewById(R.id.place_card_favorite);
             name = (TextView) itemView.findViewById(R.id.place_item_favorite);
             imageView = (ImageView) itemView.findViewById(R.id.card_image_favorite);
+            address = (TextView) itemView.findViewById(R.id.place_address_favorite);
 
             itemView.setOnClickListener(this);
         }
@@ -133,10 +137,14 @@ public class RecyclePlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 placeViewHolderFavorite.imageView.setImageBitmap(BitmapFactory.decodeByteArray(
                         places.get(i).getImageFavorite(),0,places.get(i).getImageFavorite().length
                 ));
+                placeViewHolderFavorite.address.setText(places.get(i).getAddress());
                 break;
             case NORMAL:
                 PlaceViewHolder placeViewHolder = (PlaceViewHolder) viewHolder;
                 placeViewHolder.name.setText(places.get(i).getName());
+                placeViewHolder.image.setImageBitmap(BitmapFactory.decodeByteArray(
+                        places.get(i).getImageFavorite(), 0, places.get(i).getImageFavorite().length
+                ));
                 break;
         }
     }

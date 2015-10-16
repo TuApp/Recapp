@@ -14,6 +14,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -21,11 +22,14 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.internal.view.ContextThemeWrapper;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.util.Rfc822Tokenizer;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,8 +37,11 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
@@ -76,7 +83,8 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private View root;
     private ActionBarDrawerToggle drawerToggle;
     private Button add;
-    private Button addCategory;
+    private ImageButton resetFilters;
+    //private Button addCategory;
     private final String TAG = NavigationDrawer.class.getSimpleName();
     private final String FILE = "filters.txt";
     private static final int USER = 10;
@@ -184,70 +192,27 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
 
 
         }
-        filterCategory = (MultiAutoCompleteTextView) findViewById(R.id.filter_text);
-        List<Category> categories  = new ArrayList<>();
-        filterCategory.setTokenizer(new Rfc822Tokenizer());
-        adapter = new LimitArrayAdapterCategory(this,
-              categories);
 
-        filterCategory.setThreshold(1);
-        filterCategory.setAdapter(adapter);
-
-        List<SubCategory> subCategories = new ArrayList<>();
-        filterSubcategory = (AutoCompleteTextView) findViewById(R.id.filter_subcategory);
-        adapterSubCategory = new LimitArrayAdapterSubCategory(this,subCategories);
-        filterSubcategory.setThreshold(1);
-        filterSubcategory.setAdapter(adapterSubCategory);
-
-
-        addCategory = (Button) root.findViewById(R.id.add_category);
-        addCategory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String[] text = filterCategory.getText().toString().split(", ");
-                if (!Arrays.deepEquals(text, subCategory)) {
-                    subCategory = text;
-                    if (getSupportLoaderManager().getLoader(SUB_CATEGORY) == null) {
-                        getSupportLoaderManager().initLoader(SUB_CATEGORY, null, NavigationDrawer.this);
-                    } else {
-                        getSupportLoaderManager().restartLoader(SUB_CATEGORY, null, NavigationDrawer.this);
-                    }
-                }
-            }
-        });
-        add = (Button) root.findViewById(R.id.add);
+        add = (Button) root.findViewById(R.id.add_category);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //EditText editText = (EditText) root.findViewById(R.id.filter_text);
-                if(!filterSubcategory.getText().toString().trim().equals("")){
-                    Menu menu = navFilterDrawer.getMenu();
-                    String menuFilter = filterSubcategory.getText().toString();
-                    boolean isAdded = false;
-                    for(int i=0; i<menu.size(); i++){
-                        if(menuFilter.toLowerCase().equals(menu.getItem(i).toString().toLowerCase())){
-                            isAdded = true;
-                            break;
-                        }
-                    }
-                    if(!isAdded) {
-                        filtersConstraint.add(menuFilter);
-                        menu.add(0, totalFilter, Menu.NONE, menuFilter).setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-                        totalFilter++;
-                        selectionArgs=null;
-                        selectionPlaces=null;
-                        if(query!=null && query.length()>0) {
-                            handleIntent(getIntent());
-                        }else {
-                            loadSelection();
-                            resetLoaderFilter();
-                        }
-                        //((PlacesFragment)(((ViewPagerAdapter) viewPager.getAdapter()).getItem(viewPager.getCurrentItem()))).setFilters(filtersConstraint);
+                showCategoriesDialog();
+            }
+        });
 
-                    }
-                    filterSubcategory.setText("");
-
-
+        resetFilters = (ImageButton) findViewById(R.id.resetFilters);
+        resetFilters.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navFilterDrawer.getMenu().clear();
+                filtersConstraint.clear();
+                selectionPlaces = null;
+                selectionArgs = null;
+                if (getSupportLoaderManager().getLoader(PLACE) == null) {
+                    getSupportLoaderManager().initLoader(PLACE, null, NavigationDrawer.this);
+                } else {
+                    getSupportLoaderManager().restartLoader(PLACE, null, NavigationDrawer.this);
                 }
             }
         });
@@ -385,7 +350,6 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
 
                 }
 
-                //((PlacesFragment)(((ViewPagerAdapter) viewPager.getAdapter()).getItem(viewPager.getCurrentItem()))).setFilters(filtersConstraint);
                 return false;
             }
         });
@@ -448,6 +412,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             Snackbar.make(view, "algo", Snackbar.LENGTH_LONG).show();
         }
         if(id == R.id.action_navigation){
+
             navigationDrawer.openDrawer(navFilterDrawer);
         }
         return super.onOptionsItemSelected(item);
@@ -523,6 +488,56 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
+    }
+
+    public void showCategoriesDialog(){
+        FragmentManager fm = getSupportFragmentManager();
+        FilterCategoriesDialogFragment categoriesDialog = new FilterCategoriesDialogFragment();
+        categoriesDialog.show(fm, "fragment_categories");
+    }
+
+    public void showSubCategoriesDialog(int idCategory){
+        FragmentManager fm = getSupportFragmentManager();
+        FilterSubCategoriesDialogFragment subcategoriesDialog = new FilterSubCategoriesDialogFragment();
+        subcategoriesDialog.setIdCategory(idCategory);
+        subcategoriesDialog.show(fm, "fragment_subcategories");
+    }
+
+    public void addItemToMenu(long idCategory, long idSubcategory, String subcategory){
+        Menu menu = navFilterDrawer.getMenu();
+        filtersConstraint.add(subcategory);
+        int mDrawableIcon = 0;
+        switch ((int)idCategory){
+            case 1:
+                mDrawableIcon = R.drawable.battery_circle;
+                break;
+            case 2:
+                mDrawableIcon = R.drawable.tire_circle;
+                break;
+            case 3:
+                mDrawableIcon = R.drawable.electronic_circle;
+                break;
+
+            default:
+                mDrawableIcon = R.drawable.battery_circle;
+                break;
+        }
+        menu.add(0, filtersConstraint.size(), Menu.NONE, subcategory).setIcon(android.R.drawable.ic_delete);
+        //menu.add(idCategory+" "+idSubcategory+" " + subcategory);
+        if(query!=null && query.length()>0) {
+            handleIntent(getIntent());
+        }else if(filtersConstraint.size()>0) {
+            loadSelection();
+            resetLoaderFilter();
+        }else {
+            selectionPlaces = null;
+            selectionArgs = null;
+            if (getSupportLoaderManager().getLoader(PLACE) == null) {
+                getSupportLoaderManager().initLoader(PLACE, null, NavigationDrawer.this);
+            } else {
+                getSupportLoaderManager().restartLoader(PLACE, null, NavigationDrawer.this);
+            }
+        }
     }
 
     public void saveFilters(){
@@ -726,11 +741,11 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 break;
             case CATEGORY:
                 List<Category> categories = Category.allCategories(data);
-                adapter.setData(categories);
+                //adapter.setData(categories);
                 break;
             case SUB_CATEGORY:
                 List<SubCategory> subCategories = SubCategory.allSubCategories(data);
-                adapterSubCategory.setData(subCategories);
+                //adapterSubCategory.setData(subCategories);
 
                 if(subCategories.size()>0){
                     add.setVisibility(View.VISIBLE);

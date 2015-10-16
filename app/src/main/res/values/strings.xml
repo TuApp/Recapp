@@ -37,6 +37,12 @@
     <string name="search">Search</string>
     <string name="search_hint">Search...</string>
     <string name="filter">Filters</string>
+    <string name="add_item_item">Add item to filter</string>
+    <string name="batteries">Batteries</string>
+    <string name="tires">Tires</string>
+    <string name="devices">Devices</string>
+    <string name="accept">Accept</string>
+    <string name="cancel">Cancel</string>
     <string name="facebook_app_id">1674043846146726</string>
     <string name="title_activity_gallery">Gallery</string>
     <string name="going">Are you going to?</string>

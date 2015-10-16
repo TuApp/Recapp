@@ -100,7 +100,7 @@ public class PlacesFragment extends Fragment {
         BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.unicentrologo).
                 compress(Bitmap.CompressFormat.PNG, 100, stream);
         values.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream.toByteArray());
-        values.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
+        values.put(RecappContract.PlaceEntry.COLUMN_WEB, "http://www.pilascolombia.com/");
 
         values1.put(RecappContract.PlaceEntry.COLUMN_NAME, "CC Gran Estacion");
         values1.put(RecappContract.PlaceEntry.COLUMN_LAT, 4.648128);
@@ -111,7 +111,7 @@ public class PlacesFragment extends Fragment {
         BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.gelogo).
                 compress(Bitmap.CompressFormat.PNG, 100, stream1);
         values1.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream1.toByteArray());
-        values1.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
+        values1.put(RecappContract.PlaceEntry.COLUMN_WEB, "http://www.pilascolombia.com/");
 
         values2.put(RecappContract.PlaceEntry.COLUMN_NAME, "TM Station Ricaurte");
         values2.put(RecappContract.PlaceEntry.COLUMN_LAT, 4.611586);
@@ -135,7 +135,7 @@ public class PlacesFragment extends Fragment {
         BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.salitreplace1).
                 compress(Bitmap.CompressFormat.PNG, 100, stream3);
         values3.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream3.toByteArray());
-        values3.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
+        values3.put(RecappContract.PlaceEntry.COLUMN_WEB, "http://www.pilascolombia.com/");
 
         values4.put(RecappContract.PlaceEntry.COLUMN_NAME, "UN C. y T.");
         values4.put(RecappContract.PlaceEntry.COLUMN_LAT, 4.638242);
@@ -147,7 +147,7 @@ public class PlacesFragment extends Fragment {
         BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.cytplace1).
                 compress(Bitmap.CompressFormat.PNG, 100, stream4);
         values4.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, stream4.toByteArray());
-        values4.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
+        values4.put(RecappContract.PlaceEntry.COLUMN_WEB, "http://www.pilascolombia.com/");
 
         valuesVector.add(values);
         valuesVector.add(values1);
@@ -167,16 +167,30 @@ public class PlacesFragment extends Fragment {
 
         ContentValues category = new ContentValues();
         category.put(RecappContract.CategoryEntry.COLUMN_NAME, "pilas");
+        stream3 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.battery_circle).
+                compress(Bitmap.CompressFormat.PNG, 100, stream3);
         category.put(RecappContract.CategoryEntry.COLUMN_IMAGE, stream3.toByteArray());
 
         ContentValues category1 = new ContentValues();
         category1.put(RecappContract.CategoryEntry.COLUMN_NAME, "llantas");
-        category1.put(RecappContract.CategoryEntry.COLUMN_IMAGE, stream4.toByteArray());
+        stream3 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.tire_circle).
+                compress(Bitmap.CompressFormat.PNG, 100, stream3);
+        category1.put(RecappContract.CategoryEntry.COLUMN_IMAGE, stream3.toByteArray());
+
+        ContentValues category2 = new ContentValues();
+        category2.put(RecappContract.CategoryEntry.COLUMN_NAME, "equipos");
+        stream3 =  new ByteArrayOutputStream();
+        BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.electronic_circle).
+                compress(Bitmap.CompressFormat.PNG, 100, stream3);
+        category2.put(RecappContract.CategoryEntry.COLUMN_IMAGE, stream3.toByteArray());
 
         Vector<ContentValues> categories = new Vector<>();
         categories.add(category);
         categories.add(category1);
-        ContentValues categoryArray [] = new ContentValues[2];
+        categories.add(category2);
+        ContentValues categoryArray [] = new ContentValues[3];
         categories.toArray(categoryArray);
         getActivity().getContentResolver().bulkInsert(
                 RecappContract.CategoryEntry.CONTENT_URI,
@@ -184,7 +198,7 @@ public class PlacesFragment extends Fragment {
         );
 
         ContentValues subCategory = new ContentValues(); //Id 1
-        subCategory.put(RecappContract.SubCategoryEntry.COLUMN_NAME, "pilas");
+        subCategory.put(RecappContract.SubCategoryEntry.COLUMN_NAME, "aaa");
         subCategory.put(RecappContract.SubCategoryEntry.COLUMN_CATEGORY_KEY, 1);
 
         ContentValues subCategory1 = new ContentValues(); //Id 2
@@ -193,14 +207,24 @@ public class PlacesFragment extends Fragment {
 
 
         ContentValues subCategory2 = new ContentValues(); //Id 3
-        subCategory2.put(RecappContract.SubCategoryEntry.COLUMN_NAME, "llantas");
+        subCategory2.put(RecappContract.SubCategoryEntry.COLUMN_NAME, "Llantas");
         subCategory2.put(RecappContract.SubCategoryEntry.COLUMN_CATEGORY_KEY, 2);
+
+        ContentValues subCategory3 = new ContentValues(); //Id 3
+        subCategory3.put(RecappContract.SubCategoryEntry.COLUMN_NAME, "TV");
+        subCategory3.put(RecappContract.SubCategoryEntry.COLUMN_CATEGORY_KEY, 3);
+
+        ContentValues subCategory4 = new ContentValues(); //Id 3
+        subCategory4.put(RecappContract.SubCategoryEntry.COLUMN_NAME, "Telefonos");
+        subCategory4.put(RecappContract.SubCategoryEntry.COLUMN_CATEGORY_KEY, 3);
 
         Vector<ContentValues> subCategories = new Vector<>();
         subCategories.add(subCategory);
         subCategories.add(subCategory1);
         subCategories.add(subCategory2);
-        ContentValues subCategoryArray [] = new ContentValues[3];
+        subCategories.add(subCategory3);
+        subCategories.add(subCategory4);
+        ContentValues subCategoryArray [] = new ContentValues[5];
 
         subCategories.toArray(subCategoryArray);
 
@@ -226,13 +250,23 @@ public class PlacesFragment extends Fragment {
         subCategoryPlace3.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_PLACE_KEY, 3);
         subCategoryPlace3.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY, 3);
 
+        ContentValues subCategoryPlace4 = new ContentValues();
+        subCategoryPlace4.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_PLACE_KEY, 1);
+        subCategoryPlace4.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY, 4);
+
+        ContentValues subCategoryPlace5 = new ContentValues();
+        subCategoryPlace5.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_PLACE_KEY, 2);
+        subCategoryPlace5.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY, 5);
+
         Vector<ContentValues> subCategoriesPlaces = new Vector<>();
         subCategoriesPlaces.add(subCategoryPlace);
         subCategoriesPlaces.add(subCategoryPlace1);
         subCategoriesPlaces.add(subCategoryPlace2);
         subCategoriesPlaces.add(subCategoryPlace3);
+        subCategoriesPlaces.add(subCategoryPlace4);
+        subCategoriesPlaces.add(subCategoryPlace5);
 
-        ContentValues []arraySubCategoriesPlaces = new ContentValues[4];
+        ContentValues []arraySubCategoriesPlaces = new ContentValues[6];
         subCategoriesPlaces.toArray(arraySubCategoriesPlaces);
 
         getActivity().getContentResolver().bulkInsert(

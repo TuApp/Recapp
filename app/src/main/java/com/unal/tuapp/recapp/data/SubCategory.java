@@ -41,6 +41,7 @@ public class SubCategory {
     public void setName(String name) {
         this.name = name;
     }
+
     public static ArrayList<SubCategory> allSubCategories(Cursor cursor){
         ArrayList<SubCategory> subCategories = new ArrayList<>();
         while (cursor.moveToNext()){

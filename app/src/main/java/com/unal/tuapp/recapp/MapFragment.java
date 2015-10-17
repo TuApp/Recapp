@@ -1,12 +1,19 @@
 package com.unal.tuapp.recapp;
 
 
+import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 
 import android.net.Uri;
@@ -25,6 +32,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -45,6 +53,7 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,7 +65,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
                         ClusterManager.OnClusterInfoWindowClickListener<Place>,
                         ClusterManager.OnClusterItemClickListener<Place>,
                         ClusterManager.OnClusterItemInfoWindowClickListener<Place>{
-    private GoogleApiClient mGoogleApiClient;
+
+    private static GoogleApiClient mGoogleApiClient;
     private SupportMapFragment mapFragment;
     private GoogleMap map;
     private static View view;
@@ -77,6 +87,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     private static ClusterManager<Place> placeClusterManager;
     private Cluster<Place> clickedCluster;
     private Place clickedPlace;
+    private static ArrayList<Geofence> mGeofenceList;
+    private static String [] places;
+    private static Intent intent;
+    private static Context context;
 
 
     @Override
@@ -92,6 +106,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
                 parent.removeView(view);
             }
         }
+        mGeofenceList = new ArrayList<>();
+
         try{
             view = inflater.inflate(R.layout.fragment_map,container,false);
             calculateDistance = (ImageButton) view.findViewById(R.id.the_way);
@@ -139,7 +155,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         if (map == null) {
             map = mapFragment.getMap();
             placeClusterManager = new ClusterManager<>(getActivity(),map);
@@ -193,6 +208,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         });
 
     }
+
+
     @Override
     public void onPause(){
         mGoogleApiClient.disconnect();
@@ -203,6 +220,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     public void onResume(){
         super.onResume();
         mGoogleApiClient.connect();
+
     }
 
     @Override
@@ -246,25 +264,38 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
             }
         }
         currentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        LatLng myLocation = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        if(me==null) {
+        if(currentLocation!=null) {
+            LatLng myLocation = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
 
-            me = map.addMarker(new MarkerOptions()
-                    .position(myLocation)
-                    .title("Me"));
-            if(icon!=null){
-                me.setIcon(icon);
+            if (me == null) {
+
+                me = map.addMarker(new MarkerOptions()
+                        .position(myLocation)
+                        .title("Me"));
+                if (icon != null) {
+                    me.setIcon(icon);
+                }
+            } else {
+                me.setPosition(myLocation);
             }
-        }else{
-            me.setPosition(myLocation);
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(myLocation)
+                    .zoom(16)
+                    .build();
+            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 3000, null);
         }
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(myLocation)
-                .zoom(16)
-                .build();
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),3000,null);
+        if(mGeofenceList.size()>0) {
+
+            LocationServices.GeofencingApi.addGeofences(
+                    mGoogleApiClient,
+                    getGeoFencingRequest(),
+                    getGeofencingIntent()
+            );
+        }
+
 
         startLocationUpdate();
+
 
     }
 
@@ -281,6 +312,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     @Override
     public void onLocationChanged(Location location) {
         currentLocation = location;
+        //me.remove();
+        LatLng myLocation = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+        if (me == null) {
+
+            me = map.addMarker(new MarkerOptions()
+                    .position(myLocation)
+                    .title("Me"));
+        } else {
+            me.setPosition(myLocation);
+        }
         if(user!= null){
             if(user.getProfileImage()!=null) {
                 Bitmap iconImage = BitmapFactory.decodeByteArray(user.getProfileImage(), 0, user.getProfileImage().length);
@@ -288,13 +330,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
                 icon = BitmapDescriptorFactory.fromBitmap(
                         iconImageScaled
                 );
-                me.setIcon(icon);
+                if(me!=null) {
+                    me.setIcon(icon);
+                }
             }
         }
-
-        //me.remove();
-        LatLng myLocation = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        me.setPosition(myLocation);
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(myLocation)
+                .zoom(16)
+                .build();
+        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 3000, null);
         //Should we animate the camera?
 
 
@@ -319,10 +364,54 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
 
     public void addPlaces(List<Place> places){
         placeClusterManager.clearItems();
+        if(mGeofenceList.size()>0 && mGoogleApiClient.isConnected()){
+            LocationServices.GeofencingApi.removeGeofences(
+                    mGoogleApiClient,
+                    getGeofencingIntent()
+            );
+        }
+        mGeofenceList.clear();
+        this.places = new String[places.size()];
+        int i = 0;
         for (Place place:places) {
+            this.places[i] = ""+place.getId()+"\n"+place.getName();
             placeClusterManager.addItem(place);
+            mGeofenceList.add(new Geofence.Builder()
+                            .setRequestId("" + place.getId())
+                            .setCircularRegion(
+                                    place.getLat(),
+                                    place.getLog(),
+                                    100
+                            )
+                            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                            .build()
+            );
+            i++;
+
+        }
+        if(mGeofenceList.size()>0 && mGoogleApiClient.isConnected()){
+            LocationServices.GeofencingApi.addGeofences(
+                    mGoogleApiClient,
+                    getGeoFencingRequest(),
+                    getGeofencingIntent()
+            );
         }
 
+    }
+    private GeofencingRequest getGeoFencingRequest(){
+        GeofencingRequest.Builder geoFencing = new GeofencingRequest.Builder();
+        geoFencing.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER);
+        geoFencing.addGeofences(mGeofenceList);
+        return geoFencing.build();
+    }
+    private PendingIntent getGeofencingIntent(){
+        if(intent==null){
+            intent = new Intent(getActivity(),GeofenceTransitionsIntentService.class);
+            context = getActivity();
+        }
+        intent.putExtra("places",places);
+        return PendingIntent.getService(context,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     private class InfoWindowAdapterMarker implements GoogleMap.InfoWindowAdapter{
@@ -398,4 +487,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
             placeCursor.close();
         }
     }
+
+
 }

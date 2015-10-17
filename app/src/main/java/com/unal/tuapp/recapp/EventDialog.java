@@ -47,7 +47,7 @@ import java.util.List;
 /**
  * Created by andresgutierrez on 9/28/15.
  */
-public class EventDialog extends DialogFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class  EventDialog extends DialogFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private View root;
     private ImageView eventImage;
     private EditText eventName;
@@ -209,12 +209,12 @@ public class EventDialog extends DialogFragment implements LoaderManager.LoaderC
                         try {
                             list = gc.getFromLocation(place.latitude, place.longitude, 3);
                         } catch (Exception e) {}
-                        if(list!=null) {
+                        if(list!=null && list.size()>0) {
                             eventPlace.setText(list.get(0).getAddressLine(0) + "\nLat: " + place.latitude + " Lng: " + place.longitude);
+                            address = list.get(0).getAddressLine(0);
                         }else{
                             eventPlace.setText("Lat: " + place.latitude + " Lng: " + place.longitude);
                         }
-                        address = list.get(0).getAddressLine(0);
                         lat = place.latitude;
                         lng = place.longitude;
 

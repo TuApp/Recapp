@@ -105,6 +105,7 @@
             android:process=":remote" >
         </receiver>
 
+
         <activity
             android:name=".EventActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan" >
@@ -122,6 +123,8 @@
 
         <activity android:name="com.google.android.gms.adds.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
+        <service android:name=".GeofenceTransitionsIntentService"
+            android:exported="false"/>
     </application>
 
 </manifest>

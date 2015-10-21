@@ -506,24 +506,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     public void addItemToMenu(long idCategory, long idSubcategory, String subcategory){
         Menu menu = navFilterDrawer.getMenu();
         filtersConstraint.add(subcategory);
-        int mDrawableIcon = 0;
-        switch ((int)idCategory){
-            case 1:
-                mDrawableIcon = R.drawable.battery_circle;
-                break;
-            case 2:
-                mDrawableIcon = R.drawable.tire_circle;
-                break;
-            case 3:
-                mDrawableIcon = R.drawable.electronic_circle;
-                break;
-
-            default:
-                mDrawableIcon = R.drawable.battery_circle;
-                break;
-        }
         menu.add(0, filtersConstraint.size(), Menu.NONE, subcategory).setIcon(android.R.drawable.ic_delete);
-        //menu.add(idCategory+" "+idSubcategory+" " + subcategory);
         if(query!=null && query.length()>0) {
             handleIntent(getIntent());
         }else if(filtersConstraint.size()>0) {

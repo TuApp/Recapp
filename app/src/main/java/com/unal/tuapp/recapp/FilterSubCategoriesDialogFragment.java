@@ -59,7 +59,7 @@ public class FilterSubCategoriesDialogFragment extends DialogFragment implements
             @Override
             public void onItemClick(View view, long position) {
                 NavigationDrawer callingActivity = (NavigationDrawer) getActivity();
-                TextView mtvSubcategory = (TextView) view.findViewById(R.id.subcategory_item);
+                TextView mtvSubcategory = (TextView) view.findViewById(R.id.category_item);
                 String subcategory = mtvSubcategory.getText().toString();
                 callingActivity.addItemToMenu(idCategory,position, subcategory);
                 dismiss();

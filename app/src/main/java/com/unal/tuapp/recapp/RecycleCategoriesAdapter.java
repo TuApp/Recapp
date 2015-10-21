@@ -11,29 +11,30 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.unal.tuapp.recapp.data.SubCategory;
+import com.unal.tuapp.recapp.data.Category;
 
 import java.util.List;
 
 /**
  * Created by andresgutierrez on 7/22/15.
  */
-public class RecycleSubCategoriesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<SubCategory> subCategories;
-    private Cursor subCategoriesCursor =null;
+public class RecycleCategoriesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private List<Category> categories;
+    private Cursor categoriesCursor =null;
     public static OnItemClickListener mItemClickListener;
 
-    public RecycleSubCategoriesAdapter(List<SubCategory> subcategories) {
-        this.subCategories = subcategories;
+    public RecycleCategoriesAdapter(List<Category> subcategories) {
+        this.categories = subcategories;
     }
 
-    public static class SubcategoryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public static class CategoryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+
         private CardView mCardView;
         private ImageView mCategoryImage;
         private TextView mCategoryText;
         private TextView mCategoryId;
 
-        public SubcategoryViewHolder(final View itemView){
+        public CategoryViewHolder(final View itemView){
             super(itemView);
             mCardView = (CardView) itemView.findViewById(R.id.category_card);
             mCategoryImage = (ImageView) itemView.findViewById(R.id.category_image);
@@ -48,6 +49,7 @@ public class RecycleSubCategoriesAdapter extends RecyclerView.Adapter<RecyclerVi
             if(mItemClickListener!=null){
                 //placeImage.setBackgroundColor(GalleryFragment.SELECTED_BORDER);
                 long id = getAdapterPosition();
+                id = Long.parseLong(mCategoryId.getText().toString());
                 mItemClickListener.onItemClick(view,id);
             }
         }
@@ -55,32 +57,34 @@ public class RecycleSubCategoriesAdapter extends RecyclerView.Adapter<RecyclerVi
 
     @Override
     public int getItemCount() {
-        return subCategories.size();
+        return categories.size();
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         RecyclerView.ViewHolder viewHolder;
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.category_item,parent,false);
-        viewHolder = new SubcategoryViewHolder(view);
+        View view = inflater.inflate(R.layout.category_item, parent, false);
+        viewHolder = new CategoryViewHolder(view);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        SubcategoryViewHolder subcategoryViewHolder = (SubcategoryViewHolder) holder;
-        SubCategory subCategory =subCategories.get(position);
-        subcategoryViewHolder.mCategoryText.setText(subCategory.getName());
-        byte[] image = subCategory.getImage();
+        CategoryViewHolder subcategoryViewHolder = (CategoryViewHolder) holder;
+        Category category =categories.get(position);
+        byte[] image = category.getImage();
         subcategoryViewHolder.mCategoryImage.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         int width =  subcategoryViewHolder.mCategoryImage.getMeasuredWidth();
         int height =  subcategoryViewHolder.mCategoryImage.getMeasuredHeight();
         Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
-        Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap, width * 4, height * 4, true);
-        subcategoryViewHolder.mCategoryImage.setImageResource(R.drawable.ic_home);
-        //subcategoryViewHolder.mCategoryImage.setImageBitmap(bitmapScaled);
+        Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap, width*4, height*4, true);
+        subcategoryViewHolder.mCategoryImage.setImageBitmap(bitmapScaled);
+        subcategoryViewHolder.mCategoryText.setText(category.getName());
+        subcategoryViewHolder.mCategoryId.setText(category.getId()+"");
+
     }
+
 
     public interface OnItemClickListener{
         void onItemClick(View view, long position);
@@ -89,19 +93,19 @@ public class RecycleSubCategoriesAdapter extends RecyclerView.Adapter<RecyclerVi
         this.mItemClickListener = mItemClickListener;
     }
 
-    public void swapData(List<SubCategory> subCategories){
-        this.subCategories = subCategories;
+    public void swapData(List<Category> categories){
+        this.categories = categories;
         notifyDataSetChanged();
     }
-    public void setSubCategoriesCursor(Cursor cursor){
-        if(subCategoriesCursor !=null){
+    public void setCategoriesCursor(Cursor cursor){
+        if(categoriesCursor !=null){
             closeCursor();
         }
-        this.subCategoriesCursor = cursor;
+        this.categoriesCursor = cursor;
     }
     public void closeCursor(){
-        subCategoriesCursor.close();
-        subCategoriesCursor = null;
+        categoriesCursor.close();
+        categoriesCursor = null;
 
     }
 

@@ -234,6 +234,7 @@ public class RecappContract {
 
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_DESCRIPTION = "description";
+        public static final String COLUMN_LINK_VIDEO = "link_video";
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_TUTORIAL).build();
 

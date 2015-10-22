@@ -283,7 +283,7 @@ public class PlacesFragment extends Fragment {
                 compress(Bitmap.CompressFormat.PNG, 100, stream5);
         image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
         image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
-        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only an example
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, 1); //This is only an example
         getActivity().getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 image
@@ -293,7 +293,7 @@ public class PlacesFragment extends Fragment {
                 compress(Bitmap.CompressFormat.PNG, 100, stream5);
         image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
         image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
-        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only an example
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, 1); //This is only an example
         getActivity().getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 image
@@ -304,7 +304,7 @@ public class PlacesFragment extends Fragment {
                 compress(Bitmap.CompressFormat.PNG, 100, stream5);
         image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
         image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
-        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only an example
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, 1); //This is only an example
         getActivity().getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 image
@@ -315,7 +315,7 @@ public class PlacesFragment extends Fragment {
                 compress(Bitmap.CompressFormat.PNG, 100, stream5);
         image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
         image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
-        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,1); //This is only an example
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, 1); //This is only an example
         getActivity().getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 image
@@ -328,7 +328,7 @@ public class PlacesFragment extends Fragment {
                 compress(Bitmap.CompressFormat.PNG, 100, stream5);
         image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
         image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
-        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,2); //This is only an example
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, 2); //This is only an example
         getActivity().getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 image
@@ -338,7 +338,7 @@ public class PlacesFragment extends Fragment {
                 compress(Bitmap.CompressFormat.PNG, 100, stream5);
         image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
         image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
-        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,2); //This is only an example
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, 2); //This is only an example
         getActivity().getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 image
@@ -349,7 +349,7 @@ public class PlacesFragment extends Fragment {
                 compress(Bitmap.CompressFormat.PNG, 100, stream5);
         image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
         image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
-        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,2); //This is only an example
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, 2); //This is only an example
         getActivity().getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 image
@@ -360,7 +360,7 @@ public class PlacesFragment extends Fragment {
                 compress(Bitmap.CompressFormat.PNG, 100, stream5);
         image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
         image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
-        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,2); //This is only an example
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, 2); //This is only an example
         getActivity().getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 image
@@ -373,7 +373,7 @@ public class PlacesFragment extends Fragment {
                 compress(Bitmap.CompressFormat.PNG, 100, stream5);
         image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
         image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
-        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,3); //This is only an example
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, 3); //This is only an example
         getActivity().getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 image
@@ -383,7 +383,7 @@ public class PlacesFragment extends Fragment {
                 compress(Bitmap.CompressFormat.PNG, 100, stream5);
         image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
         image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
-        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,3); //This is only an example
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, 3); //This is only an example
         getActivity().getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 image
@@ -395,7 +395,7 @@ public class PlacesFragment extends Fragment {
                 compress(Bitmap.CompressFormat.PNG, 100, stream5);
         image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
         image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
-        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,4); //This is only an example
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, 4); //This is only an example
         getActivity().getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 image
@@ -407,11 +407,17 @@ public class PlacesFragment extends Fragment {
                 compress(Bitmap.CompressFormat.PNG, 100, stream5);
         image.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, stream5.toByteArray());
         image.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,10);
-        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,5); //This is only an example
+        image.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, 5); //This is only an example
         getActivity().getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 image
         );
+
+        ContentValues values6 = new ContentValues();
+        values6.put(RecappContract.TutorialEntry.COLUMN_NAME, "Bottles");
+        values6.put(RecappContract.TutorialEntry.COLUMN_DESCRIPTION, "How to recycle bottles?");
+        values6.put(RecappContract.TutorialEntry.COLUMN_LINK_VIDEO, "https://www.youtube.com/watch?v=aLkoaiC48j0");
+        getActivity().getContentResolver().insert(RecappContract.TutorialEntry.CONTENT_URI, values6);
 
     }
 

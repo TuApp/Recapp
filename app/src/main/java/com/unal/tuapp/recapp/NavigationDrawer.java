@@ -33,6 +33,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -46,6 +47,7 @@ import com.unal.tuapp.recapp.data.MySuggestionProvider;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.SubCategory;
+import com.unal.tuapp.recapp.data.Tutorial;
 import com.unal.tuapp.recapp.data.User;
 
 import java.io.BufferedReader;
@@ -85,10 +87,12 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private static final int PLACE_FILTER = 467;
     private static final int EVENT = 579;
     private static final int EVENT_GOING = 591;
+    private static final int TUTORIAL = 610;
     private Cursor userCursor;
     private MapFragment mapFragment;
     private PlacesFragment placesFragment;
     private EventsFragment eventsFragment;
+    private TutorialFragment tutorialsFragment;
     private MultiAutoCompleteTextView filterCategory;
     private LimitArrayAdapterCategory adapter;
     private LimitArrayAdapterSubCategory adapterSubCategory;
@@ -160,7 +164,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             if(getSupportLoaderManager().getLoader(USER)==null) {
                 getSupportLoaderManager().initLoader(USER, null, this);
             }else{
-                getSupportLoaderManager().restartLoader(USER,null,this);
+                getSupportLoaderManager().restartLoader(USER, null, this);
             }
             if(getSupportLoaderManager().getLoader(CATEGORY)==null){
                 getSupportLoaderManager().initLoader(CATEGORY,null,this);
@@ -181,6 +185,11 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 getSupportLoaderManager().initLoader(EVENT_GOING,null,this);
             }else{
                 getSupportLoaderManager().restartLoader(EVENT_GOING,null,this);
+            }
+            if(getSupportLoaderManager().getLoader(TUTORIAL)==null){
+                getSupportLoaderManager().initLoader(TUTORIAL,null,this);
+            }else{
+                getSupportLoaderManager().restartLoader(TUTORIAL,null,this);
             }
 
             resetLoaderFilter();
@@ -475,10 +484,18 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 startActivity(intent);
             }
         });
+
+        tutorialsFragment = new TutorialFragment();
+        tutorialsFragment.setOnTutorialListener(new TutorialFragment.onTutorialListener() {
+            @Override
+            public void onTutorial(View view, long position, String link) {
+                Toast.makeText(NavigationDrawer.this, link, Toast.LENGTH_SHORT).show();
+            }
+        });
         viewPagerAdapter.addFragment(placesFragment, getResources().getString(R.string.places));
         viewPagerAdapter.addFragment(mapFragment, getResources().getString(R.string.map));
         viewPagerAdapter.addFragment(eventsFragment, getResources().getString(R.string.events));
-        viewPagerAdapter.addFragment(new TutorialFragment(), getResources().getString(R.string.tutorial));
+        viewPagerAdapter.addFragment(tutorialsFragment, getResources().getString(R.string.tutorial));
         viewPager.setOffscreenPageLimit(4);
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -682,6 +699,15 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         null,
                         sortOrderEvent
                 );
+            case TUTORIAL:
+                return new CursorLoader(
+                        this,
+                        RecappContract.TutorialEntry.CONTENT_URI,
+                        null,
+                        null,
+                        null,
+                        null
+                );
 
         }
         return null;
@@ -693,6 +719,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         List<Place> places;
         List<Event> events;
         List<Event> eventsGoing;
+        List<Tutorial> tutorials;
         switch (loader.getId()){
             case USER:
                 if(data.moveToFirst()){
@@ -753,7 +780,10 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 eventsGoing = Event.allEvents(data);
                 eventsFragment.setDataEventsGoing(eventsGoing, data);
                 break;
-
+            case TUTORIAL:
+                tutorials = Tutorial.allTutorials(data);
+                tutorialsFragment.setDataTutorials(tutorials, data);
+                break;
         }
 
     }
@@ -764,6 +794,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         placesFragment.closeData();
         mapFragment.closeData();
         eventsFragment.closeData();
+        tutorialsFragment.closeData();
     }
     public String buildSelection(String [] category){
         String where = null;

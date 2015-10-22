@@ -81,7 +81,8 @@ public class RecappDBHelper extends SQLiteOpenHelper{
         final String CREATE_TUTORIAL_TABLE = "CREATE TABLE " + TutorialEntry.TABLE_NAME + " ( " +
                 TutorialEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 TutorialEntry.COLUMN_NAME + " TEXT NOT NULL, " +
-                TutorialEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL );";
+                TutorialEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL," +
+                TutorialEntry.COLUMN_LINK_VIDEO + " TEXT NOT NULL );";
         final String CREATE_TUTORIAL_IMAGE_TABLE = "CREATE TABLE " + TutorialImageEntry.TABLE_NAME + " ( " +
                 TutorialImageEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 TutorialImageEntry.COLUMN_IMAGE + " BLOB NOT NULL, " +

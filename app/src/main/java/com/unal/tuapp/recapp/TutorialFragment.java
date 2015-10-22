@@ -23,8 +23,8 @@ import java.util.List;
  * Created by andresgutierrez on 7/13/15.
  */
 public class TutorialFragment  extends Fragment {
-    private RecyclerView recyclerView;
-    private RecycleTutorialAdapter adapter;
+    private static  RecyclerView recyclerView;
+    private static RecycleTutorialAdapter adapter;
     public static onTutorialListener mOnTutorialListener;
 
 
@@ -35,7 +35,7 @@ public class TutorialFragment  extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_tutorial, container);
+        View view = inflater.inflate(R.layout.fragment_tutorial, container,false);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView = (RecyclerView) view.findViewById(R.id.tutorial_recycler);
         recyclerView.setLayoutManager(linearLayoutManager);

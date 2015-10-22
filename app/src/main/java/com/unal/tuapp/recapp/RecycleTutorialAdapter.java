@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class RecycleTutorialAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<Tutorial> tutorials;
+    private static List<Tutorial> tutorials;
     private Cursor tutorialsCursor =null;
     public static OnItemClickListener mItemClickListener;
 

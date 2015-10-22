@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.design.widget.FloatingActionButton;
@@ -23,6 +24,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,8 +37,10 @@ import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.PlusShare;
@@ -111,8 +115,6 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private de.hdodenhof.circleimageview.CircleImageView imageView;
     private FloatingActionButton eventCreate;
     private AdView mAdView;
-
-
 
 
     @Override
@@ -489,7 +491,24 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         tutorialsFragment.setOnTutorialListener(new TutorialFragment.onTutorialListener() {
             @Override
             public void onTutorial(View view, long position, String link) {
-                Toast.makeText(NavigationDrawer.this, link, Toast.LENGTH_SHORT).show();
+                final String linkTutorial = link;
+                /*InterstitialAd mInterstitialAd = new InterstitialAd(view.getContext());
+                mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id));
+
+                mInterstitialAd.setAdListener(new AdListener() {
+                    @Override
+                    public void onAdClosed() {
+                        super.onAdClosed();
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(linkTutorial)));
+                    }
+                });
+                AdRequest adRequest = new AdRequest.Builder().build();
+                mInterstitialAd.loadAd(adRequest);
+                if(mInterstitialAd.isLoaded())
+                    mInterstitialAd.show();
+                */
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(linkTutorial)));
+
             }
         });
         viewPagerAdapter.addFragment(placesFragment, getResources().getString(R.string.places));
@@ -532,6 +551,12 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             } else {
                 getSupportLoaderManager().restartLoader(PLACE, null, NavigationDrawer.this);
             }
+            if (getSupportLoaderManager().getLoader(TUTORIAL) == null) {
+                getSupportLoaderManager().initLoader(TUTORIAL, null, NavigationDrawer.this);
+            } else {
+                getSupportLoaderManager().restartLoader(TUTORIAL, null, NavigationDrawer.this);
+            }
+
         }
     }
 
@@ -700,9 +725,26 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         sortOrderEvent
                 );
             case TUTORIAL:
+                /*return new CursorLoader(
+                        this,
+                        RecappContract.SubCategoryByTutorialEntry.buildSubCategoryByTutorialByTutorial(),
+                        //RecappContract.SubCategoryByPlaceEntry.buildSubCategoryByPlacePlaceSubCategory(),
+                        new String[]{RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry._ID,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_NAME,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_LOG,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_LAT,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_ADDRESS,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_DESCRIPTION,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_RATING,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE,
+                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_WEB},
+                        selectionPlaces,
+                        selectionArgs,
+                        sortOrder
+                );*/
                 return new CursorLoader(
                         this,
-                        RecappContract.TutorialEntry.CONTENT_URI,
+                        RecappContract.SubCategoryByTutorialEntry.CONTENT_URI,
                         null,
                         null,
                         null,

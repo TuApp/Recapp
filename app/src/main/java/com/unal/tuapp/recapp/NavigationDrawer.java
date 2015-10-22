@@ -61,6 +61,7 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -92,6 +93,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private static final int EVENT = 579;
     private static final int EVENT_GOING = 591;
     private static final int TUTORIAL = 610;
+    private static final int TUTORIAL_FILTER = 620;
     private Cursor userCursor;
     private MapFragment mapFragment;
     private PlacesFragment placesFragment;
@@ -342,7 +344,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 totalFilter--;
                 if(query!=null && query.length()>0) {
                     handleIntent(getIntent());
-                }else if(filtersConstraint.size()>0) {
+                }else if(!filtersConstraint.isEmpty()) {
                     loadSelection();
                     resetLoaderFilter();
                 }else{
@@ -540,7 +542,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         menu.add(0, filtersConstraint.size(), Menu.NONE, subcategory).setIcon(android.R.drawable.ic_delete);
         if(query!=null && query.length()>0) {
             handleIntent(getIntent());
-        }else if(filtersConstraint.size()>0) {
+        }else if(!filtersConstraint.isEmpty()) {
             loadSelection();
             resetLoaderFilter();
         }else {
@@ -725,30 +727,28 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         sortOrderEvent
                 );
             case TUTORIAL:
-                /*return new CursorLoader(
-                        this,
-                        RecappContract.SubCategoryByTutorialEntry.buildSubCategoryByTutorialByTutorial(),
-                        //RecappContract.SubCategoryByPlaceEntry.buildSubCategoryByPlacePlaceSubCategory(),
-                        new String[]{RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry._ID,
-                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_NAME,
-                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_LOG,
-                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_LAT,
-                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_ADDRESS,
-                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_DESCRIPTION,
-                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_RATING,
-                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE,
-                                RecappContract.PlaceEntry.TABLE_NAME+"."+ RecappContract.PlaceEntry.COLUMN_WEB},
-                        selectionPlaces,
-                        selectionArgs,
-                        sortOrder
-                );*/
                 return new CursorLoader(
                         this,
-                        RecappContract.SubCategoryByTutorialEntry.CONTENT_URI,
+                        RecappContract.TutorialEntry.CONTENT_URI,
                         null,
                         null,
                         null,
                         null
+                );
+            case TUTORIAL_FILTER:
+                String[] selectionArgs = new String[filtersConstraint.size()];
+                filtersConstraint.toArray(selectionArgs);
+                String selectionTutorialFilter = buildSelectionPlaceFilters(selectionArgs);
+                return new CursorLoader(
+                        this,
+                        RecappContract.SubCategoryByTutorialEntry.buildSubCategoryByTutorialSubCategoryTutorial(),
+                        new String[]{RecappContract.TutorialEntry.TABLE_NAME+"."+RecappContract.TutorialEntry._ID,
+                                RecappContract.TutorialEntry.TABLE_NAME+"."+RecappContract.TutorialEntry.COLUMN_NAME,
+                                RecappContract.TutorialEntry.COLUMN_DESCRIPTION,
+                                RecappContract.TutorialEntry.COLUMN_LINK_VIDEO},
+                        selectionTutorialFilter,
+                        selectionArgs,
+                        RecappContract.TutorialEntry.TABLE_NAME +"."+RecappContract.TutorialEntry.COLUMN_NAME+" ASC "
                 );
 
         }
@@ -801,14 +801,14 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 }
                 break;
             case PLACE:
-                if(filtersConstraint.size()==0) {
+                if(filtersConstraint.isEmpty()) {
                     places = Place.allPlaces(data);
                     placesFragment.setData(places, data);
                     mapFragment.setDate(places,data);
                 }
                 break;
             case PLACE_FILTER:
-                if(filtersConstraint.size()>0) {
+                if(!filtersConstraint.isEmpty()) {
                     places = Place.allPlaces(data);
                     placesFragment.setData(places, data);
                     mapFragment.setDate(places,data);
@@ -823,8 +823,17 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 eventsFragment.setDataEventsGoing(eventsGoing, data);
                 break;
             case TUTORIAL:
-                tutorials = Tutorial.allTutorials(data);
-                tutorialsFragment.setDataTutorials(tutorials, data);
+                if(filtersConstraint.isEmpty()) {
+                    tutorials = Tutorial.allTutorials(data);
+                    tutorialsFragment.setDataTutorials(tutorials, data);
+                }
+                break;
+            case TUTORIAL_FILTER:
+                if(!filtersConstraint.isEmpty()){
+                    tutorials = Tutorial.allTutorials(data);
+                    tutorialsFragment.setDataTutorials(tutorials, data);
+                }
+
                 break;
         }
 
@@ -873,7 +882,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             suggestions.saveRecentQuery(query, null);
             //searchView.invalidate();
             if(query.toUpperCase().equals("ALL PLACES") || query.toUpperCase().equals("TODOS LOS LUGARES")){
-                if(filtersConstraint.size()>0){
+                if(!filtersConstraint.isEmpty()){
                     loadSelection();
                     resetLoaderFilter();
                 }else{
@@ -944,6 +953,11 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             getSupportLoaderManager().initLoader(PLACE_FILTER, null, this);
         } else {
             getSupportLoaderManager().restartLoader(PLACE_FILTER, null, this);
+        }
+        if (getSupportLoaderManager().getLoader(TUTORIAL_FILTER) == null) {
+            getSupportLoaderManager().initLoader(TUTORIAL_FILTER, null, this);
+        } else {
+            getSupportLoaderManager().restartLoader(TUTORIAL_FILTER, null, this);
         }
     }
 }

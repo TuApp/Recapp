@@ -414,15 +414,26 @@ public class PlacesFragment extends Fragment {
         );
 
         ContentValues values6 = new ContentValues();
-        values6.put(RecappContract.TutorialEntry.COLUMN_NAME, "Bottles");
-        values6.put(RecappContract.TutorialEntry.COLUMN_DESCRIPTION, "How to recycle bottles?");
+        values6.put(RecappContract.TutorialEntry.COLUMN_NAME, "Batteries");
+        values6.put(RecappContract.TutorialEntry.COLUMN_DESCRIPTION, "How to recycle batteries?");
         values6.put(RecappContract.TutorialEntry.COLUMN_LINK_VIDEO, "https://www.youtube.com/watch?v=aLkoaiC48j0");
         getActivity().getContentResolver().insert(RecappContract.TutorialEntry.CONTENT_URI, values6);
+
+        ContentValues values7 = new ContentValues();
+        values7.put(RecappContract.TutorialEntry.COLUMN_NAME, "Tires");
+        values7.put(RecappContract.TutorialEntry.COLUMN_DESCRIPTION, "How to recycle tires?");
+        values7.put(RecappContract.TutorialEntry.COLUMN_LINK_VIDEO, "https://www.youtube.com/watch?v=aLkoaiC48j0");
+        getActivity().getContentResolver().insert(RecappContract.TutorialEntry.CONTENT_URI, values7);
 
         ContentValues subCategoryTutorial = new ContentValues();
         subCategoryTutorial.put(RecappContract.SubCategoryByTutorialEntry.COLUMN_TUTORIAL_KEY, 1);
         subCategoryTutorial.put(RecappContract.SubCategoryByTutorialEntry.COLUMN_SUBCATEGORY_KEY, 1);
         getActivity().getContentResolver().insert(RecappContract.SubCategoryByTutorialEntry.CONTENT_URI, subCategoryTutorial);
+
+        ContentValues subCategoryTutorial2 = new ContentValues();
+        subCategoryTutorial2.put(RecappContract.SubCategoryByTutorialEntry.COLUMN_TUTORIAL_KEY, 2);
+        subCategoryTutorial2.put(RecappContract.SubCategoryByTutorialEntry.COLUMN_SUBCATEGORY_KEY, 3);
+        getActivity().getContentResolver().insert(RecappContract.SubCategoryByTutorialEntry.CONTENT_URI, subCategoryTutorial2);
 
     }
 

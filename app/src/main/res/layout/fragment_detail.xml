@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.unal.tuapp.recapp.DetailFragment"
+    tools:context="com.unal.tuapp.recapp.fragments.DetailFragment"
     android:focusableInTouchMode="true"
     android:descendantFocusability="beforeDescendants"
     android:id="@+id/fragment_detail">
@@ -76,34 +76,38 @@
                         android:layout_marginLeft="8dp"/>
 
                     <!--flat button ?-->
-                    <Button
+                    <ImageButton
                         android:id="@+id/card_share"
                         android:layout_below="@+id/card_address"
                         android:layout_alignParentRight="true"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
                         android:text="SHARE"
                         android:layout_marginLeft="8dp"
                         android:layout_marginRight="8dp"
-                        android:textColor="@color/my_accent"
+                        android:src="@drawable/google_plus"
+                        android:scaleType="centerCrop"
                         style="?android:attr/borderlessButtonStyle"/>
 
-                    <Button
+                    <ImageButton
                         android:id="@+id/card_share_facebook"
-                        android:layout_below="@+id/card_share"
+                        android:layout_below="@+id/card_address"
                         android:layout_alignParentRight="true"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_toLeftOf="@+id/card_share"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
                         android:text="SHARE FACEBOOK"
                         android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:textColor="@color/my_accent"
+                        android:layout_marginRight="70dp"
+                        android:src="@drawable/facebook"
+                        android:scaleType="centerCrop"
                         style="?android:attr/borderlessButtonStyle"/>
 
                     <ImageButton
                         android:id="@+id/card_favorite"
                         android:layout_below="@+id/card_address"
                         android:layout_alignParentLeft="true"
+                        android:layout_toRightOf="@+id/card_share"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_favorites"

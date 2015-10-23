@@ -40,44 +40,40 @@ public class RecappProvider extends ContentProvider {
     static final int PLACE_IMAGE= 700;
     static final int PLACE_IMAGE_WITH_PLACE = 710;
     static final int PLACE_IMAGE_WITH_ID = 720;
-    static final int TUTORIAL_IMAGE = 800;
-    static final int TUTORIAL_IMAGE_WITH_TUTORIAL= 810;
-    static final int TUTORIAL_IMAGE_WITH_ID = 820;
-    static final int SUB_CATEGORY = 900;
-    static final int SUB_CATEGORY_WITH_CATEGORY = 910;
-    static final int SUB_CATEGORY_WITH_CATEGORY_ID = 920;
-    static final int SUB_CATEGORY_WITH_ID = 930;
-    static final int SUB_CATEGORY_BY_PLACE = 1000;
-    static final int SUB_CATEGORY_BY_PLACE_ID = 1010;
-    static final int SUB_CATEGORY_BY_PLACE_PLACE = 1020;
-    static final int SUB_CATEGORY_BY_PLACE_PLACE_ID = 1030;
-    static final int SUB_CATEGORY_BY_PLACE_SUB_CATEGORY = 1040;
-    static final int SUB_CATEGORY_BY_PLACE_SUB_CATEGORY_ID = 1050;
-    static final int SUB_CATEGORY_BY_PLACE_PLACE_SUB_CATEGORY = 1060;
-    static final int SUB_CATEGORY_BY_TUTORIAL = 1100;
-    static final int SUB_CATEGORY_BY_TUTORIAL_ID = 1110;
-    static final int SUB_CATEGORY_BY_TUTORIAL_TUTORIAL = 1120;
-    static final int SUB_CATEGORY_BY_TUTORIAL_TUTORIAL_ID = 1130;
-    static final int SUB_CATEGORY_BY_TUTORIAL_SUB_CATEGORY = 1140;
-    static final int SUB_CATEGORY_BY_TUTORIAL_SUB_CATEGORY_ID = 1150;
-    static final int SUB_CATEGORY_BY_TUTORIAL_TUTORIAL_SUB_CATEGORY = 1160;
-    static final int USER_BY_PLACE = 1200;
-    static final int USER_BY_PLACE_USER = 1210;
-    static final int USER_BY_PLACE_PLACE = 1220;
-    static final int USER_BY_PLACE_ID = 1230;
-    static final int EVENT = 1300;
-    static final int EVENT_ID = 1310;
-    static final int EVENT_BY_USER = 1400;
-    static final int EVENT_BY_USER_EVENT = 1410;
-    static final int EVENT_BY_USER_USER = 1420;
-    static final int EVENT_BY_USER_ID = 1430;
+    static final int SUB_CATEGORY = 800;
+    static final int SUB_CATEGORY_WITH_CATEGORY = 810;
+    static final int SUB_CATEGORY_WITH_CATEGORY_ID = 820;
+    static final int SUB_CATEGORY_WITH_ID = 830;
+    static final int SUB_CATEGORY_BY_PLACE = 900;
+    static final int SUB_CATEGORY_BY_PLACE_ID = 910;
+    static final int SUB_CATEGORY_BY_PLACE_PLACE = 920;
+    static final int SUB_CATEGORY_BY_PLACE_PLACE_ID = 930;
+    static final int SUB_CATEGORY_BY_PLACE_SUB_CATEGORY = 940;
+    static final int SUB_CATEGORY_BY_PLACE_SUB_CATEGORY_ID = 950;
+    static final int SUB_CATEGORY_BY_PLACE_PLACE_SUB_CATEGORY = 960;
+    static final int SUB_CATEGORY_BY_TUTORIAL = 1000;
+    static final int SUB_CATEGORY_BY_TUTORIAL_ID = 1010;
+    static final int SUB_CATEGORY_BY_TUTORIAL_TUTORIAL = 1020;
+    static final int SUB_CATEGORY_BY_TUTORIAL_TUTORIAL_ID = 1030;
+    static final int SUB_CATEGORY_BY_TUTORIAL_SUB_CATEGORY = 1040;
+    static final int SUB_CATEGORY_BY_TUTORIAL_SUB_CATEGORY_ID = 1050;
+    static final int SUB_CATEGORY_BY_TUTORIAL_TUTORIAL_SUB_CATEGORY = 1060;
+    static final int USER_BY_PLACE = 1100;
+    static final int USER_BY_PLACE_USER = 1110;
+    static final int USER_BY_PLACE_PLACE = 1120;
+    static final int USER_BY_PLACE_ID = 1130;
+    static final int EVENT = 1200;
+    static final int EVENT_ID = 1210;
+    static final int EVENT_BY_USER = 1300;
+    static final int EVENT_BY_USER_EVENT = 1310;
+    static final int EVENT_BY_USER_USER = 1320;
+    static final int EVENT_BY_USER_ID = 1330;
 
     private static final SQLiteQueryBuilder reminderByUser;
     private static final SQLiteQueryBuilder reminderByPlace;
     private static final SQLiteQueryBuilder commentByUser;
     private static final SQLiteQueryBuilder commentByPlace;
     private static final SQLiteQueryBuilder placeImagePlace;
-    private static final SQLiteQueryBuilder tutorialImageTutorial;
     private static final SQLiteQueryBuilder subCategoryCategory;
     private static final SQLiteQueryBuilder subCategoryByPlacePlace;
     private static final SQLiteQueryBuilder subCategoryByPlaceSubCategory;
@@ -127,13 +123,6 @@ public class RecappProvider extends ContentProvider {
                         PlaceEntry.TABLE_NAME + " ON " +
                         PlaceImageEntry.TABLE_NAME+"."+PlaceImageEntry.COLUMN_PLACE_KEY +
                         " = " + PlaceEntry.TABLE_NAME+"."+PlaceEntry._ID
-        );
-        tutorialImageTutorial = new SQLiteQueryBuilder();
-        tutorialImageTutorial.setTables(
-                TutorialImageEntry.TABLE_NAME+ " INNER JOIN " +
-                        TutorialEntry.TABLE_NAME + " ON " +
-                        TutorialImageEntry.TABLE_NAME+"."+TutorialImageEntry.COLUMN_TUTORIAL_KEY +
-                        " = " + TutorialEntry.TABLE_NAME+"."+TutorialEntry._ID
         );
         subCategoryCategory = new SQLiteQueryBuilder();
         subCategoryCategory.setTables(
@@ -264,11 +253,6 @@ public class RecappProvider extends ContentProvider {
         matcher.addURI(authority,RecappContract.PATH_PLACEIMAGE+"/"+RecappContract.PATH_PLACE+"/#",PLACE_IMAGE_WITH_PLACE);
         matcher.addURI(authority,RecappContract.PATH_PLACEIMAGE+"/#",PLACE_IMAGE_WITH_ID);
 
-        //Matchers for tutorial with image
-        matcher.addURI(authority,RecappContract.PATH_TUTORIALIAMGE,TUTORIAL_IMAGE);
-        matcher.addURI(authority,RecappContract.PATH_TUTORIALIAMGE+"/"+RecappContract.PATH_TUTORIAL+"/#",TUTORIAL_IMAGE_WITH_TUTORIAL);
-        matcher.addURI(authority,RecappContract.PATH_TUTORIALIAMGE+"/#",TUTORIAL_IMAGE_WITH_ID);
-
         //Matchers for sub category
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY,SUB_CATEGORY);
         matcher.addURI(authority,RecappContract.PATH_SUBCATEGORY+"/"+RecappContract.PATH_CATEGORY,SUB_CATEGORY_WITH_CATEGORY);
@@ -365,12 +349,6 @@ public class RecappProvider extends ContentProvider {
                 return PlaceImageEntry.CONTENT_TYPE;
             case PLACE_IMAGE_WITH_ID:
                 return PlaceImageEntry.CONTENT_ITEM_TYPE;
-            case TUTORIAL_IMAGE:
-                return TutorialImageEntry.CONTENT_TYPE;
-            case TUTORIAL_IMAGE_WITH_TUTORIAL:
-                return TutorialImageEntry.CONTENT_TYPE;
-            case TUTORIAL_IMAGE_WITH_ID:
-                return TutorialImageEntry.CONTENT_ITEM_TYPE;
             case SUB_CATEGORY:
                 return SubCategoryEntry.CONTENT_TYPE;
             case SUB_CATEGORY_WITH_CATEGORY:
@@ -697,43 +675,6 @@ public class RecappProvider extends ContentProvider {
                         projection,
                         selection,
                         new String[]{""+ placeImageId},
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
-            case TUTORIAL_IMAGE:
-                retCursor = recappDBHelper.getReadableDatabase().query(
-                        TutorialEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
-            case TUTORIAL_IMAGE_WITH_TUTORIAL:
-                tutorialId = TutorialImageEntry.getTutorialFromUri(uri);
-                selection = TutorialImageEntry.COLUMN_TUTORIAL_KEY + " = ? ";
-                retCursor = tutorialImageTutorial.query(
-                        recappDBHelper.getReadableDatabase(),
-                        projection,
-                        selection,
-                        new String[]{""+tutorialId},
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
-            case TUTORIAL_IMAGE_WITH_ID:
-                long tutorialImageId = TutorialImageEntry.getIdFromUri(uri);
-                selection = TutorialImageEntry._ID + " = ? ";
-                retCursor = recappDBHelper.getReadableDatabase().query(
-                        TutorialImageEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        new String[]{""+tutorialImageId},
                         null,
                         null,
                         sortOrder
@@ -1147,15 +1088,6 @@ public class RecappProvider extends ContentProvider {
                 }
                 break;
 
-            case TUTORIAL_IMAGE:
-                id = db.insert(TutorialImageEntry.TABLE_NAME,null,values);
-                if(id>0){
-                    returnUri = TutorialImageEntry.buildTutorialImageUri(id);
-                }else{
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
-                }
-                break;
-
             case SUB_CATEGORY:
                 id = db.insert(SubCategoryEntry.TABLE_NAME,null,values);
                 if(id>0){
@@ -1241,9 +1173,6 @@ public class RecappProvider extends ContentProvider {
                 rowsDeleted = db.delete(PlaceImageEntry.TABLE_NAME,selection,selectionArgs);
                 break;
 
-            case TUTORIAL_IMAGE:
-                rowsDeleted = db.delete(TutorialImageEntry.TABLE_NAME,selection,selectionArgs);
-                break;
 
             case SUB_CATEGORY:
                 rowsDeleted = db.delete(SubCategoryEntry.TABLE_NAME,selection,selectionArgs);
@@ -1301,9 +1230,6 @@ public class RecappProvider extends ContentProvider {
                 rowUpdated = db.update(PlaceImageEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
 
-            case TUTORIAL_IMAGE:
-                rowUpdated = db.update(TutorialImageEntry.TABLE_NAME, values, selection, selectionArgs);
-                break;
 
             case SUB_CATEGORY:
                 rowUpdated = db.update(SubCategoryEntry.TABLE_NAME, values, selection, selectionArgs);
@@ -1446,23 +1372,6 @@ public class RecappProvider extends ContentProvider {
                 try{
                     for(ContentValues value:values){
                         long id = db.insert(PlaceImageEntry.TABLE_NAME,null,value);
-                        if(id!=-1){
-                            returnCount++;
-                        }
-                    }
-                    db.setTransactionSuccessful();
-
-                }finally {
-                    db.endTransaction();
-                }
-                getContext().getContentResolver().notifyChange(uri,null);
-                return returnCount;
-            case TUTORIAL_IMAGE:
-                db.beginTransaction();
-                returnCount = 0;
-                try{
-                    for(ContentValues value:values){
-                        long id = db.insert(TutorialImageEntry.TABLE_NAME,null,value);
                         if(id!=-1){
                             returnCount++;
                         }

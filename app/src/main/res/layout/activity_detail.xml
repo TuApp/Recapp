@@ -24,7 +24,8 @@
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:expandedTitleMarginStart="48dp"
                 app:expandedTitleMarginEnd="64dp"
-                app:contentScrim="?attr/colorPrimary">
+                app:contentScrim="?attr/colorPrimary"
+                android:title="@string/title_activity_detail">
                 
                 <ImageView
                     android:id="@+id/detail_image"
@@ -37,7 +38,8 @@
                     android:id="@+id/toolbar"
                     android:layout_height="?attr/actionBarSize"
                     android:layout_width="match_parent"
-                    app:layout_collapseMode="pin" />
+                    app:layout_collapseMode="pin"
+                    android:title="@string/title_activity_detail"/>
 
 
             </android.support.design.widget.CollapsingToolbarLayout>

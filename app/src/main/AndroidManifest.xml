@@ -49,7 +49,7 @@
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
-            android:name=".Recapp"
+            android:name=".activities.Recapp"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -58,7 +58,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".NavigationDrawer"
+            android:name=".activities.NavigationDrawer"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan" >
@@ -79,51 +79,53 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Detail"
+            android:name=".activities.Detail"
             android:label="@string/title_activity_detail"
-            android:parentActivityName=".NavigationDrawer"
+            android:parentActivityName=".activities.NavigationDrawer"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.unal.tuapp.recapp.NavigationDrawer" />
+                android:value=".activities.NavigationDrawer" />
         </activity>
         <activity
-            android:name=".UserDetail"
+            android:name=".activities.UserDetail"
             android:label="@string/title_activity_user_detail"
-            android:parentActivityName=".NavigationDrawer" >
+            android:parentActivityName=".activities.NavigationDrawer" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.unal.tuapp.recapp.NavigationDrawer" />
+                android:value=".activities.NavigationDrawer" />
         </activity>
         <activity
-            android:name=".ReminderActivity"
+            android:name=".activities.ReminderActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan" >
         </activity>
 
         <receiver
-            android:name=".MyAlarmReceiver"
+            android:name=".servicesAndAsyncTasks.MyAlarmReceiver"
             android:process=":remote" >
         </receiver>
 
 
         <activity
-            android:name=".EventActivity"
+            android:name=".activities.EventActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan" >
         </activity>
-        <activity android:name=".EventActivityGoing" />
-        <activity android:name=".EventUpdateActivity" />
+        <activity android:name=".activities.EventActivityGoing" />
+        <activity android:name=".activities.EventUpdateActivity" />
         <activity
-            android:name=".Gallery"
+            android:name=".activities.Gallery"
             android:label="@string/title_activity_gallery"
-            android:parentActivityName=".Detail" >
+            android:parentActivityName=".activities.Detail" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.unal.tuapp.recapp.Detail" />
+                android:value=".activities.Detail" />
         </activity>
 
         <activity android:name="com.google.android.gms.adds.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
-        <service android:name=".GeofenceTransitionsIntentService"
+        <service android:name=".servicesAndAsyncTasks.GeofenceTransitionsIntentService"
+            android:exported="false"/>
+        <service android:name=".servicesAndAsyncTasks.DummyData"
             android:exported="false"/>
     </application>
 

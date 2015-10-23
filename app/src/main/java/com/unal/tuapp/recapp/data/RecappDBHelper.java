@@ -83,13 +83,6 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 TutorialEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                 TutorialEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL," +
                 TutorialEntry.COLUMN_LINK_VIDEO + " TEXT NOT NULL );";
-        final String CREATE_TUTORIAL_IMAGE_TABLE = "CREATE TABLE " + TutorialImageEntry.TABLE_NAME + " ( " +
-                TutorialImageEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                TutorialImageEntry.COLUMN_IMAGE + " BLOB NOT NULL, " +
-                TutorialImageEntry.COLUMN_WORTH + " INTEGER NOT NULL DEFAULT 0, "+
-                TutorialImageEntry.COLUMN_TUTORIAL_KEY+ " INTEGER, " +
-                "FOREIGN KEY ( "+ TutorialImageEntry.COLUMN_TUTORIAL_KEY + " ) REFERENCES " +
-                TutorialEntry.TABLE_NAME + " ( " + TutorialEntry._ID + " ) );";
         final String CREATE_CATEGORY_TABLE = "CREATE TABLE " + CategoryEntry.TABLE_NAME + " ( " +
                 CategoryEntry._ID + "  INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 CategoryEntry.COLUMN_NAME + " TEXT UNIQUE NOT NULL, "+
@@ -150,7 +143,6 @@ public class RecappDBHelper extends SQLiteOpenHelper{
         sqLiteDatabase.execSQL(CREATE_COMMENT_TABLE);
         sqLiteDatabase.execSQL(CREATE_PLACE_IMAGE_TABLE);
         sqLiteDatabase.execSQL(CREATE_TUTORIAL_TABLE);
-        sqLiteDatabase.execSQL(CREATE_TUTORIAL_IMAGE_TABLE);
         sqLiteDatabase.execSQL(CREATE_CATEGORY_TABLE);
         sqLiteDatabase.execSQL(CREATE_SUB_CATEGORY_TABLE);
         sqLiteDatabase.execSQL(CREATE_SUB_CATEGORY_BY_PLACE);
@@ -170,7 +162,6 @@ public class RecappDBHelper extends SQLiteOpenHelper{
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CommentEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + PlaceImageEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TutorialEntry.TABLE_NAME);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TutorialImageEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CategoryEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + SubCategoryEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + SubCategoryByPlaceEntry.TABLE_NAME );

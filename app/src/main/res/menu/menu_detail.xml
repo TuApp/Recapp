@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context="com.unal.tuapp.recapp.Detail">
+    xmlns:tools="http://schemas.android.com/tools" tools:context="com.unal.tuapp.recapp.activities.Detail">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/help" android:title="@string/action_help"

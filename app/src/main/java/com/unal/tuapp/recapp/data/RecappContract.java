@@ -252,38 +252,6 @@ public class RecappContract {
         }
     }
 
-    public static class TutorialImageEntry implements BaseColumns {
-        public static final String TABLE_NAME = "TutorialImage";
-
-        public static final String COLUMN_IMAGE = "image";
-        public static final String COLUMN_WORTH = "worth";
-        public static final String COLUMN_TUTORIAL_KEY = "tutorial_key";
-
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_TUTORIALIAMGE).build();
-
-        public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TUTORIALIAMGE;
-        public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TUTORIALIAMGE;
-
-        public static Uri buildTutorialImageUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
-        }
-
-        public static Uri buildTutorialImageTutorialUri(long tutorial) {
-            return CONTENT_URI.buildUpon()
-                    .appendPath(PATH_TUTORIAL)
-                    .appendPath("" + tutorial).build();
-        }
-
-        public static long getTutorialFromUri(Uri uri) {
-            return Long.parseLong(uri.getPathSegments().get(2));
-        }
-
-        public static long getIdFromUri(Uri uri) {
-            return Long.parseLong(uri.getPathSegments().get(1));
-        }
-    }
 
     public static class CategoryEntry implements BaseColumns {
         public static final String TABLE_NAME = "Category";

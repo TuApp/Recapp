@@ -96,8 +96,10 @@ public class RecycleTutorialAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         this.tutorialsCursor = cursor;
     }
     public void closeCursor(){
-        tutorialsCursor.close();
-        tutorialsCursor = null;
+        if(tutorialsCursor!=null) {
+            tutorialsCursor.close();
+            tutorialsCursor = null;
+        }
 
     }
 

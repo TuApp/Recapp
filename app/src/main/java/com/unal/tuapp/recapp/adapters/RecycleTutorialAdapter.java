@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.unal.tuapp.recapp.R;
@@ -31,6 +32,7 @@ public class RecycleTutorialAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         private TextView mTittle;
         private TextView mDescription;
         private TextView mLink;
+        private ImageView mIcon;
         private CardView mCardView;
 
         public TutorialViewHolder(final View itemView){
@@ -39,6 +41,7 @@ public class RecycleTutorialAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             mTittle = (TextView) itemView.findViewById(R.id.tutorial_tittle_item);
             mDescription = (TextView) itemView.findViewById(R.id.tutorial_description_item);
             mLink = (TextView) itemView.findViewById(R.id.tutorial_link_item);
+            mIcon = (ImageView) itemView.findViewById(R.id.tutorial_icon);
 
 
             itemView.setOnClickListener(this);
@@ -75,7 +78,14 @@ public class RecycleTutorialAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         Tutorial tutorial = tutorials.get(position);
         tutorialsViewHolder.mTittle.setText(tutorial.getTittle());
         tutorialsViewHolder.mDescription.setText(tutorial.getDescription());
-        tutorialsViewHolder.mLink.setText(tutorial.getLink());
+        String link = tutorial.getLink();
+        if(link.contains("youtu")){
+            tutorialsViewHolder.mIcon.setImageResource(R.drawable.youtube);
+            tutorialsViewHolder.mLink.setVisibility(View.GONE);
+        }else{
+            tutorialsViewHolder.mIcon.setVisibility(View.GONE);
+            tutorialsViewHolder.mLink.setText(tutorial.getLink());
+        }
     }
 
     public interface OnItemClickListener{

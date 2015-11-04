@@ -12,6 +12,7 @@ import com.google.api.server.spi.config.ApiNamespace;
 
 
 import java.awt.Image;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Hashtable;
@@ -28,9 +29,28 @@ import sun.security.util.BitArray;
 /**
  * An endpoint class we are exposing
  */
+
+
+//TODO
+    /*
+    delete user
+    update user
+
+
+     */
 @Api(name = "myApi", version = "v1", namespace = @ApiNamespace(ownerDomain = "backend.recapp.tuapp.unal.com", ownerName = "backend.recapp.tuapp.unal.com", packagePath = ""))
 public class MyEndpoint {
 
+
+
+    @ApiMethod(name="getImage")
+    public StringResult getImage() throws IOException {
+        byte data[] = UtilDB.getImageByteOfPath();
+        String result = "";
+        for( int i = 0; i < Math.min(data.length, 50); i++ )
+            result += data[i];
+        return new StringResult(result);
+    }
 
     @ApiMethod(name = "AddComment") //OK1
     public StringResult AddComment(@Named("emailUser") String emailUser,@Named("idPlace") long idPlace, @Named("content") String content) {

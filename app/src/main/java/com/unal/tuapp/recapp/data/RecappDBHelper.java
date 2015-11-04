@@ -46,7 +46,9 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 PlaceEntry.COLUMN_ADDRESS + " TEXT UNIQUE NOT NULL, " +
                 PlaceEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
                 PlaceEntry.COLUMN_RATING + " REAL DEFAULT 0.0 , "+
-                PlaceEntry.COLUMN_IMAGE_FAVORITE + " BLOB NOT NULL);";
+                PlaceEntry.COLUMN_IMAGE_FAVORITE + " BLOB NOT NULL ," +
+                PlaceEntry.COLUMN_EMAIL + " TEXT UNIQUE NOT NULL , " +
+                PlaceEntry.COLUMN_PASSWORD+" TEXT NOT NULL );";
 
         final String CREATE_REMINDER_TABLE = "CREATE TABLE "+ ReminderEntry.TABLE_NAME +" ( "+
                 ReminderEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +

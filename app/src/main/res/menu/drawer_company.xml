@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/main"
+        android:checkableBehavior="single">
+
+        <item android:id="@+id/home"
+            android:title="@string/my_home"
+            android:checked="true"
+            android:icon="@drawable/ic_home"/>
+
+        <item android:id="@+id/information"
+            android:title="@string/my_information"
+            android:icon="@android:drawable/ic_menu_info_details"/>
+
+        <item android:id="@+id/comments"
+            android:title="@string/my_comments"
+            android:icon="@drawable/ic_comments"/>
+
+        <item android:id="@+id/events"
+            android:title="@string/my_events"
+            android:icon="@drawable/ic_calendar"/>
+
+        <item android:id="@+id/images"
+            android:title="@string/my_images"
+            android:icon="@android:drawable/ic_menu_gallery"/>
+
+        <item android:id="@+id/account"
+            android:title="@string/my_account">
+            <menu>
+                <item android:id="@+id/sign_out"
+                    android:title="@string/action_sign_out"
+                    android:icon="@drawable/ic_sign_out"></item>
+            </menu>
+        </item>
+
+
+    </group>
+
+    <group android:id="@+id/footer"
+        android:checkableBehavior="none">
+        <item android:title="@string/action_settings"
+            android:icon="@drawable/ic_settings"></item>
+        <item android:title="@string/action_help"
+            android:icon="@drawable/ic_help">
+        </item>
+    </group>
+
+</menu>

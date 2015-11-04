@@ -76,6 +76,8 @@ public class RecappContract {
         public static final String COLUMN_RATING = "rating"; //We use it to sort the results
         public static final String COLUMN_IMAGE_FAVORITE = "imageFavorite";
         public static final String COLUMN_WEB = "web";
+        public static final String COLUMN_EMAIL = "email";
+        public static final String COLUMN_PASSWORD = "password";
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_PLACE).build();
 
@@ -89,8 +91,17 @@ public class RecappContract {
 
         }
 
+        public static Uri buildPlaceEmailUri(String email){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(email).build();
+        }
+
         public static long getIdFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(1));
+        }
+
+        public static String getEmailFromUri(Uri uri){
+            return uri.getPathSegments().get(1);
         }
 
     }

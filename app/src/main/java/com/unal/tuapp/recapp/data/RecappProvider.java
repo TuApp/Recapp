@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
 
 
 import com.unal.tuapp.recapp.data.RecappContract.*;
@@ -24,6 +25,7 @@ public class RecappProvider extends ContentProvider {
     static final int USER_WITH_ID = 120;
     static final int PLACE = 200;
     static final int PLACE_WITH_ID = 210;
+    static final int PLACE_WITH_EMAIL = 220;
     static final int REMINDER = 300;
     static final int REMINDER_WITH_USER = 310;
     static final int REMINDER_WITH_PLACE = 320;
@@ -225,6 +227,7 @@ public class RecappProvider extends ContentProvider {
         //Matchers for place
         matcher.addURI(authority,RecappContract.PATH_PLACE,PLACE);
         matcher.addURI(authority,RecappContract.PATH_PLACE+"/#",PLACE_WITH_ID);
+        matcher.addURI(authority,RecappContract.PATH_PLACE+"/*",PLACE_WITH_EMAIL);
 
         //Matchers for reminder
         matcher.addURI(authority,RecappContract.PATH_REMINDER,REMINDER);
@@ -316,6 +319,8 @@ public class RecappProvider extends ContentProvider {
             case PLACE:
                 return PlaceEntry.CONTENT_TYPE;
             case PLACE_WITH_ID:
+                return PlaceEntry.CONTENT_ITEM_TYPE;
+            case PLACE_WITH_EMAIL:
                 return PlaceEntry.CONTENT_ITEM_TYPE;
             case REMINDER:
                 return ReminderEntry.CONTENT_TYPE;
@@ -478,6 +483,25 @@ public class RecappProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
+                break;
+            case PLACE_WITH_EMAIL:
+                String placeEmail = PlaceEntry.getEmailFromUri(uri);
+                Log.e("algo",placeEmail);
+                String selectionEmailPlace = PlaceEntry.COLUMN_EMAIL + " = ?";
+                Log.e("algo",selectionEmailPlace);
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        PlaceEntry.TABLE_NAME,
+                        projection,
+                        selectionEmailPlace,
+                        new String[]{placeEmail.trim()},
+                        null,
+                        null,
+                        null
+
+                );
+                if(retCursor==null){
+                    Log.e("algo","algo");
+                }
                 break;
             case REMINDER:
                 retCursor = recappDBHelper.getReadableDatabase().query(

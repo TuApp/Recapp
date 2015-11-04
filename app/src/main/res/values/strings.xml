@@ -12,6 +12,8 @@
     <string name="my_comments">My comments</string>
     <string name="my_appointments">My appointments</string>
     <string name="my_favorites">My favorites</string>
+    <string name="my_images">My images</string>
+    <string name="my_information">My information</string>
     <string name="places">Places</string>
     <string name="map">Map</string>
     <string name="events">Events</string>
@@ -51,5 +53,9 @@
     <string name="my_events">My events</string>
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="company_loging">Login for companies</string>
+    <string name="login">Log in</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
 
 </resources>

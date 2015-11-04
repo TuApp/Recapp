@@ -354,7 +354,7 @@ public class  EventDialog extends DialogFragment implements LoaderManager.Loader
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==1 && resultCode==Activity.RESULT_OK){
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-            Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap,eventImage.getWidth(),eventImage.getHeight(),true);
+            Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap,eventImage.getWidth()/2,eventImage.getHeight(),true);
             image = bitmapScaled;
             eventImage.setImageBitmap(bitmapScaled);
             eventImage.invalidate();
@@ -363,7 +363,7 @@ public class  EventDialog extends DialogFragment implements LoaderManager.Loader
             try {
                 Bitmap bitmap = MediaStore.Images.Media
                         .getBitmap(getActivity().getContentResolver(), data.getData());
-                Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap,eventImage.getWidth(),eventImage.getHeight(),true);
+                Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap,eventImage.getWidth()/2,eventImage.getHeight(),true);
                 image = bitmapScaled;
                 eventImage.setImageBitmap(bitmapScaled);
             }catch (Exception e){

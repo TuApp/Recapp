@@ -1,20 +1,27 @@
 package com.unal.tuapp.recapp.fragments;
 
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.database.Cursor;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
+import com.unal.tuapp.recapp.activities.Company;
+import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.others.GooglePlus;
 import com.unal.tuapp.recapp.activities.NavigationDrawer;
 import com.unal.tuapp.recapp.R;
@@ -28,6 +35,7 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
 
     private GooglePlus mGooglePlus;
     private SignInButton mSignInButton;
+    private Button mLoginCompany;
     private int mSignInProgress;
     private PendingIntent mSignInIntent;
 
@@ -51,6 +59,70 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
                     mGooglePlus.mGoogleApiClient.connect();
                 }
                 //resolveSignInError();
+            }
+        });
+        mLoginCompany = (Button) root.findViewById(R.id.companyLogin);
+        mLoginCompany.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                final Dialog dialog = new Dialog(getActivity());
+                dialog.setContentView(R.layout.login_dialog);
+                //dialog.setTitle(getActivity().getString(R.string.login));
+                final TextView email = (TextView) dialog.findViewById(R.id.company_email);
+                final TextView password = (TextView) dialog.findViewById(R.id.company_password);
+                Button login = (Button) dialog.findViewById(R.id.login);
+                email.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                    @Override
+                    public void onFocusChange(View view, boolean b) {
+                        if (!b && !isValidEmail(email.getText().toString())) {
+                            email.setError("The email is not valid");
+                        }
+                    }
+                });
+                password.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                    @Override
+                    public void onFocusChange(View view, boolean b) {
+                        if (!b && password.getText().toString().equals("")) {
+                            password.setError("The password can't be empty ");
+                        }
+                    }
+                });
+                login.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String emailText = email.getText().toString();
+                        String passwordText = password.getText().toString();
+                        if (!passwordText.equals("")) {
+                            if (isValidEmail(emailText)) {
+                                Cursor data = getActivity().getContentResolver().query(
+                                        RecappContract.PlaceEntry.buildPlaceEmailUri(emailText.trim()),
+                                        new String[]{RecappContract.PlaceEntry._ID, RecappContract.PlaceEntry.COLUMN_PASSWORD},
+                                        null,
+                                        null,
+                                        null
+                                );
+                                if (data.moveToFirst()) {
+                                    if (passwordText.equals(data.getString(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_PASSWORD)))) {
+                                        Intent intent = new Intent(getActivity(), Company.class);
+                                        intent.putExtra("email", emailText);
+                                        startActivity(intent);
+                                    } else {
+                                        password.setError("The passwords don't match");
+                                    }
+                                } else {
+                                    email.setError("The email is not associated to a company");
+                                }
+                            }
+                        } else {
+                            password.setError("The password can't be empty");
+                        }
+                    }
+                });
+
+                dialog.show();
+
+
             }
         });
         return root;
@@ -134,6 +206,9 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
     public void onPause(){
         super.onPause();
         //getActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+    public boolean isValidEmail(String email){
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
 

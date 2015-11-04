@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.data.RecappContract;
@@ -35,6 +36,8 @@ public class DummyData extends IntentService {
         values.put(RecappContract.PlaceEntry.COLUMN_LOG,  -74.11411179999999);
         values.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, " Kr 103 # 1 - 89");
         values.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "Shopping center in Bogota");
+        values.put(RecappContract.PlaceEntry.COLUMN_EMAIL, "agutierrezt@unal.edu.co");
+        values.put(RecappContract.PlaceEntry.COLUMN_PASSWORD, "gutierrez2011");
 
         ByteArrayOutputStream stream =  new ByteArrayOutputStream();
         BitmapFactory.decodeResource(this.getResources(), R.drawable.unicentrologo).
@@ -47,6 +50,8 @@ public class DummyData extends IntentService {
         values1.put(RecappContract.PlaceEntry.COLUMN_LOG, -74.101848);
         values1.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, " ADD AS");
         values1.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "Shopping center in Bogota");
+        values1.put(RecappContract.PlaceEntry.COLUMN_EMAIL, "andresrene2005@hotmail.com");
+        values1.put(RecappContract.PlaceEntry.COLUMN_PASSWORD, "gutierrez2011");
         ByteArrayOutputStream stream1 =  new ByteArrayOutputStream();
         BitmapFactory.decodeResource(this.getResources(),R.drawable.gelogo).
                 compress(Bitmap.CompressFormat.PNG, 100, stream1);
@@ -59,6 +64,8 @@ public class DummyData extends IntentService {
         values2.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, " dfsdafaddress2");
         values2.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "alguna descripcioDSFn");
         values2.put(RecappContract.PlaceEntry.COLUMN_WEB,"http://www.pilascolombia.com/");
+        values2.put(RecappContract.PlaceEntry.COLUMN_EMAIL, "agutierrezt930410@gmail.com");
+        values2.put(RecappContract.PlaceEntry.COLUMN_PASSWORD, "gutierrez2011");
 
         ByteArrayOutputStream stream2 =  new ByteArrayOutputStream();
         BitmapFactory.decodeResource(this.getResources(),R.drawable.tmricaurtelogo).
@@ -70,6 +77,8 @@ public class DummyData extends IntentService {
         values3.put(RecappContract.PlaceEntry.COLUMN_LOG, -74.1102505);
         values3.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, "nueva direcion");
         values3.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "Shopping center in Bogota");
+        values3.put(RecappContract.PlaceEntry.COLUMN_EMAIL,"pepitoperez@gmail.com");
+        values3.put(RecappContract.PlaceEntry.COLUMN_PASSWORD, "12345");
 
         ByteArrayOutputStream stream3 =  new ByteArrayOutputStream();
         BitmapFactory.decodeResource(this.getResources(),R.drawable.salitreplace1).
@@ -82,6 +91,8 @@ public class DummyData extends IntentService {
         values4.put(RecappContract.PlaceEntry.COLUMN_LOG, -74.083961);
         values4.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, "234ad");
         values4.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, "Building at National University of Colombia, Bogota");
+        values4.put(RecappContract.PlaceEntry.COLUMN_EMAIL,"carlosperez@hotmail.com");
+        values4.put(RecappContract.PlaceEntry.COLUMN_PASSWORD,"12345");
 
         ByteArrayOutputStream stream4 =  new ByteArrayOutputStream();
         BitmapFactory.decodeResource(this.getResources(),R.drawable.cytplace1).

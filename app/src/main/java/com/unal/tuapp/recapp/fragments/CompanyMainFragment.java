@@ -16,12 +16,13 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.unal.tuapp.recapp.R;
+import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
 
 /**
  * Created by andresgutierrez on 11/4/15.
  */
-public class CompanyMainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class CompanyMainFragment extends Fragment {
     private View root;
     private ImageView companyImage;
     private TextView companyName;
@@ -30,7 +31,9 @@ public class CompanyMainFragment extends Fragment implements LoaderManager.Loade
     private TextView companyWeb;
     private RatingBar companyRating;
     private final int PLACE = 7845;
-    private String email;
+    private Place place;
+    //private String email;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -41,56 +44,19 @@ public class CompanyMainFragment extends Fragment implements LoaderManager.Loade
         companyAddress = (TextView) root.findViewById(R.id.address_company);
         companyWeb = (TextView) root.findViewById(R.id.web_company);
         companyRating = (RatingBar) root.findViewById(R.id.rating_company);
-        if(getActivity().getIntent().getExtras()!=null){
-            email = getActivity().getIntent().getExtras().getString("email");
-        }
 
-        if(getLoaderManager().getLoader(PLACE)==null){
-            getLoaderManager().initLoader(PLACE,null,this);
-        }else{
-            getLoaderManager().restartLoader(PLACE,null,this);
-        }
         return root;
     }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(
-                getActivity(),
-                RecappContract.PlaceEntry.buildPlaceEmailUri(email),
-                null,
-                null,
-                null,
-                null
+    public void setPlace(Place place){
+        this.place = place;
+        companyAddress.setText(place.getAddress());
+        companyWeb.setText(place.getWeb());
+        companyDescription.setText(place.getDescription());
+        companyRating.setRating((float) place.getRating());
+        companyName.setText(place.getName());
+        companyImage.setImageBitmap(
+                BitmapFactory.decodeByteArray(place.getImageFavorite(),0,place.getImageFavorite().length)
         );
     }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(data.moveToFirst()){
-            companyImage.setImageBitmap(
-                    BitmapFactory.decodeByteArray(data.getBlob(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE)),
-                            0, data.getBlob(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE)).length)
-            );
-            companyName.setText(
-                    data.getString(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_NAME))
-            );
-            companyDescription.setText(
-                    data.getString(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_DESCRIPTION))
-            );
-            companyAddress.setText(
-                    data.getString(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_ADDRESS))
-            );
-            companyWeb.setText(
-                    data.getString(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_WEB))
-            );
-            companyRating.setRating((float)data.getDouble(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_RATING)));
-        }
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
 }

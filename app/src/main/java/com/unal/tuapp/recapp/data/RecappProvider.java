@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.util.Log;
 
 
 import com.unal.tuapp.recapp.data.RecappContract.*;
@@ -486,9 +485,7 @@ public class RecappProvider extends ContentProvider {
                 break;
             case PLACE_WITH_EMAIL:
                 String placeEmail = PlaceEntry.getEmailFromUri(uri);
-                Log.e("algo",placeEmail);
                 String selectionEmailPlace = PlaceEntry.COLUMN_EMAIL + " = ?";
-                Log.e("algo",selectionEmailPlace);
                 retCursor = recappDBHelper.getReadableDatabase().query(
                         PlaceEntry.TABLE_NAME,
                         projection,
@@ -499,9 +496,7 @@ public class RecappProvider extends ContentProvider {
                         null
 
                 );
-                if(retCursor==null){
-                    Log.e("algo","algo");
-                }
+
                 break;
             case REMINDER:
                 retCursor = recappDBHelper.getReadableDatabase().query(

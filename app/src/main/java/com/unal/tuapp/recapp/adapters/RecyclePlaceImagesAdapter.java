@@ -42,7 +42,12 @@ public static class PlaceImagesViewHolder extends RecyclerView.ViewHolder implem
     }
 
 
-}
+
+
+    }
+    public byte[] getImage(int position){
+        return  placeImages.get(position);
+    }
 
     public int getCurrentSelectedPositionImage() {
         return currentSelectedPositionImage;

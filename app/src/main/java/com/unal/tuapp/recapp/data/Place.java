@@ -12,7 +12,6 @@ import java.util.ArrayList;
  * Created by andresgutierrez on 8/5/15.
  */
 public class Place implements ClusterItem {
-
     private long id;
     private String name;
     private String description;

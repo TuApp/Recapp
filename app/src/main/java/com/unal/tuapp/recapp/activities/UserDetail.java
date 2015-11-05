@@ -137,6 +137,8 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                         }
 
                         fragmentTransaction.hide(fragmentComment);
+                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.setCommentPositon(-1);
+                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.notifyDataSetChanged();
                         fragmentTransaction.hide(fragmentReminder);
                         fragmentTransaction.hide(fragmentEvents);
                         fragmentTransaction.commit();
@@ -147,6 +149,8 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                         if(fragmentReminder.isAdded()){
                             fragmentTransaction.show(fragmentReminder);
                         }
+                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.setCommentPositon(-1);
+                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.notifyDataSetChanged();
                         fragmentTransaction.hide(fragmentPlace);
                         fragmentTransaction.hide(fragmentComment);
                         fragmentTransaction.hide(fragmentEvents);
@@ -158,6 +162,8 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                         if(fragmentComment.isAdded()){
                             fragmentTransaction.show(fragmentComment);
                         }
+                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.setCommentPositon(-1);
+                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.notifyDataSetChanged();
                         fragmentTransaction.hide(fragmentPlace);
                         fragmentTransaction.hide(fragmentReminder);
                         fragmentTransaction.hide(fragmentEvents);
@@ -170,6 +176,8 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                         if(fragmentEvents.isAdded()){
                             fragmentTransaction.show(fragmentEvents);
                         }
+                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.setCommentPositon(-1);
+                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.notifyDataSetChanged();
                         fragmentTransaction.hide(fragmentPlace);
                         fragmentTransaction.hide(fragmentReminder);
                         fragmentTransaction.hide(fragmentComment);

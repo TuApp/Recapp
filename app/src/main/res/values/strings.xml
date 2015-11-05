@@ -57,5 +57,12 @@
     <string name="login">Log in</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
+    <string name="company_name">Company name</string>
+    <string name="company_description">Company description</string>
+    <string name="company_address">Company address</string>
+    <string name="company_position">Company position</string>
+    <string name="company_web">Company web</string>
+    <string name="company_image">Company favorite image</string>
+    <string name="company_favorite">Please choose the image which you want to be the favorite</string>
 
 </resources>

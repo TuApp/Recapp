@@ -104,8 +104,10 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
                                 );
                                 if (data.moveToFirst()) {
                                     if (passwordText.equals(data.getString(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_PASSWORD)))) {
+                                        dialog.dismiss();
                                         Intent intent = new Intent(getActivity(), Company.class);
                                         intent.putExtra("email", emailText);
+                                        intent.putExtra("id",data.getLong(data.getColumnIndexOrThrow(RecappContract.PlaceEntry._ID)));
                                         startActivity(intent);
                                     } else {
                                         password.setError("The passwords don't match");

@@ -3,6 +3,7 @@ package com.unal.tuapp.recapp.fragments;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -37,7 +38,7 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
     private User user;
     private View root;
     private RecyclerView recyclerView;
-    private RecycleCommentsUserAdapter recycleCommentsAdapter;
+    public RecycleCommentsUserAdapter recycleCommentsAdapter;
     private static final int COMMENT = 20;
     private ActionMode actionMode;
     private long idComment;
@@ -75,6 +76,9 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             actionMode = null;
+            recycleCommentsAdapter.setCommentPositon(-1);
+            recycleCommentsAdapter.notifyDataSetChanged();
+
         }
 
 
@@ -96,17 +100,21 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
         recycleCommentsAdapter.setOnItemClickListener(new RecycleCommentsUserAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, long id,long idPlace) {
+
                 idComment = id;
                 idPlaceComment = idPlace;
                 if(actionMode==null){
                     actionMode = ((AppCompatActivity)getActivity()).startSupportActionMode(mActionModeCallback);
-                }else{
+                }/*else{
                     actionMode.finish();
                     actionMode = ((AppCompatActivity)getActivity()).startSupportActionMode(mActionModeCallback);
 
-                }
+                }*/
+                recycleCommentsAdapter.notifyDataSetChanged();
             }
         });
+        recycleCommentsAdapter.setCommentPositon(-1);
+        recycleCommentsAdapter.notifyDataSetChanged();
 
         //AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(recycleCommentsAdapter);
         //alphaInAnimationAdapter.setDuration(1000);
@@ -145,6 +153,7 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
                 sortOrder
         );
     }
+
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {

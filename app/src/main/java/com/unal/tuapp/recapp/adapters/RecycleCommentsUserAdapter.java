@@ -13,6 +13,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.unal.tuapp.recapp.R;
+import com.unal.tuapp.recapp.fragments.GalleryFragment;
 import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.data.Comment;
 
@@ -25,6 +26,8 @@ public class RecycleCommentsUserAdapter extends RecyclerView.Adapter<RecyclerVie
     public static OnItemClickListener mItemClickListener;
     private static List<Comment> comments;
     private Cursor commentCursor=null;
+    private static int commentPositon;
+
 
     public RecycleCommentsUserAdapter(List<Comment> comments) {
         this.comments = comments;
@@ -57,7 +60,7 @@ public class RecycleCommentsUserAdapter extends RecyclerView.Adapter<RecyclerVie
         @Override
         public boolean onLongClick(View view) {
             if(mItemClickListener!=null){
-
+                commentPositon = getAdapterPosition();
                 long id = comments.get(getAdapterPosition()).getId();
                 long idPlace = comments.get(getAdapterPosition()).getIdPlace();
 
@@ -68,7 +71,13 @@ public class RecycleCommentsUserAdapter extends RecyclerView.Adapter<RecyclerVie
         }
     }
 
+    public int getCommentPositon() {
+        return commentPositon;
+    }
 
+    public void setCommentPositon(int commentPositon) {
+        RecycleCommentsUserAdapter.commentPositon = commentPositon;
+    }
 
     @Override
     public int getItemCount() {
@@ -95,6 +104,11 @@ public class RecycleCommentsUserAdapter extends RecyclerView.Adapter<RecyclerVie
                     BitmapFactory.decodeByteArray(comment.getImageProfile(),0,comment.getImageProfile().length));
         }else {
             commentsViewHolder.imageView.setImageResource(R.drawable.background_material);
+        }
+        if(commentPositon==position){
+            commentsViewHolder.itemView.setBackgroundColor(GalleryFragment.SELECTED_BORDER);
+        }else{
+            commentsViewHolder.itemView.setBackgroundColor(Color.TRANSPARENT);
         }
         //We need to change the value, dynamically
         commentsViewHolder.ratingBar.setRating((float)comment.getRating());

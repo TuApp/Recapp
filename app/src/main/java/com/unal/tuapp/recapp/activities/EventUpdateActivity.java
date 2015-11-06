@@ -24,6 +24,8 @@ public class EventUpdateActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private View root;
     private User user;
+    private String email;
+    private long id;
     private long eventId;
     private EventDialog dialog;
 
@@ -34,7 +36,13 @@ public class EventUpdateActivity extends AppCompatActivity {
         setContentView(root);
         toolbar = (Toolbar) root.findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        user = getIntent().getExtras().getParcelable("user");
+        if(getIntent().getExtras().containsKey("user")) {
+            user = getIntent().getExtras().getParcelable("user");
+            email = user.getEmail();
+        }else if(getIntent().getExtras().containsKey("email")){
+            email = getIntent().getExtras().getString("email");
+            id = getIntent().getExtras().getLong("id");
+        }
         eventId = getIntent().getExtras().getLong("event");
 
         dialog = new EventDialog();
@@ -42,13 +50,12 @@ public class EventUpdateActivity extends AppCompatActivity {
             @Override
             public void onAction(String action, Object... objects) {
                 if(action.equals("save")){
-                    Log.e("algo",(String)objects[0]);
                     //We should save the event
                     ContentValues values = new ContentValues();
                     values.put(RecappContract.EventEntry.COLUMN_NAME,(String)objects[0]);
                     values.put(RecappContract.EventEntry.COLUMN_DESCRIPTION,(String)objects[1]);
                     values.put(RecappContract.EventEntry.COLUMN_DATE,((Date)objects[2]).getTime());
-                    values.put(RecappContract.EventEntry.COLUMN_CREATOR,user.getEmail());
+                    values.put(RecappContract.EventEntry.COLUMN_CREATOR,email);
                     values.put(RecappContract.EventEntry.COLUMN_ADDRESS,(String)objects[3]);
                     values.put(RecappContract.EventEntry.COLUMN_LAT, (Double) objects[4]);
                     values.put(RecappContract.EventEntry.COLUMN_LOG,(Double)objects[5]);
@@ -76,10 +83,18 @@ public class EventUpdateActivity extends AppCompatActivity {
                             new String[]{"" + eventId}
                     );
                 }
-                Intent  intent = new Intent(EventUpdateActivity.this,UserDetail.class);
-                intent.putExtra("user",user);
-                intent.putExtra("type","event");
-                startActivity(intent);
+                if(user!=null) {
+                    Intent intent = new Intent(EventUpdateActivity.this, UserDetail.class);
+                    intent.putExtra("user", user);
+                    intent.putExtra("type", "event");
+                    startActivity(intent);
+                }else{
+                    Intent intent = new Intent(EventUpdateActivity.this, Company.class);
+                    intent.putExtra("email", email);
+                    intent.putExtra("id",id);
+                    intent.putExtra("type", "event");
+                    startActivity(intent);
+                }
             }
         });
         getSupportFragmentManager().beginTransaction().

@@ -21,6 +21,7 @@ public class Place implements ClusterItem {
     private double rating;
     private byte[] imageFavorite;
     private String web;
+    private String email;
 
 
     public Place(String address, String description, long id,
@@ -34,6 +35,14 @@ public class Place implements ClusterItem {
         this.name = name;
         this.rating = rating;
         this.web = web;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getAddress() {

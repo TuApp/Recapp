@@ -25,6 +25,8 @@ public class EventActivity extends AppCompatActivity {
     private View root;
     private User user;
     private EventDialog dialog;
+    private String email;
+    private long id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +35,13 @@ public class EventActivity extends AppCompatActivity {
         setContentView(root);
         toolbar = (Toolbar) root.findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        user = getIntent().getExtras().getParcelable("user");
+        if(getIntent().getExtras().containsKey("user")) {
+            user = getIntent().getExtras().getParcelable("user");
+            email = user.getEmail();
+        }else if(getIntent().getExtras().containsKey("email")){
+            email = getIntent().getExtras().getString("email");
+            id = getIntent().getExtras().getLong("id");
+        }
 
         dialog = new EventDialog();
         dialog.setOnEventListener(new EventDialog.OnEventListener() {
@@ -45,7 +53,7 @@ public class EventActivity extends AppCompatActivity {
                     values.put(RecappContract.EventEntry.COLUMN_NAME,(String)objects[0]);
                     values.put(RecappContract.EventEntry.COLUMN_DESCRIPTION,(String)objects[1]);
                     values.put(RecappContract.EventEntry.COLUMN_DATE,((Date)objects[2]).getTime());
-                    values.put(RecappContract.EventEntry.COLUMN_CREATOR,user.getEmail());
+                    values.put(RecappContract.EventEntry.COLUMN_CREATOR,email);
                     values.put(RecappContract.EventEntry.COLUMN_ADDRESS,(String)objects[3]);
                     values.put(RecappContract.EventEntry.COLUMN_LAT,(Double)objects[4]);
                     values.put(RecappContract.EventEntry.COLUMN_LOG,(Double)objects[5]);
@@ -58,18 +66,26 @@ public class EventActivity extends AppCompatActivity {
                             RecappContract.EventEntry.CONTENT_URI,
                             values
                     );
-
-                    //The user who creates the event also should attend to it
-                    ContentValues values1 = new ContentValues();
-                    values1.put(RecappContract.EventByUserEntry.COLUMN_KEY_USER, user.getEmail());
-                    values1.put(RecappContract.EventByUserEntry.COLUMN_KEY_EVENT, RecappContract.EventEntry.getIdFromUri(uri));
-                    getContentResolver().insert(
-                            RecappContract.EventByUserEntry.CONTENT_URI,
-                            values1
-                    );
+                    if(user!=null) {
+                        //The user who creates the event also should attend to it
+                        ContentValues values1 = new ContentValues();
+                        values1.put(RecappContract.EventByUserEntry.COLUMN_KEY_USER, user.getEmail());
+                        values1.put(RecappContract.EventByUserEntry.COLUMN_KEY_EVENT, RecappContract.EventEntry.getIdFromUri(uri));
+                        getContentResolver().insert(
+                                RecappContract.EventByUserEntry.CONTENT_URI,
+                                values1
+                        );
+                    }
                 }
-                Intent intent = new Intent(EventActivity.this,NavigationDrawer.class);
-                startActivity(intent);
+                if(user!=null) {
+                    Intent intent = new Intent(EventActivity.this, NavigationDrawer.class);
+                    startActivity(intent);
+                }else{
+                    Intent intent = new Intent(EventActivity.this, Company.class);
+                    intent.putExtra("email",email);
+                    intent.putExtra("id",id);
+                    startActivity(intent);
+                }
             }
         });
         getSupportFragmentManager().beginTransaction().

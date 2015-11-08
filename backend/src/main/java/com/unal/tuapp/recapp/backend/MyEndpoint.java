@@ -52,7 +52,7 @@ public class MyEndpoint {
         return new StringResult(result);
     }
 
-    @ApiMethod(name = "AddComment") //OK1
+    @ApiMethod(name = "AddComment") //Listo
     public StringResult AddComment(@Named("emailUser") String emailUser,@Named("idPlace") long idPlace, @Named("content") String content) {
         UserDB myUser = DB.users.get(emailUser);
         PlaceDB myPlace = DB.places.get(idPlace);
@@ -62,7 +62,7 @@ public class MyEndpoint {
         myPlace.comments.put(myComent.id, myComent);
         return new StringResult(myComent.id+"");
     }
-    @ApiMethod(name = "AddUser") //OK1
+    @ApiMethod(name = "AddUser") //Listo
     public StringResult  AddUser(@Named("name") String name, @Named("lastName") String lastName, @Named("email") String email, @Named("profileImage") String profileImage)
     {
         StringResult result;
@@ -77,7 +77,7 @@ public class MyEndpoint {
         return result;
     }
 
-    @ApiMethod(name = "AddEvent") //OK1
+    @ApiMethod(name = "AddEvent") //listo
     public StringResult Event(@Named("emailUser") String emailUser, @Named("content") String content)
     {
         UserDB myUser = DB.users.get(emailUser);
@@ -100,7 +100,7 @@ public class MyEndpoint {
 
     }
 
-    @ApiMethod(name = "deleteComment") //OK1
+    @ApiMethod(name = "deleteComment") //listo
     public StringResult deleteComment(@Named("id") long id)
     {
         CommentDB myComment = DB.comments.get(id);
@@ -112,7 +112,7 @@ public class MyEndpoint {
         return new StringResult("success");
     }
 
-    @ApiMethod(name = "deleteEvent") //OK1 tener cuidado con los id que quedan en los users para los eventos a los que asistiran
+    @ApiMethod(name = "deleteEvent") //listo tener cuidado con los id que quedan en los users para los eventos a los que asistiran
     public StringResult deleteEvent(@Named("id") long id)
     {
         EventDB myEvent = DB.events.get(id);
@@ -122,7 +122,7 @@ public class MyEndpoint {
         return new StringResult("success");
     }
 
-    @ApiMethod(name = "updateEvent") //OK1
+    @ApiMethod(name = "updateEvent") //listo
     public StringResult updateEvent(@Named("id") long id, @Named("content") String content)
     {
         EventDB myEvent= DB.events.get(id);
@@ -130,7 +130,7 @@ public class MyEndpoint {
         return new StringResult("success");
     }
 
-    @ApiMethod(name = "updateComment") //OK1
+    @ApiMethod(name = "updateComment") //listo
     public ResultUptadeComment updateComment(@Named("id") long id, @Named("content") String content)
     {
         CommentDB myComment = DB.comments.get(id);
@@ -138,7 +138,7 @@ public class MyEndpoint {
         return new ResultUptadeComment("success");
     }
 
-    @ApiMethod(name = "getEvents") //OK1
+    @ApiMethod(name = "getEvents") //listo
     public EventDB[] getEvents()
     {
         Set keys = DB.events.keySet();
@@ -155,7 +155,7 @@ public class MyEndpoint {
     }
 
     @ApiMethod(name = "getPlaces")
-    public PlaceDB[] getPlaces() //OK1 OK2
+    public PlaceDB[] getPlaces() //listo
     {
         Set keys = DB.places.keySet();
         PlaceDB result[] = new PlaceDB[keys.size()];
@@ -170,7 +170,7 @@ public class MyEndpoint {
         return result;
     }
 
-    @ApiMethod(name = "getComments")
+    @ApiMethod(name = "getComments") //listo
     public CommentDB[] getCommentsOfPlace(@Named("idPlace") long idPlace)
     {
         PlaceDB myPlace = DB.places.get(idPlace);
@@ -187,14 +187,14 @@ public class MyEndpoint {
         return result;
     }
 
-    @ApiMethod(name = "getUser")
+    @ApiMethod(name = "getUser") // listo
     public UserDB getUser(@Named("idUser") String idUser)
     {
         return DB.users.get(idUser);
     }
 
     //OK1 OK2
-    @ApiMethod(name = "startDB") // esta funcion es obligatoria llamarla antes de iniciar el backend, se puede llamar desde la interfaz web
+    @ApiMethod(name = "startDB") // listo, esta funcion es obligatoria llamarla antes de iniciar el backend, se puede llamar desde la interfaz web
     public StringResult startDB(@Named("password") String password)
     {
         StringResult result;

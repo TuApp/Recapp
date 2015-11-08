@@ -55,15 +55,13 @@ public class MyEndpoint {
     @ApiMethod(name = "AddComment") //OK1
     public StringResult AddComment(@Named("emailUser") String emailUser,@Named("idPlace") long idPlace, @Named("content") String content) {
         UserDB myUser = DB.users.get(emailUser);
-        PlaceDB myPlace = DB.places.get(new Long(idPlace));
+        PlaceDB myPlace = DB.places.get(idPlace);
         CommentDB myComent = new CommentDB(CommentDB.getnextID(), emailUser, idPlace, content);
         DB.comments.put(myComent.id, myComent);
         myUser.myComments.add(myComent.id);
         myPlace.comments.put(myComent.id, myComent);
         return new StringResult(myComent.id+"");
     }
-
-
     @ApiMethod(name = "AddUser") //OK1
     public StringResult  AddUser(@Named("name") String name, @Named("lastName") String lastName, @Named("email") String email, @Named("profileImage") String profileImage)
     {
@@ -212,14 +210,7 @@ public class MyEndpoint {
         catch(Exception e)
         {
             result  = new StringResult("wrong");
-
         }
         return result;
     }
-
-
-
-
-
-
 }

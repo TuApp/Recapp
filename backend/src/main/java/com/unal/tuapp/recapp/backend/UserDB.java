@@ -17,8 +17,6 @@ public class UserDB implements Comparable<UserDB> {
     LinkedList<Long> attendToEvents;
     public UserDB(String name, String lastName, String email, String profileImage)
     {
-
-
         this.name = name;
         this.lastName  = lastName;
         this.email = email;

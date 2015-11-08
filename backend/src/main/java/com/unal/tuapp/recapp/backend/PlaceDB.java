@@ -1,6 +1,7 @@
 package com.unal.tuapp.recapp.backend;
 
 import java.awt.Image;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ public class PlaceDB implements Comparable<PlaceDB> {
     Map<Long, CommentDB> comments;
     public PlaceDB(String address, String description, long id,
                  double log, double lat, String name, double rating,byte[] imageFavorite,String web) {
+        comments = new HashMap<Long, CommentDB>();
         this.address = address;
         this.description = description;
         this.id = id;

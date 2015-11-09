@@ -1,10 +1,16 @@
 package com.unal.tuapp.recapp.activities;
 
+import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -28,9 +34,15 @@ import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.fragments.CompanyCommentsFragment;
 import com.unal.tuapp.recapp.fragments.CompanyEventsFragment;
+import com.unal.tuapp.recapp.fragments.CompanyImagesFragment;
 import com.unal.tuapp.recapp.fragments.CompanyInformationFragment;
 import com.unal.tuapp.recapp.fragments.CompanyMainFragment;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,6 +50,9 @@ import java.util.List;
  */
 public class Company extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
     private FloatingActionButton companyEvent;
+    private FloatingActionButton companyImages;
+    private FloatingActionButton companyImagesCamera;
+    private FloatingActionButton companyImagesGallery;
     private View root;
     private DrawerLayout navigationDrawer;
     private NavigationView navDrawer;
@@ -53,7 +68,11 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
     private Fragment companyInformation;
     private Fragment companyComments;
     private Fragment companyEventFragment;
+    private Fragment companyImagesFragment;
     private String menu;
+    private boolean addImages;
+    private String imagePath;
+    private Bitmap image;
 
 
     @Override
@@ -64,6 +83,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
         menu = "home";
         if(savedInstanceState!=null){
             menu = savedInstanceState.getString("type");
+            addImages = savedInstanceState.getBoolean("addImage");
         }
         if(getIntent().getExtras()!=null){
             email = getIntent().getExtras().getString("email");
@@ -81,12 +101,61 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                 startActivity(intent);
             }
         });
+        companyImages = (FloatingActionButton) root.findViewById(R.id.company_add_image);
+        companyImagesCamera = (FloatingActionButton) root.findViewById(R.id.company_add_image_camera);
+        companyImagesGallery = (FloatingActionButton) root.findViewById(R.id.company_add_image_gallery);
+
+        companyImages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addImages =  addImages ?false:true;
+                if(addImages){
+                    companyImages.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+                    companyImagesCamera.show();
+                    companyImagesGallery.show();
+                }else{
+                    companyImages.setImageResource(R.drawable.ic_add_white_24dp);
+                    companyImagesGallery.hide();
+                    companyImagesCamera.hide();
+                }
+            }
+        });
+        companyImagesGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent choosePicture = new Intent(Intent.ACTION_GET_CONTENT);
+                choosePicture.setType("image/*");
+                startActivityForResult(choosePicture,2);
+            }
+        });
+        companyImagesCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File photo = null;
+                try {
+                    photo = createImageFile();
+                }catch (Exception e){}
+                if(photo!=null) {
+                    imagePath = photo.getAbsolutePath();
+                    Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (takePicture.resolveActivity(getPackageManager()) != null) {
+                        takePicture.putExtra(MediaStore.EXTRA_OUTPUT,
+                                Uri.fromFile(photo));
+                        startActivityForResult(takePicture, 1);
+                    }
+                }
+            }
+        });
+
+
+
         companyImage = (de.hdodenhof.circleimageview.CircleImageView) root.findViewById(R.id.favorite_image);
         companyName = (TextView) root.findViewById(R.id.company_name);
         companyHome = new CompanyMainFragment();
         companyInformation = new CompanyInformationFragment();
         companyComments = new CompanyCommentsFragment();
         companyEventFragment =  new CompanyEventsFragment();
+        companyImagesFragment = new CompanyImagesFragment();
         ((CompanyEventsFragment) companyEventFragment).setOnEventCompanyListener(new CompanyEventsFragment.OnEventCompanyListener() {
             @Override
             public void onAction(long id) {
@@ -122,8 +191,14 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             ft.hide(companyInformation);
                             ft.hide(companyComments);
                             ft.hide(companyEventFragment);
+                            ft.hide(companyImagesFragment);
                             ft.commit();
                             companyEvent.hide();
+                            companyImages.hide();
+                            if(addImages){
+                                companyImagesCamera.hide();
+                                companyImagesGallery.hide();
+                            }
                             menu = "home";
                             break;
                         case R.id.information:
@@ -133,8 +208,14 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             ft.hide(companyHome);
                             ft.hide(companyComments);
                             ft.hide(companyEventFragment);
+                            ft.hide(companyImagesFragment);
                             ft.commit();
                             companyEvent.hide();
+                            companyImages.hide();
+                            if(addImages){
+                                companyImagesCamera.hide();
+                                companyImagesGallery.hide();
+                            }
                             menu = "information";
                             break;
                         case R.id.comments:
@@ -144,8 +225,14 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             ft.hide(companyHome);
                             ft.hide(companyInformation);
                             ft.hide(companyEventFragment);
+                            ft.hide(companyImagesFragment);
                             ft.commit();
                             companyEvent.hide();
+                            companyImages.hide();
+                            if(addImages){
+                                companyImagesCamera.hide();
+                                companyImagesGallery.hide();
+                            }
                             menu = "comments";
                             break;
                         case R.id.events:
@@ -155,11 +242,32 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             ft.hide(companyHome);
                             ft.hide(companyInformation);
                             ft.hide(companyComments);
+                            ft.hide(companyImagesFragment);
                             ft.commit();
                             companyEvent.show();
+                            companyImages.hide();
+                            if(addImages){
+                                companyImagesCamera.hide();
+                                companyImagesGallery.hide();
+                            }
                             menu = "events";
                             break;
                         case R.id.images:
+                            if(companyImagesFragment.isAdded()){
+                                ft.show(companyImagesFragment);
+                            }
+                            ft.hide(companyHome);
+                            ft.hide(companyInformation);
+                            ft.hide(companyComments);
+                            ft.hide(companyEventFragment);
+                            ft.commit();
+                            companyImages.show();
+                            companyImages.setImageResource(R.drawable.ic_add_white_24dp);
+                            companyImagesCamera.hide();
+                            companyImagesGallery.hide();
+                            companyEvent.hide();
+                            addImages = false;
+                            menu = "images";
                             break;
                         case R.id.sign_out:
                             Intent intent = new Intent(Company.this, Recapp.class);
@@ -175,8 +283,10 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                 case "home":
                     fragmentTransaction.replace(R.id.company_container, companyHome,"home");
                     fragmentTransaction.add(R.id.company_container, companyInformation, "information");
-                    fragmentTransaction.add(R.id.company_container, companyComments,"comments");
+                    fragmentTransaction.add(R.id.company_container, companyComments, "comments");
                     fragmentTransaction.add(R.id.company_container, companyEventFragment,"events");
+                    fragmentTransaction.add(R.id.company_container, companyImagesFragment,"images");
+                    fragmentTransaction.hide(companyImagesFragment);
                     fragmentTransaction.hide(companyEventFragment);
                     fragmentTransaction.hide(companyInformation);
                     fragmentTransaction.hide(companyComments);
@@ -189,6 +299,8 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                     fragmentTransaction.add(R.id.company_container, companyHome, "home");
                     fragmentTransaction.add(R.id.company_container, companyComments, "comments");
                     fragmentTransaction.add(R.id.company_container, companyEventFragment,"events");
+                    fragmentTransaction.add(R.id.company_container, companyImagesFragment,"images");
+                    fragmentTransaction.hide(companyImagesFragment);
                     fragmentTransaction.hide(companyEventFragment);
                     fragmentTransaction.hide(companyHome);
                     fragmentTransaction.hide(companyComments);
@@ -202,6 +314,8 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                     fragmentTransaction.add(R.id.company_container, companyInformation, "information");
                     fragmentTransaction.add(R.id.company_container, companyHome, "home");
                     fragmentTransaction.add(R.id.company_container, companyEventFragment, "events");
+                    fragmentTransaction.add(R.id.company_container, companyImagesFragment,"images");
+                    fragmentTransaction.hide(companyImagesFragment);
                     fragmentTransaction.hide(companyEventFragment);
                     fragmentTransaction.hide(companyInformation);
                     fragmentTransaction.hide(companyHome);
@@ -215,6 +329,8 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                     fragmentTransaction.add(R.id.company_container, companyInformation, "information");
                     fragmentTransaction.add(R.id.company_container, companyHome, "home");
                     fragmentTransaction.add(R.id.company_container, companyComments,"comments");
+                    fragmentTransaction.add(R.id.company_container, companyImagesFragment,"images");
+                    fragmentTransaction.hide(companyImagesFragment);
                     fragmentTransaction.hide(companyComments);
                     fragmentTransaction.hide(companyInformation);
                     fragmentTransaction.hide(companyHome);
@@ -222,6 +338,25 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                     companyEvent.show();
                     navDrawer.getMenu().findItem(R.id.events).setChecked(true);
 
+                    break;
+                case "images":
+                    fragmentTransaction.replace(R.id.company_container, companyImagesFragment, "images");
+                    fragmentTransaction.add(R.id.company_container, companyHome, "home");
+                    fragmentTransaction.add(R.id.company_container, companyInformation, "information");
+                    fragmentTransaction.add(R.id.company_container, companyComments, "comments");
+                    fragmentTransaction.add(R.id.company_container, companyEventFragment, "events");
+                    fragmentTransaction.hide(companyHome);
+                    fragmentTransaction.hide(companyEventFragment);
+                    fragmentTransaction.hide(companyInformation);
+                    fragmentTransaction.hide(companyComments);
+                    fragmentTransaction.commit();
+                    companyImages.show();
+                    if(addImages){
+                        companyImagesCamera.show();
+                        companyImagesGallery.show();
+                    }
+                    companyEvent.hide();
+                    navDrawer.getMenu().findItem(R.id.images).setChecked(true);
                     break;
 
             }
@@ -248,48 +383,45 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
             return super.onOptionsItemSelected(item);
         }
 
-        @Override
-        protected void onPostCreate(Bundle savedInstanceState) {
-            super.onPostCreate(savedInstanceState);
-            // Sync the toggle state after onRestoreInstanceState has occurred.
-            drawerToggle.syncState();
-        }
-        @Override
-        public void onConfigurationChanged(Configuration newConfig) {
-            super.onConfigurationChanged(newConfig);
-            drawerToggle.onConfigurationChanged(newConfig);
-            // Pass any configuration change to the drawer toggles
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        drawerToggle.syncState();
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+        // Pass any configuration change to the drawer toggles
+     }
 
-        }
-
-        @Override
-        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            return new CursorLoader(
-                    this,
-                    RecappContract.PlaceEntry.buildPlaceUri(placeId),
-                    null,
-                    null,
-                    null,
-                    null
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(
+                this,
+                RecappContract.PlaceEntry.buildPlaceUri(placeId),
+                null,
+                null,
+                null,
+                null
+        );
+    }
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        List<Place> places = Place.allPlaces(data);
+        if(!places.isEmpty()){
+            place = places.get(0);
+            place.setEmail(email);
+            companyName.setText(place.getName());
+            companyImage.setImageBitmap(
+                    BitmapFactory.decodeByteArray(place.getImageFavorite(), 0, place.getImageFavorite().length)
             );
+            ((CompanyMainFragment)companyHome).setPlace(place);
+            ((CompanyInformationFragment)companyInformation).setPlace(place);
         }
 
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-            List<Place> places = Place.allPlaces(data);
-            if(!places.isEmpty()){
-                place = places.get(0);
-                place.setEmail(email);
-                companyName.setText(place.getName());
-                companyImage.setImageBitmap(
-                        BitmapFactory.decodeByteArray(place.getImageFavorite(), 0, place.getImageFavorite().length)
-                );
-                ((CompanyMainFragment)companyHome).setPlace(place);
-                ((CompanyInformationFragment)companyInformation).setPlace(place);
-            }
-
-        }
+    }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -297,8 +429,59 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-            outState.putString("type",menu);
-        }
+        outState.putString("type",menu);
+        outState.putBoolean("addImage",addImages);
+    }
     @Override
     public void onBackPressed() {}
+
+    public File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFilename = "JPEG_"+timeStamp+"_";
+        File storeDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES
+        );
+        File image = File.createTempFile(
+                imageFilename,
+                ".jpg",
+                storeDir
+        );
+        return image;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1 && resultCode== Activity.RESULT_OK){
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+            Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap,root.getWidth()/2,root.getHeight(),true);
+            image = bitmapScaled;
+
+        }
+        if(requestCode==2 && resultCode==Activity.RESULT_OK){
+            try {
+                Bitmap bitmap = MediaStore.Images.Media
+                        .getBitmap(getContentResolver(), data.getData());
+                Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap,root.getWidth()/2,root.getHeight(),true);
+                image = bitmapScaled;
+            }catch (Exception e){
+
+            }
+
+        }
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        ContentValues values = new ContentValues();
+        values.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE,stream.toByteArray());
+        values.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,placeId);
+        getContentResolver().insert(
+                RecappContract.PlaceImageEntry.CONTENT_URI,
+                values
+        );
+        companyImagesGallery.hide();
+        companyImagesCamera.hide();
+        companyImages.setImageResource(R.drawable.ic_add_white_24dp);
+
+    }
 }

@@ -23,23 +23,23 @@ public class RecyclePlaceImagesAdapter extends RecyclerView.Adapter<RecyclerView
     public static OnItemClickListener mItemClickListener;
     private int currentSelectedPositionImage;
 
-public static class PlaceImagesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-    private ImageView placeImage;
+    public static class PlaceImagesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        private ImageView placeImage;
 
-    public PlaceImagesViewHolder(View itemView){
-        super(itemView);
-        placeImage = (ImageView) itemView.findViewById(R.id.place_image);
+        public PlaceImagesViewHolder(View itemView){
+            super(itemView);
+            placeImage = (ImageView) itemView.findViewById(R.id.place_image);
 
-        itemView.setOnClickListener(this);
-    }
-    @Override
-    public void onClick(View view){
-        if(mItemClickListener!=null){
-            placeImage.setBackgroundColor(GalleryFragment.SELECTED_BORDER);
-            long id = getAdapterPosition();
-            mItemClickListener.onItemClick(view,id);
+            itemView.setOnClickListener(this);
         }
-    }
+        @Override
+        public void onClick(View view){
+            if(mItemClickListener!=null){
+                placeImage.setBackgroundColor(GalleryFragment.SELECTED_BORDER);
+                long id = getAdapterPosition();
+                mItemClickListener.onItemClick(view,id);
+            }
+        }
 
 
 

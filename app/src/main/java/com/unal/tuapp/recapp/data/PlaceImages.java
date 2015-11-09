@@ -9,19 +9,27 @@ import java.util.List;
  * Created by andresgutierrez on 8/6/15.
  */
 public class PlaceImages {
-    private List<byte[]> images;
-    public PlaceImages(){}
-
-    public List<byte[]> getImages(){
-        return images;
+    private long id;
+    private byte image[];
+    public PlaceImages(long id,byte[] image){
+        this.id = id;
+        this.image = image;
     }
-    public void setImages(Cursor cursor){
-        images = new ArrayList<>();
-        while (cursor.moveToNext()){
-            images.add(cursor.getBlob(cursor.getColumnIndexOrThrow(
-                    RecappContract.PlaceImageEntry.COLUMN_IMAGE
-            )));
-        }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 
     public static ArrayList<byte[]> allImages(Cursor cursor){
@@ -29,6 +37,15 @@ public class PlaceImages {
         while (cursor.moveToNext()){
             byte[] image = cursor.getBlob(cursor.getColumnIndexOrThrow(RecappContract.PlaceImageEntry.COLUMN_IMAGE));
             placeImages.add(image);
+        }
+        return placeImages;
+    }
+    public static ArrayList<PlaceImages> allImagesPlaces(Cursor cursor){
+        ArrayList<PlaceImages> placeImages = new ArrayList<>();
+        while (cursor.moveToNext()){
+            placeImages.add(new PlaceImages(
+                    cursor.getLong(cursor.getColumnIndexOrThrow(RecappContract.PlaceImageEntry.TABLE_NAME+"."+RecappContract.PlaceImageEntry._ID)),
+                    cursor.getBlob(cursor.getColumnIndexOrThrow(RecappContract.PlaceImageEntry.COLUMN_IMAGE))));
         }
         return placeImages;
     }

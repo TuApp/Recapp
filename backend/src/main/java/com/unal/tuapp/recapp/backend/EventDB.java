@@ -1,5 +1,8 @@
 package com.unal.tuapp.recapp.backend;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by yeisondavid on 07/10/2015.
  */
@@ -10,11 +13,13 @@ public class EventDB implements Comparable<EventDB>
     long id;
     String idUser;
     String content;
+    public List<String> assistants;
     public EventDB(long id, String idUser, String content)
     {
         this.idUser = idUser;
         this.content = content;
         this.id = id;
+        assistants = new ArrayList<String>();
     }
 
     @Override

@@ -88,16 +88,34 @@ public class MyEndpoint {
     }
 
     @ApiMethod(name = "attendToEvent")
-    public void attendToEvent(@Named("idUser") long idUser, @Named("idEvent") long idEvent)
+    public void attendToEvent(@Named("idUser") String idUser, @Named("idEvent") long idEvent)
     {
         UserDB myUser = DB.users.get(idUser);
+        EventDB myEvent = DB.events.get(idEvent);
+        myUser.attendToEvents.add(idEvent);
+        myEvent.assistants.add(idUser);
 
     }
 
     @ApiMethod(name = "undoAttendToEvent")
-    public void undoAttendToEvent()
+    public void undoAttendToEvent(@Named("idUser") String idUser, @Named("idEvent") long idEvent)
     {
+        UserDB myUser = DB.users.get(idUser);
+        EventDB myEvent = DB.events.get(idEvent);
+        myUser.attendToEvents.remove(idEvent);
+        myEvent.assistants.remove(idUser);
+    }
 
+    @ApiMethod(name = "getAssistant")
+    public StringResult[] getAssistantToEvent(@Named("idEvent") long idEvent)
+    {
+        EventDB myEvent = DB.events.get(idEvent);
+        StringResult result[] = new StringResult[myEvent.assistants.size()];
+        for( int i = 0; i < myEvent.assistants.size(); i++ )
+        {
+            result[i] = new StringResult(myEvent.assistants.get(i));
+        }
+        return result;
     }
 
     @ApiMethod(name = "deleteComment") //listo

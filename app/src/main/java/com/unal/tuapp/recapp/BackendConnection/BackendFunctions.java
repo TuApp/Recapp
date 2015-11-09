@@ -27,4 +27,13 @@ public class BackendFunctions {
         }catch(Exception e){}
         return result;
     }
+    public static String addComment(String emailUser, Long idPlace, String content)
+    {
+        String result = "bad";
+        try
+        {
+            result = new AddCommentTask().execute(new String[]{emailUser, idPlace+"", content}).get();
+        }catch(Exception e){}
+        return result;
+    }
 }

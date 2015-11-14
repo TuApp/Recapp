@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.database.Cursor;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -69,32 +70,40 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
                 final Dialog dialog = new Dialog(getActivity());
                 dialog.setContentView(R.layout.login_dialog);
                 //dialog.setTitle(getActivity().getString(R.string.login));
-                final TextView email = (TextView) dialog.findViewById(R.id.company_email);
-                final TextView password = (TextView) dialog.findViewById(R.id.company_password);
+                final TextInputLayout email = (TextInputLayout) dialog.findViewById(R.id.company_email);
+                final TextInputLayout password = (TextInputLayout) dialog.findViewById(R.id.company_password);
+                email.setErrorEnabled(true);
+                password.setErrorEnabled(true);
                 Button login = (Button) dialog.findViewById(R.id.login);
-                email.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                email.getEditText().setOnFocusChangeListener(new View.OnFocusChangeListener() {
                     @Override
                     public void onFocusChange(View view, boolean b) {
-                        if (!b && !isValidEmail(email.getText().toString())) {
+                        if (!b && !isValidEmail(email.getEditText().getText().toString())) {
                             email.setError("The email is not valid");
+                        }else{
+                            email.setError(null);
                         }
                     }
                 });
-                password.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                password.getEditText().setOnFocusChangeListener(new View.OnFocusChangeListener() {
                     @Override
                     public void onFocusChange(View view, boolean b) {
-                        if (!b && password.getText().toString().equals("")) {
+                        if (!b && password.getEditText().getText().toString().equals("")) {
                             password.setError("The password can't be empty ");
+                        }else{
+                            password.setError(null);
                         }
                     }
                 });
                 login.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        String emailText = email.getText().toString();
-                        String passwordText = password.getText().toString();
+                        String emailText = email.getEditText().getText().toString();
+                        String passwordText = password.getEditText().getText().toString();
                         if (!passwordText.equals("")) {
+                            password.setError(null);
                             if (isValidEmail(emailText)) {
+                                email.setError(null);
                                 Cursor data = getActivity().getContentResolver().query(
                                         RecappContract.PlaceEntry.buildPlaceEmailUri(emailText.trim()),
                                         new String[]{RecappContract.PlaceEntry._ID, RecappContract.PlaceEntry.COLUMN_PASSWORD},
@@ -104,6 +113,7 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
                                 );
                                 if (data.moveToFirst()) {
                                     if (passwordText.equals(data.getString(data.getColumnIndexOrThrow(RecappContract.PlaceEntry.COLUMN_PASSWORD)))) {
+                                        password.setError(null);
                                         dialog.dismiss();
                                         Intent intent = new Intent(getActivity(), Company.class);
                                         intent.putExtra("email", emailText);

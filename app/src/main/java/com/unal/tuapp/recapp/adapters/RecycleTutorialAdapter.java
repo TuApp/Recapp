@@ -3,6 +3,7 @@ package com.unal.tuapp.recapp.adapters;
 import android.database.Cursor;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,13 +80,21 @@ public class RecycleTutorialAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         tutorialsViewHolder.mTittle.setText(tutorial.getTittle());
         tutorialsViewHolder.mDescription.setText(tutorial.getDescription());
         String link = tutorial.getLink();
-        if(link.contains("youtu")){
+        Log.d("Poniendo la imagen", (tutorial.getPreview() != null?"Tengo imagen para ":"No tengo imagen para ")
+                + tutorial.getTittle());
+        if(tutorial.getPreview() != null){
+            tutorialsViewHolder.mIcon.setImageBitmap(tutorial.getPreview());
+        }else{
+            tutorialsViewHolder.mIcon.setImageResource(R.drawable.youtube);
+            tutorialsViewHolder.mLink.setVisibility(View.GONE);
+        }
+        /*if(link.contains("youtu")){
             tutorialsViewHolder.mIcon.setImageResource(R.drawable.youtube);
             tutorialsViewHolder.mLink.setVisibility(View.GONE);
         }else{
             tutorialsViewHolder.mIcon.setVisibility(View.GONE);
             tutorialsViewHolder.mLink.setText(tutorial.getLink());
-        }
+        }*/
     }
 
     public interface OnItemClickListener{

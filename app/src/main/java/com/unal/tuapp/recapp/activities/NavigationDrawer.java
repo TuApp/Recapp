@@ -980,11 +980,12 @@ public class    NavigationDrawer extends AppCompatActivity implements LoaderMana
     }
 
     private void addPreviewsToTutorial(List<Tutorial> tutorials){
-        for (int i = 0; i < tutorials.size(); i++){
-            Tutorial tutorial = tutorials.get(i);
-            getPreviewFromYouTube(tutorial);
+        if(Utility.isNetworkAvailable(getApplicationContext()))
+            for (int i = 0; i < tutorials.size(); i++){
+                Tutorial tutorial = tutorials.get(i);
+                getPreviewFromYouTube(tutorial);
 
-        }
+            }
     }
 
     private Bitmap getPreviewFromYouTube(Tutorial tutorial){
@@ -1082,6 +1083,7 @@ public class    NavigationDrawer extends AppCompatActivity implements LoaderMana
             Tutorial tutorial = (Tutorial) objects[0];
             Bitmap bitmap = (Bitmap) objects[1];
             tutorial.setPreview(bitmap);
+            tutorialsFragment.notifyDataSetChanged();
         }
 
         @Override

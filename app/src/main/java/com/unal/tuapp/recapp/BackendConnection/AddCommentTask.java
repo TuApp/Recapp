@@ -15,7 +15,7 @@ public class AddCommentTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params) {
         String result = null;
         try {
-            StringResult query = getAPI.getMyAPI().addComment(params[0], Long.parseLong(params[1]), params[2]).execute();
+            StringResult query = getAPI.getMyAPI().addComment(params[0], Long.parseLong(params[1]), params[2], Double.parseDouble(params[3]), Long.parseLong(params[4])).execute();
             result = (String)query.get("result");
         } catch (IOException e) {
             e.printStackTrace();

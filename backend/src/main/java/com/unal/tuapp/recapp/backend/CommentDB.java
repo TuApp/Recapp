@@ -10,17 +10,29 @@ public class CommentDB implements Comparable<CommentDB>{
     String idUser;
     long idPlace;
     String content;
-    public CommentDB(long id, String idUser, long idPlace, String content)
+    double rating;
+    long date;
+    public CommentDB(long id, String idUser, long idPlace, String content, double rating, long date)
     {
         this.idUser = idUser;
         this.idPlace = idPlace;
         this.content = content;
         this.id = id;
+        this.rating = rating;
+        this.date = date;
     }
 
     @Override
     public int compareTo(CommentDB o) {
         return new Long(id).compareTo(o.id);
+    }
+
+    public static long getNextId() {
+        return nextId;
+    }
+
+    public static void setNextId(long nextId) {
+        CommentDB.nextId = nextId;
     }
 
     public long getId() {
@@ -53,5 +65,21 @@ public class CommentDB implements Comparable<CommentDB>{
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
     }
 }

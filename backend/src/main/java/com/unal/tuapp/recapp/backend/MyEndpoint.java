@@ -53,10 +53,10 @@ public class MyEndpoint {
     }
 
     @ApiMethod(name = "AddComment") //Listo
-    public StringResult AddComment(@Named("emailUser") String emailUser,@Named("idPlace") long idPlace, @Named("content") String content) {
+    public StringResult AddComment(@Named("emailUser") String emailUser,@Named("idPlace") long idPlace, @Named("content") String content, @Named("rating") double rating, @Named("date") long date) {
         UserDB myUser = DB.users.get(emailUser);
         PlaceDB myPlace = DB.places.get(idPlace);
-        CommentDB myComent = new CommentDB(CommentDB.getnextID(), emailUser, idPlace, content);
+        CommentDB myComent = new CommentDB(CommentDB.getnextID(), emailUser, idPlace, content, rating, date);
         DB.comments.put(myComent.id, myComent);
         myUser.myComments.add(myComent.id);
         myPlace.comments.put(myComent.id, myComent);
@@ -69,7 +69,7 @@ public class MyEndpoint {
         try {
             UserDB myUser = new UserDB(name, lastName, email, profileImage);
             DB.users.put(myUser.email, myUser);
-            result = new StringResult("success");
+            result = new StringResult("success"+", id:"+email);
         }catch(Exception e)
         {
             result = new  StringResult("wrong");
@@ -78,10 +78,10 @@ public class MyEndpoint {
     }
 
     @ApiMethod(name = "AddEvent") //listo
-    public StringResult Event(@Named("emailUser") String emailUser, @Named("content") String content)
+    public StringResult Event(@Named("emailUser") String emailUser, @Named("name") String name, @Named("description") String description, @Named("address") String address, @Named("date") long date, @Named("log") double log, @Named("lng") double lng)
     {
         UserDB myUser = DB.users.get(emailUser);
-        EventDB myEvent = new EventDB(EventDB.getnextID(), emailUser, content);
+        EventDB myEvent = new EventDB(EventDB.getnextID(), emailUser, name, description, address, date, log, lng);
         DB.events.put(myEvent.id, myEvent);
         myUser.myEvents.add(myEvent.id);
         return new StringResult(myEvent.id+"");
@@ -141,10 +141,15 @@ public class MyEndpoint {
     }
 
     @ApiMethod(name = "updateEvent") //listo
-    public StringResult updateEvent(@Named("id") long id, @Named("content") String content)
+    public StringResult updateEvent(@Named("id") long id , @Named("name") String name, @Named("description") String description, @Named("address") String address, @Named("date") long date, @Named("log") double log, @Named("lng") double lng)
     {
         EventDB myEvent= DB.events.get(id);
-        myEvent.content = content;
+        myEvent.name = name;
+        myEvent.description = description;
+        myEvent.address = address;
+        myEvent.date = date;
+        myEvent.log = log;
+        myEvent.lng = lng;
         return new StringResult("success");
     }
 

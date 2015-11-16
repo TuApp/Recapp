@@ -4,9 +4,12 @@ package com.unal.tuapp.recapp.activities;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.unal.tuapp.recapp.BackendConnection.BackendFunctions;
 import com.unal.tuapp.recapp.R;
 
 
@@ -17,6 +20,8 @@ public class Recapp extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recapp);
+        String algo = BackendFunctions.startDB("7I930x82dxI");
+        Toast.makeText(this,algo,Toast.LENGTH_LONG).show();
 
 
 

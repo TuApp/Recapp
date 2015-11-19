@@ -33,8 +33,8 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
-        places = intent.getStringArrayExtra("places");
+        GeongEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
+        plafencices = intent.getStringArrayExtra("places");
         placesNotification = new ArrayList<>();
         int geofenceTransitions = geofencingEvent.getGeofenceTransition();
         if (geofenceTransitions == Geofence.GEOFENCE_TRANSITION_ENTER ||

@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
+    <filter>
+        <filter-name>ObjectifyFilter</filter-name>
+        <filter-class>com.googlecode.objectify.ObjectifyFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>ObjectifyFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
     <servlet>
         <servlet-name>SystemServiceServlet</servlet-name>
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>com.unal.tuapp.recapp.backend.MyEndpoint</param-value>
+            <param-value>com.unal.tuapp.recapp.backend.MyEndpoint,
+                com.unal.tuapp.recapp.backend.UserEndpoint,
+                com.unal.tuapp.recapp.backend.PlaceEndpoint,
+                com.unal.tuapp.recapp.backend.CommentEndpoint,
+                com.unal.tuapp.recapp.backend.PlaceImageEndpoint,
+                com.unal.tuapp.recapp.backend.TutorialEndpoint,
+                com.unal.tuapp.recapp.backend.CategoryEndpoint,
+                com.unal.tuapp.recapp.backend.SubCategoryEndpoint,
+                com.unal.tuapp.recapp.backend.SubCategoryByPlaceEndpoint,
+                com.unal.tuapp.recapp.backend.SubCategoryByTutorialEndpoint,
+                com.unal.tuapp.recapp.backend.UserByPlaceEndpoint,
+                com.unal.tuapp.recapp.backend.EventEndpoint,
+                com.unal.tuapp.recapp.backend.EventByUserEndpoint,
+                com.unal.tuapp.recapp.backend.ReminderEndpoint,
+                com.unal.tuapp.recapp.backend.RegistrationEndpoint</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>

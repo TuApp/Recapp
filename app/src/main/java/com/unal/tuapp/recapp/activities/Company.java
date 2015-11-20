@@ -2,12 +2,14 @@ package com.unal.tuapp.recapp.activities;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -24,12 +26,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.unal.tuapp.recapp.R;
+import com.unal.tuapp.recapp.backend.model.placeImageApi.model.PlaceImage;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.fragments.CompanyCommentsFragment;
@@ -37,6 +41,8 @@ import com.unal.tuapp.recapp.fragments.CompanyEventsFragment;
 import com.unal.tuapp.recapp.fragments.CompanyImagesFragment;
 import com.unal.tuapp.recapp.fragments.CompanyInformationFragment;
 import com.unal.tuapp.recapp.fragments.CompanyMainFragment;
+import com.unal.tuapp.recapp.others.Utility;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceImageEndPoint;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -470,15 +476,25 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
             }
 
         }
+        PlaceImage placeImage = new PlaceImage();
+        placeImage.setId(System.currentTimeMillis());
+        placeImage.setPlaceId(placeId);
+        placeImage.setWorth(5);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        placeImage.setImage(Utility.encodeImage(stream.toByteArray()));
         ContentValues values = new ContentValues();
         values.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE,stream.toByteArray());
-        values.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,placeId);
+        values.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,placeImage.getPlaceId());
+        values.put(RecappContract.PlaceImageEntry._ID,placeImage.getId());
+        values.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,placeImage.getWorth());
         getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 values
         );
+        Pair<Pair<Context,Long>,Pair<PlaceImage,String>> pair = new Pair<>(new Pair<>(getApplicationContext(),-1L),
+                new Pair<>(placeImage,"addImage"));
+        new PlaceImageEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
         companyImagesGallery.hide();
         companyImagesCamera.hide();
         companyImages.setImageResource(R.drawable.ic_add_white_24dp);

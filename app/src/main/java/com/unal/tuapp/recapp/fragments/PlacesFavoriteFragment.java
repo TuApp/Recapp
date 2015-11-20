@@ -1,6 +1,8 @@
 package com.unal.tuapp.recapp.fragments;
 
+import android.content.Context;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -8,15 +10,18 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.adapters.RecyclePlaceAdapter;
+import com.unal.tuapp.recapp.backend.model.userByPlaceApi.model.UserByPlace;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserByPlaceEndPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +47,10 @@ public class PlacesFavoriteFragment extends Fragment implements LoaderManager.Lo
         if(extras!=null){
             user = extras.getParcelable("user");
         }
+        UserByPlace userByPlaceBackend = new UserByPlace();
+        userByPlaceBackend.setUserId(user.getId());
+        Pair<Context,Pair<UserByPlace,String>> pairUserByPlace = new Pair<>(getContext(),new Pair<>(userByPlaceBackend,"getUserByPlaceUser"));
+        new UserByPlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairUserByPlace);
         recyclerView = (RecyclerView) root.findViewById(R.id.places_recycle_view);
 
         final List<Place> places = new ArrayList<>();

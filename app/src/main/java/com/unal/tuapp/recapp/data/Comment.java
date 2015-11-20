@@ -19,6 +19,7 @@ public class Comment  implements Parcelable {
     private long id;
     private long date;
     private long idPlace;
+    private long idUser;
 
     public Comment(){}
 
@@ -42,6 +43,15 @@ public class Comment  implements Parcelable {
         this.date = date;
     }
 
+
+
+    public long getIdUser() {
+        return idUser;
+    }
+
+    public void setIdUser(long idUser) {
+        this.idUser = idUser;
+    }
 
     public String getComment() {
         return comment;
@@ -117,7 +127,7 @@ public class Comment  implements Parcelable {
                     cursor.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_IMAGE)
             ));
             comment.setIdPlace(cursor.getLong(cursor.getColumnIndexOrThrow(RecappContract.CommentEntry.COLUMN_PLACE_KEY)));
-
+            comment.setIdUser(cursor.getLong(cursor.getColumnIndexOrThrow(RecappContract.CommentEntry.COLUMN_USER_KEY)));
 
             comments.add(comment);
         }

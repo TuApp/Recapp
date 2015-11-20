@@ -1,8 +1,10 @@
 package com.unal.tuapp.recapp.fragments;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -12,6 +14,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +24,7 @@ import com.unal.tuapp.recapp.adapters.RecycleRemindersAdapter;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.Reminder;
 import com.unal.tuapp.recapp.data.User;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.ReminderEndPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +49,10 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
         if(extras!=null){
             user = extras.getParcelable("user");
         }
+        com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder reminder = new com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder();
+        reminder.setUserId(user.getId());
+        Pair<Context,Pair<com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder,String>> pair = new Pair<>(getContext(),new Pair<>(reminder,"getReminderUser"));
+        new ReminderEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
         final List<Reminder> reminders = new ArrayList<>();
@@ -84,12 +92,25 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
                         new String[]{""+deleteReminder.getId()}
                 );
                 recycleRemindersAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                final com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder reminder = new com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder();
+                reminder.setId(deleteReminder.getId());
+                Pair<Context,Pair<com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder,String>> pair = new Pair<>(getContext(),new Pair<>(reminder,"deleteReminder"));
+                new ReminderEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
 
 
                 Snackbar.make(getActivity().findViewById(R.id.user_detail_coordination),"the event "+deleteReminder.getName() +" was deleted",Snackbar.LENGTH_SHORT)
                         .setAction("UNDO", new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
+                                reminder.setId(deleteReminder.getId());
+                                reminder.setUserId(deleteReminder.getUserId());
+                                reminder.setPlaceId(deleteReminder.getPlaceId());
+                                reminder.setEndDate(deleteReminder.getEndDate());
+                                reminder.setNotification(deleteReminder.getNotification());
+                                reminder.setDescription(deleteReminder.getDescription());
+                                reminder.setName(deleteReminder.getName());
+                                Pair<Context,Pair<com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder,String>> pair = new Pair<>(getContext(),new Pair<>(reminder,"addReminder"));
+                                new ReminderEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
                                 ContentValues values = new ContentValues();
                                 values.put(RecappContract.ReminderEntry.COLUMN_NAME,deleteReminder.getName());
                                 values.put(RecappContract.ReminderEntry.COLUMN_DESCRIPTION,deleteReminder.getDescription());
@@ -97,6 +118,7 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
                                 values.put(RecappContract.ReminderEntry.COLUMN_END_DATE, deleteReminder.getEndDate());
                                 values.put(RecappContract.ReminderEntry.COLUMN_USER_KEY,deleteReminder.getUserId());
                                 values.put(RecappContract.ReminderEntry.COLUMN_PLACE_KEY,deleteReminder.getPlaceId());
+                                values.put(RecappContract.ReminderEntry._ID,deleteReminder.getId());
                                 Uri uri = getActivity().getContentResolver().insert(
                                         RecappContract.ReminderEntry.CONTENT_URI,
                                         values

@@ -3,11 +3,9 @@ package com.unal.tuapp.recapp.adapters;
 import android.database.Cursor;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.unal.tuapp.recapp.R;
@@ -33,7 +31,6 @@ public class RecycleTutorialAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         private TextView mTittle;
         private TextView mDescription;
         private TextView mLink;
-        private ImageView mIcon;
         private CardView mCardView;
 
         public TutorialViewHolder(final View itemView){
@@ -42,7 +39,6 @@ public class RecycleTutorialAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             mTittle = (TextView) itemView.findViewById(R.id.tutorial_tittle_item);
             mDescription = (TextView) itemView.findViewById(R.id.tutorial_description_item);
             mLink = (TextView) itemView.findViewById(R.id.tutorial_link_item);
-            mIcon = (ImageView) itemView.findViewById(R.id.tutorial_icon);
 
 
             itemView.setOnClickListener(this);
@@ -79,22 +75,7 @@ public class RecycleTutorialAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         Tutorial tutorial = tutorials.get(position);
         tutorialsViewHolder.mTittle.setText(tutorial.getTittle());
         tutorialsViewHolder.mDescription.setText(tutorial.getDescription());
-        String link = tutorial.getLink();
-        Log.d("Poniendo la imagen", (tutorial.getPreview() != null?"Tengo imagen para ":"No tengo imagen para ")
-                + tutorial.getTittle());
-        if(tutorial.getPreview() != null){
-            tutorialsViewHolder.mIcon.setImageBitmap(tutorial.getPreview());
-        }else{
-            tutorialsViewHolder.mIcon.setImageResource(R.drawable.youtube);
-            tutorialsViewHolder.mLink.setVisibility(View.GONE);
-        }
-        /*if(link.contains("youtu")){
-            tutorialsViewHolder.mIcon.setImageResource(R.drawable.youtube);
-            tutorialsViewHolder.mLink.setVisibility(View.GONE);
-        }else{
-            tutorialsViewHolder.mIcon.setVisibility(View.GONE);
-            tutorialsViewHolder.mLink.setText(tutorial.getLink());
-        }*/
+        tutorialsViewHolder.mLink.setText(tutorial.getLink());
     }
 
     public interface OnItemClickListener{

@@ -3,6 +3,7 @@ package com.unal.tuapp.recapp.fragments;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.CursorLoader;
@@ -16,6 +17,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,10 +47,14 @@ import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.plus.PlusShare;
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.adapters.RecycleCommentsAdapter;
+import com.unal.tuapp.recapp.backend.model.userByPlaceApi.model.UserByPlace;
 import com.unal.tuapp.recapp.data.Comment;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.CommentEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserByPlaceEndPoint;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,7 +71,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private ImageButton share;
     private ImageButton shareFacebook;
     private View root;
-    private NestedScrollView nestedScrollView;
     private RecyclerView comment;
     private RecycleCommentsAdapter commentsAdapter;
     private Button commentButton;
@@ -115,18 +120,41 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             public void onClick(View view) {
 
                 if (count == 0) {
+                    UserByPlace userByPlaceBackend = new UserByPlace();
+                    userByPlaceBackend.setUserId(user.getId());
+                    userByPlaceBackend.setPlaceId(id);
+                    userByPlaceBackend.setId(System.currentTimeMillis());
                     //favorite.setImageResource(R.drawable.ic_favorites_color);
                     ContentValues userByPlace = new ContentValues();
-                    userByPlace.put(RecappContract.UserByPlaceEntry.COLUMN_USER_KEY,user.getId());
-                    userByPlace.put(RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY,id);
+                    userByPlace.put(RecappContract.UserByPlaceEntry.COLUMN_USER_KEY, user.getId());
+                    userByPlace.put(RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY, id);
+                    userByPlace.put(RecappContract.UserByPlaceEntry._ID, userByPlaceBackend.getId());
                     getActivity().getContentResolver().insert(
                             RecappContract.UserByPlaceEntry.CONTENT_URI,
                             userByPlace
                     );
+                    Pair<Context,Pair<UserByPlace,String>> pairUserByPlace = new Pair<>(getContext(),new Pair<>(userByPlaceBackend,"addUserByPlace"));
+                    new UserByPlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairUserByPlace);
+
                 } else {
                     //favorite.setImageResource(R.drawable.ic_favorites);
+                    UserByPlace userByPlaceBackend = new UserByPlace();
                     String selection = RecappContract.UserByPlaceEntry.COLUMN_USER_KEY+" = ? AND " +
                             RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY+" = ? ";
+
+                    Cursor cursor = getActivity().getContentResolver().query(
+                            RecappContract.UserByPlaceEntry.CONTENT_URI,
+                            new String[]{RecappContract.UserByPlaceEntry._ID},
+                            selection,
+                            new String[]{"" + user.getId(), "" + id},
+                            null
+                    );
+                    if(cursor.moveToFirst()){
+                        userByPlaceBackend.setId(cursor.getLong(0));
+                    }
+                    Pair<Context,Pair<UserByPlace,String>> pairUserByPlace = new Pair<>(getContext(),new Pair<>(userByPlaceBackend,"deleteUserByPlace"));
+                    new UserByPlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairUserByPlace);
+
                     getActivity().getContentResolver().delete(
                             RecappContract.UserByPlaceEntry.CONTENT_URI,
                             selection,
@@ -143,7 +171,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         commentRating = (RatingBar) root.findViewById(R.id.comment_rating);
         commentButton = (Button) root.findViewById(R.id.comment_button);
 
-        nestedScrollView = (NestedScrollView) root.findViewById(R.id.card_detail_scroll);
+        /*nestedScrollView = (NestedScrollView) root.findViewById(R.id.card_detail_scroll);
         nestedScrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
@@ -151,7 +179,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         .replace(R.id.detail_container,DetailFragment.this)
                         .commit();
             }
-        });
+        });*/
         card_title = (TextView) root.findViewById(R.id.card_title);
         card_description = (TextView) root.findViewById(R.id.card_description);
         card_address = (TextView) root.findViewById(R.id.card_address);
@@ -205,22 +233,40 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         comment.setLayoutManager(linearLayout);
         commentsAdapter = new RecycleCommentsAdapter(comments);
         comment.setAdapter(commentsAdapter);
-
+        /*Pair<Pair<Context,Pair<Long,Long>>,Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment,String>> pair =
+                new Pair<>(new Pair<>(getContext(),new Pair<>(user.getId(),id)),new Pair<>(new com.unal.tuapp.recapp.backend.model.commentApi.model.Comment(),"commentPlace"));
+        new CommentEndPoint().execute(pair);*/
         commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 if (!(commentText.getText().toString()).equals("")) {
+                    com.unal.tuapp.recapp.backend.model.commentApi.model.Comment commentApi = new com.unal.tuapp.recapp.backend.model.commentApi.model.Comment();
+                    commentApi.setId(System.currentTimeMillis());
+                    commentApi.setDate(System.currentTimeMillis());
+                    commentApi.setDescription(commentText.getText().toString());
+                    commentApi.setRating(commentRating.getRating());
+                    commentApi.setPlaceId(id);
+                    commentApi.setUserId(user.getId());
                     ContentValues values = new ContentValues();
-                    values.put(RecappContract.CommentEntry.COLUMN_DESCRIPTION, commentText.getText().toString());
-                    values.put(RecappContract.CommentEntry.COLUMN_RATING, commentRating.getRating());
-                    values.put(RecappContract.CommentEntry.COLUMN_DATE, System.currentTimeMillis());
-                    values.put(RecappContract.CommentEntry.COLUMN_USER_KEY, user.getId());
-                    values.put(RecappContract.CommentEntry.COLUMN_PLACE_KEY, id);
+                    values.put(RecappContract.CommentEntry.COLUMN_DESCRIPTION, commentApi.getDescription());
+                    values.put(RecappContract.CommentEntry.COLUMN_RATING, commentApi.getRating());
+                    values.put(RecappContract.CommentEntry.COLUMN_DATE, commentApi.getDate());
+                    values.put(RecappContract.CommentEntry.COLUMN_USER_KEY, commentApi.getUserId());
+                    values.put(RecappContract.CommentEntry.COLUMN_PLACE_KEY, commentApi.getPlaceId());
+                    values.put(RecappContract.CommentEntry._ID, commentApi.getId());
                     getActivity().getContentResolver().insert(
                             RecappContract.CommentEntry.CONTENT_URI,
                             values
                     );
+                    Pair<Pair<Context,Pair<Long,Long>>,Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment,String>> pair =
+                            new Pair<>(new Pair<>(getContext(),new Pair<>(user.getId(),id)),new Pair<>(commentApi,"addComment"));
+                    new CommentEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
+
+                    com.unal.tuapp.recapp.backend.model.placeApi.model.Place place = new com.unal.tuapp.recapp.backend.model.placeApi.model.Place();
+                    place.setId(id);
+                    Pair<Context,Pair<com.unal.tuapp.recapp.backend.model.placeApi.model.Place,String>> pairPlace = new Pair<>(getContext(),new Pair<>(place,"updatePlaceRating"));
+                    new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairPlace);
 
 
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
@@ -276,7 +322,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                                 RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_DESCRIPTION,
                                 RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_RATING,
                                 RecappContract.UserEntry.COLUMN_USER_IMAGE,
-                                RecappContract.CommentEntry.COLUMN_PLACE_KEY},
+                                RecappContract.CommentEntry.COLUMN_PLACE_KEY,
+                                RecappContract.CommentEntry.COLUMN_USER_KEY},
                     null,
                     null,
                     sortOrderComment

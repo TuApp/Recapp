@@ -9,6 +9,7 @@ import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
+import com.unal.tuapp.recapp.backend.model.Comment;
 import com.unal.tuapp.recapp.backend.model.Event;
 import com.unal.tuapp.recapp.backend.model.EventByUser;
 
@@ -136,6 +137,7 @@ public class EventByUserEndpoint {
         }
     }
 
+
     @ApiMethod(
             name = "removeUsers",
             path = "eventByUser/users",
@@ -149,6 +151,11 @@ public class EventByUserEndpoint {
             eventByUserList.add(queryResultIterator.next());
         }
         ofy().delete().entities(eventByUserList);
+        try {
+            new MessagingEndPoint().sendMessage("eventByUser");
+        }catch (IOException e){
+
+        }
     }
 
     /**
@@ -180,8 +187,8 @@ public class EventByUserEndpoint {
             path = "eventByUser/events",
             httpMethod = ApiMethod.HttpMethod.GET
     )
-    public List<EventByUser> listEvent (@Named("userId")Long user_id){
-        Query<EventByUser> query = ofy().load().type(EventByUser.class).filter("userId",user_id);
+    public List<EventByUser> listEvent (@Named("email")String email){
+        Query<EventByUser> query = ofy().load().type(EventByUser.class).filter("email",email);
         QueryResultIterator<EventByUser> queryResultIterator = query.iterator();
         List<EventByUser> eventList = new ArrayList<>();
         while (queryResultIterator.hasNext()){

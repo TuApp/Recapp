@@ -15,44 +15,29 @@
     <!--this is the layout the we will use to inflate each row of our recycleview -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="10dp">
+        android:layout_height="match_parent">
         <TextView android:id="@+id/tutorial_tittle_item"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_margin="16dp"
             android:textSize="25sp"
-            android:text="Tittle"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/tutorial_icon"
-            android:layout_toEndOf="@+id/tutorial_icon"
-            android:paddingLeft="15dp" />
+            android:text="Tittle" />
         <TextView android:id="@+id/tutorial_description_item"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:textSize="20sp"
             android:text="Description"
             android:layout_below="@+id/tutorial_tittle_item"
-            android:layout_toRightOf="@+id/tutorial_icon"
-            android:layout_toEndOf="@+id/tutorial_icon"
-            android:paddingLeft="15dp" />
+            android:layout_alignLeft="@+id/tutorial_tittle_item"
+            android:layout_alignStart="@+id/tutorial_tittle_item" />
         <TextView android:id="@+id/tutorial_link_item"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:textSize="20sp"
             android:text="www.youtube.com"
-            android:textStyle="bold|italic"
             android:layout_below="@+id/tutorial_description_item"
-            android:layout_toRightOf="@+id/tutorial_icon"
-            android:layout_toEndOf="@+id/tutorial_icon"
-            android:paddingLeft="15dp" />
-
-        <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:id="@+id/tutorial_icon"
-            android:src="@drawable/youtube"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignLeft="@+id/tutorial_description_item"
+            android:layout_alignStart="@+id/tutorial_description_item"
+            android:textStyle="bold|italic" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>

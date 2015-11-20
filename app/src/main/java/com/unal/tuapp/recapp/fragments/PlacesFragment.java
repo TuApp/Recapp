@@ -1,15 +1,18 @@
 package com.unal.tuapp.recapp.fragments;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 
 import android.view.View;
@@ -17,9 +20,21 @@ import android.view.ViewGroup;
 
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.adapters.RecyclePlaceAdapter;
+import com.unal.tuapp.recapp.backend.model.categoryApi.model.Category;
+import com.unal.tuapp.recapp.backend.model.subCategoryApi.model.SubCategory;
+import com.unal.tuapp.recapp.backend.model.subCategoryByPlaceApi.model.SubCategoryByPlace;
+import com.unal.tuapp.recapp.backend.model.subCategoryByTutorialApi.model.SubCategoryByTutorial;
+import com.unal.tuapp.recapp.backend.model.tutorialApi.model.Tutorial;
+import com.unal.tuapp.recapp.backend.model.userApi.model.User;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.CategoryEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.DummyData;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.SubCategoryByPlaceEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.SubCategoryByTutorialEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.SubCategoryEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.TutorialEndPoint;
 
 import java.io.ByteArrayOutputStream;
 
@@ -49,7 +64,6 @@ public class PlacesFragment extends Fragment {
         //For now we can use this line to optimize the recycleview because we know that the size of the list won't change
         //recyclerView.setHasFixedSize(true);
         filters = new ArrayList<>();
-        addPlaces();
         List<Place> places = new ArrayList<>();
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayout);
@@ -87,18 +101,7 @@ public class PlacesFragment extends Fragment {
         this.mOnPlaceListener= mOnPlaceListener;
     }
 
-    public void addPlaces(){
-        SharedPreferences pref = getActivity().getPreferences(0);
-        boolean dummy = pref.getBoolean("dummy",false);
-        if(!dummy) {
-            Intent intent = new Intent(getActivity(), DummyData.class);
-            getActivity().startService(intent);
-        }
-        SharedPreferences.Editor edt = pref.edit();
-        edt.putBoolean("dummy",true);
-        edt.commit();
 
-    }
 
 
     public void setData(List<Place> places,Cursor cursor){

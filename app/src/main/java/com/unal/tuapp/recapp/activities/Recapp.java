@@ -1,13 +1,44 @@
 package com.unal.tuapp.recapp.activities;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.unal.tuapp.recapp.R;
+import com.unal.tuapp.recapp.backend.model.categoryApi.model.Category;
+import com.unal.tuapp.recapp.backend.model.commentApi.model.Comment;
+import com.unal.tuapp.recapp.backend.model.eventApi.model.Event;
+import com.unal.tuapp.recapp.backend.model.eventByUserApi.model.EventByUser;
+import com.unal.tuapp.recapp.backend.model.placeApi.model.Place;
+import com.unal.tuapp.recapp.backend.model.placeImageApi.model.PlaceImage;
+import com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder;
+import com.unal.tuapp.recapp.backend.model.subCategoryApi.model.SubCategory;
+import com.unal.tuapp.recapp.backend.model.subCategoryByPlaceApi.model.SubCategoryByPlace;
+import com.unal.tuapp.recapp.backend.model.subCategoryByTutorialApi.model.SubCategoryByTutorial;
+import com.unal.tuapp.recapp.backend.model.tutorialApi.model.Tutorial;
+import com.unal.tuapp.recapp.backend.model.userApi.model.User;
+import com.unal.tuapp.recapp.backend.model.userByPlaceApi.model.UserByPlace;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.CategoryEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.CommentEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.EventByUserEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.EventEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.GcmRegistrationEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceImageEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.ReminderEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.SubCategoryByPlaceEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.SubCategoryByTutorialEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.SubCategoryEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.TutorialEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserByPlaceEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserEndPoint;
 
 
 public class Recapp extends AppCompatActivity {
@@ -17,8 +48,7 @@ public class Recapp extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recapp);
-
-
+        addData();
 
     }
 
@@ -50,6 +80,77 @@ public class Recapp extends AppCompatActivity {
     public void onBackPressed() {
         moveTaskToBack(true);
 
+    }
+
+    private void addData(){
+        SharedPreferences pref = this.getPreferences(0);
+        boolean data = pref.getBoolean("data",false);
+        if(!data) {
+            //We should call the async task
+            new GcmRegistrationEndPoint(this).execute();
+
+            Place place = new com.unal.tuapp.recapp.backend.model.placeApi.model.Place();
+            Pair<Context,Pair<Place,String>> pair = new Pair<>(this.getApplicationContext(),new Pair<>(place,"getPlaces"));
+            new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
+
+            User user = new User();
+            Pair<Pair<Context,String>,Pair<User,String>> pairUser = new Pair<>(new Pair<>(getApplicationContext(),""),
+                    new Pair<>(user,"getUsers"));
+            new UserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairUser);
+
+
+            Category category = new Category();
+            Pair<Context,Pair<Category,String>> pairCategory = new Pair<>(this.getApplicationContext(),new Pair<>(category,"getCategories"));
+            new CategoryEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairCategory);
+
+            SubCategory subCategory = new SubCategory();
+            Pair<Context,Pair<SubCategory,String>> pairSubCategory = new Pair<>(this.getApplicationContext(),new Pair<>(subCategory,"getSubCategories"));
+            new SubCategoryEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairSubCategory);
+
+            Tutorial tutorial = new Tutorial();
+            Pair<Context,Pair<Tutorial,String>> pairTutorial = new Pair<>(this.getApplicationContext(),new Pair<>(tutorial,"getTutorials"));
+            new TutorialEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairTutorial);
+
+
+            SubCategoryByPlace subCategoryByPlace = new SubCategoryByPlace();
+            Pair<Context,Pair<SubCategoryByPlace,String>> pairSubCategoryByPlace = new Pair<>(this.getApplicationContext(),new Pair<>(subCategoryByPlace,"getSubCategoryByPlace"));
+            new SubCategoryByPlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairSubCategoryByPlace);
+
+            SubCategoryByTutorial subCategoryByTutorial = new SubCategoryByTutorial();
+            Pair<Context,Pair<SubCategoryByTutorial,String>> pairSubCategoryByTutorial = new Pair<>(this.getApplicationContext(),new Pair<>(subCategoryByTutorial,"getSubCategoryByTutorial"));
+            new SubCategoryByTutorialEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairSubCategoryByTutorial);
+
+            Comment comment = new Comment();
+            Pair<Pair<Context,Pair<Long,Long>>,Pair<Comment,String>> pairComment =  new Pair<>(new Pair<>(getApplicationContext(),new Pair<>(-1L,-1L)),
+                    new Pair<>(comment,"getComments"));
+            new CommentEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairComment);
+
+            Reminder reminder = new Reminder();
+            Pair<Context,Pair<Reminder,String>> pairReminder = new Pair<>(getApplicationContext(), new Pair<>(reminder,"getAllReminders"));
+            new ReminderEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairReminder);
+
+            PlaceImage placeImage = new PlaceImage();
+            Pair<Pair<Context,Long>,Pair<PlaceImage,String>> pairPlaceImage = new Pair<>(new Pair<>(getApplicationContext(),-1L),new Pair<>(placeImage,"getAllImagesPlace"));
+            new PlaceImageEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairPlaceImage);
+
+            UserByPlace userByPlace = new UserByPlace();
+            Pair<Context,Pair<UserByPlace,String>> pairUserByPlace = new Pair<>(getApplicationContext(), new Pair<>(userByPlace,"getUserByPlace"));
+            new UserByPlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairUserByPlace);
+
+            Event event = new Event();
+            Pair<Context,Pair<Event,String>> pairEvent = new Pair<>(getApplicationContext(),new Pair<>(event,"getEvents"));
+            new EventEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairEvent);
+
+            EventByUser eventByUser = new EventByUser();
+            Pair<Context,Pair<EventByUser,String>> pairEventByUser = new Pair<>(getApplicationContext(),new Pair<>(eventByUser,
+                    "getEventByUser"));
+            new EventByUserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairEventByUser);
+
+
+        }
+        SharedPreferences.Editor edt = pref.edit();
+        edt.putBoolean("data",true);
+        edt.commit();
     }
 
 

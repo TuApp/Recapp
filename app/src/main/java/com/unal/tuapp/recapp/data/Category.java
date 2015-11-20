@@ -37,6 +37,8 @@ public class Category {
         return image;
     }
 
+
+
     public static ArrayList<Category> allCategories(Cursor cursor){
         ArrayList<Category> categories = new ArrayList<>();
         while (cursor.moveToNext()){

@@ -2,12 +2,18 @@ package com.unal.tuapp.recapp.servicesAndAsyncTasks;
 
 import android.content.ContentValues;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 
+import com.unal.tuapp.recapp.backend.model.userApi.model.User;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.others.Utility;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -46,8 +52,26 @@ public class LoadProfileImage extends AsyncTask<String, Void, Bitmap> {
         if(email!=null){
             ContentValues values = new ContentValues();
             ByteArrayOutputStream stream =  new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG,100,stream);
-            values.put(RecappContract.UserEntry.COLUMN_USER_IMAGE,stream.toByteArray());
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            values.put(RecappContract.UserEntry.COLUMN_USER_IMAGE, stream.toByteArray());
+            Cursor cursor = view.getContext().getContentResolver().query(
+                    RecappContract.UserEntry.buildUserEmail(email),
+                    null,
+                    null,
+                    null,
+                    null
+            );
+            if(cursor.moveToFirst()){
+                User user = new User();
+                user.setId(cursor.getLong(cursor.getColumnIndexOrThrow(RecappContract.UserEntry._ID)));
+                user.setEmail(email);
+                user.setLastname(cursor.getString(cursor.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_LASTNAME)));
+                user.setName(cursor.getString(cursor.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_NAME)));
+                user.setProfileImage(Utility.encodeImage(stream.toByteArray()));
+                //Log.e("algo1", ""+user.getId());
+                Pair<Pair<Context,String>,Pair<User,String>> pair = new Pair<>(new Pair<>(view.getContext(),email),new Pair<>(user,"updateUser"));
+                new UserEndPoint().execute(pair);
+            }
             view.getContext().getContentResolver().update(
                     RecappContract.UserEntry.CONTENT_URI,
                     values,

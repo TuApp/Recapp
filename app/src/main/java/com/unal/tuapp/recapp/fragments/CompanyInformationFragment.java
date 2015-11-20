@@ -1,8 +1,10 @@
 package com.unal.tuapp.recapp.fragments;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,6 +14,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +30,8 @@ import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.PlaceImages;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.dialogs.MapDialog;
+import com.unal.tuapp.recapp.others.Utility;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceEndPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,13 +94,22 @@ public class CompanyInformationFragment extends Fragment implements LoaderManage
                 byte[] image = place.getImageFavorite();
                 if(!name.equals("") && !description.equals("")
                         && !address.equals("") && !web.equals("")) {
+                    com.unal.tuapp.recapp.backend.model.placeApi.model.Place place = new com.unal.tuapp.recapp.backend.model.placeApi.model.Place();
+                    place.setId(CompanyInformationFragment.this.id);
+                    place.setAddress(address);
+                    place.setDescription(description);
+                    place.setWeb(web);
+                    place.setName(name);
+                    place.setLat(Float.parseFloat("" + lat));
+                    place.setLng(Float.parseFloat("" + lng));
+                    place.setImageFavorite(Utility.encodeImage(image));
                     ContentValues values = new ContentValues();
-                    values.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, address);
-                    values.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, description);
-                    values.put(RecappContract.PlaceEntry.COLUMN_WEB, web);
-                    values.put(RecappContract.PlaceEntry.COLUMN_NAME, name);
-                    values.put(RecappContract.PlaceEntry.COLUMN_LAT, lat);
-                    values.put(RecappContract.PlaceEntry.COLUMN_LOG, lng);
+                    values.put(RecappContract.PlaceEntry.COLUMN_ADDRESS, place.getAddress());
+                    values.put(RecappContract.PlaceEntry.COLUMN_DESCRIPTION, place.getDescription());
+                    values.put(RecappContract.PlaceEntry.COLUMN_WEB, place.getWeb());
+                    values.put(RecappContract.PlaceEntry.COLUMN_NAME, place.getName());
+                    values.put(RecappContract.PlaceEntry.COLUMN_LAT, place.getLat());
+                    values.put(RecappContract.PlaceEntry.COLUMN_LOG, place.getLng());
                     values.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, image);
                     getActivity().getContentResolver().update(
                             RecappContract.PlaceEntry.CONTENT_URI,
@@ -103,6 +117,9 @@ public class CompanyInformationFragment extends Fragment implements LoaderManage
                             RecappContract.PlaceEntry._ID + " = ?",
                             new String[]{"" + CompanyInformationFragment.this.id}
                     );
+                    Pair<Context,Pair<com.unal.tuapp.recapp.backend.model.placeApi.model.Place,String>> pair =
+                            new Pair<>(getContext(),new Pair<>(place,"updatePlace"));
+                    new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
                     Toast.makeText(getActivity(), "We update the data", Toast.LENGTH_SHORT).show();
                 }
             }

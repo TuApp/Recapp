@@ -81,7 +81,7 @@ public class PlaceImageEndpoint {
         ofy().save().entity(placeImage).now();
         logger.info("Created PlaceImage with ID: " + placeImage.getId());
         try {
-            new MessagingEndPoint().sendMessage("placeImage");
+            new MessagingEndPoint().sendMessage("imagePlace");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -107,7 +107,7 @@ public class PlaceImageEndpoint {
         ofy().save().entity(placeImage).now();
         logger.info("Updated PlaceImage: " + placeImage);
         try {
-            new MessagingEndPoint().sendMessage("placeImage");
+            new MessagingEndPoint().sendMessage("imagePlace");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -129,7 +129,7 @@ public class PlaceImageEndpoint {
         checkExists(id);
         ofy().delete().type(PlaceImage.class).id(id).now();
         try {
-            new MessagingEndPoint().sendMessage("placeImage");
+            new MessagingEndPoint().sendMessage("imagePlace");
         } catch (IOException e) {
             e.printStackTrace();
         }

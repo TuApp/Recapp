@@ -1,5 +1,6 @@
 package com.unal.tuapp.recapp.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.app.FragmentManager;
@@ -9,16 +10,20 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.unal.tuapp.recapp.backend.model.placeImageApi.model.PlaceImage;
 import com.unal.tuapp.recapp.others.GooglePlus;
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.data.PlaceImages;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
 import com.unal.tuapp.recapp.fragments.GalleryFragment;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceImageEndPoint;
 
 import java.util.List;
 
@@ -41,6 +46,9 @@ public class Gallery extends AppCompatActivity implements LoaderManager.LoaderCa
             id = extras.getLong("id");
             user = extras.getParcelable("user");
         }
+        /*PlaceImage placeImage = new PlaceImage();
+        Pair<Pair<Context,Long>,Pair<PlaceImage,String>> pair = new Pair<>(new Pair<>(this.getApplicationContext(),id) , new Pair<>(placeImage,"getImagesPlace"));
+        new PlaceImageEndPoint().execute(pair);*/
         if(getSupportLoaderManager().getLoader(PLACE_IMAGE)==null)
             getSupportLoaderManager().initLoader(PLACE_IMAGE,null,this);
         else

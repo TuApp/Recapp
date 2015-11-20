@@ -1,8 +1,10 @@
 package com.unal.tuapp.recapp.fragments;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -14,14 +16,18 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.adapters.RecycleImagesCompanyAdapter;
+import com.unal.tuapp.recapp.backend.model.placeImageApi.model.PlaceImage;
 import com.unal.tuapp.recapp.data.PlaceImages;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.others.Utility;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceImageEndPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,21 +75,37 @@ public class CompanyImagesFragment extends Fragment implements LoaderManager.Loa
                 final PlaceImages image = companyImagesAdapter.getCompanyImages().remove(viewHolder.getAdapterPosition());
                 getActivity().getContentResolver().delete(
                         RecappContract.PlaceImageEntry.CONTENT_URI,
-                        RecappContract.PlaceImageEntry._ID +" = ?",
-                        new String[]{""+image.getId()}
+                        RecappContract.PlaceImageEntry._ID + " = ?",
+                        new String[]{"" + image.getId()}
                 );
+                PlaceImage placeImage = new PlaceImage();
+                placeImage.setId(image.getId());
+                Pair<Pair<Context,Long>,Pair<PlaceImage,String>> pair = new Pair<>(new Pair<>(getContext(),-1L),
+                        new Pair<>(placeImage,"deleteImage"));
+                new PlaceImageEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
                 companyImagesAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
                 Snackbar.make(root,"The image was deleted",Snackbar.LENGTH_LONG)
                         .setAction("UNDO", new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
+                                PlaceImage placeImage = new PlaceImage();
+                                placeImage.setId(image.getId());
+                                placeImage.setImage(Utility.encodeImage(image.getImage()));
+                                placeImage.setPlaceId(placeId);
+                                placeImage.setWorth(5);
                                 ContentValues values = new ContentValues();
                                 values.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE,image.getImage());
-                                values.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, placeId);
+                                values.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, placeImage.getPlaceId());
+                                values.put(RecappContract.PlaceImageEntry._ID,placeImage.getId());
+                                values.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,placeImage.getWorth());
                                 getActivity().getContentResolver().insert(
                                         RecappContract.PlaceImageEntry.CONTENT_URI,
                                         values
                                 );
+                                Pair<Pair<Context,Long>,Pair<PlaceImage,String>> pair = new Pair<>(new Pair<>(getContext(),-1L),
+                                        new Pair<>(placeImage,"addImage"));
+                                new PlaceImageEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
+
                                 //image.setId(RecappContract.PlaceImageEntry.getIdFromUri(uri));
                                 //Log.e("algo",""+position);
                                 //companyImagesAdapter.getCompanyImages().add(position, image);

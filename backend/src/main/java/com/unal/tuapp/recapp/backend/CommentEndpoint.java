@@ -136,7 +136,24 @@ public class CommentEndpoint {
         }
         logger.info("Deleted Comment with ID: " + id);
     }
+    @ApiMethod(
+            name = "removeComments",
+            path = "comment/placesIds",
+            httpMethod = ApiMethod.HttpMethod.DELETE
+    )
+    public void removeComments(@Named("ids")List<Long> ids) throws NotFoundException{
+        for (Long i : ids) {
+            checkExists(i);
+            Comment comment = ofy().load().type(Comment.class).filter("placeId",i).first().now();
+            ofy().delete().entity(comment).now();
 
+        }
+        try {
+            new MessagingEndPoint().sendMessage("comment");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * List all entities.
      *

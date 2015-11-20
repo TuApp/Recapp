@@ -1,14 +1,17 @@
 package com.unal.tuapp.recapp.activities;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -16,9 +19,12 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.unal.tuapp.recapp.R;
+import com.unal.tuapp.recapp.backend.model.eventApi.model.Event;
+import com.unal.tuapp.recapp.backend.model.eventByUserApi.model.EventByUser;
 import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.EventByUserEndPoint;
 
 /**
  * Created by andresgutierrez on 10/11/15.
@@ -68,6 +74,20 @@ public class EventActivityGoing extends AppCompatActivity implements LoaderManag
             public void onClick(View view) {
                 if(wasGoing && !mSwitch.isChecked()){
                     //We should eliminate the user from the table because now he/she doesn't want to go to the event
+                    Cursor cursor = getContentResolver().query(
+                            RecappContract.EventByUserEntry.CONTENT_URI,
+                            new String[]{RecappContract.EventByUserEntry._ID},
+                            RecappContract.EventByUserEntry.COLUMN_KEY_USER +" = ? AND " + RecappContract.EventByUserEntry.COLUMN_KEY_EVENT+" = ?",
+                            new String[]{user.getEmail(),""+idEvent},
+                            null
+                    );
+                    if(cursor.moveToFirst()){
+                        EventByUser event = new EventByUser();
+                        event.setId(cursor.getLong(0));
+                        Pair<Context,Pair<EventByUser,String>> pairEventGoing = new Pair<>(getApplicationContext(),
+                                new Pair<>(event,"deleteEventByUser"));
+                        new EventByUserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairEventGoing);
+                    }
                     getContentResolver().delete(
                             RecappContract.EventByUserEntry.CONTENT_URI,
                             RecappContract.EventByUserEntry.COLUMN_KEY_USER +" = ? AND " + RecappContract.EventByUserEntry.COLUMN_KEY_EVENT+" = ?",
@@ -75,13 +95,22 @@ public class EventActivityGoing extends AppCompatActivity implements LoaderManag
                     );
                 }else if(!wasGoing && mSwitch.isChecked()){
                     //We should add the user to the table because now he/she want to go to the event
+                    EventByUser event = new EventByUser();
+                    event.setId(System.currentTimeMillis());
+                    event.setEventId(idEvent);
+                    event.setEmail(user.getEmail());
+                    Pair<Context,Pair<EventByUser,String>> pairEventGoing = new Pair<>(getApplicationContext(),
+                            new Pair<>(event,"addEventByUser"));
+                    new EventByUserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEventGoing);
                     ContentValues values = new ContentValues();
-                    values.put(RecappContract.EventByUserEntry.COLUMN_KEY_EVENT,idEvent);
-                    values.put(RecappContract.EventByUserEntry.COLUMN_KEY_USER,user.getEmail());
+                    values.put(RecappContract.EventByUserEntry.COLUMN_KEY_EVENT,event.getEventId());
+                    values.put(RecappContract.EventByUserEntry.COLUMN_KEY_USER, event.getEmail());
+                    values.put(RecappContract.EventByUserEntry._ID,event.getId());
                     getContentResolver().insert(
                             RecappContract.EventByUserEntry.CONTENT_URI,
                             values
                     );
+
                 }
                 Intent intent = new Intent(EventActivityGoing.this,NavigationDrawer.class);
                 startActivity(intent);

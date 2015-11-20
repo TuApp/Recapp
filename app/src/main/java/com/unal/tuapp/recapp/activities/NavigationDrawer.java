@@ -6,10 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.design.widget.FloatingActionButton;
@@ -26,7 +24,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -63,28 +61,23 @@ import com.unal.tuapp.recapp.dialogs.FilterSubCategoriesDialogFragment;
 import com.unal.tuapp.recapp.fragments.MapFragment;
 import com.unal.tuapp.recapp.fragments.PlacesFragment;
 import com.unal.tuapp.recapp.fragments.TutorialFragment;
-
-import org.json.JSONObject;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserEndPoint;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 
 /**
  * Created by andresgutierrez on 7/11/15.
  */
-public class    NavigationDrawer extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class NavigationDrawer extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private int totalFilter;
     private String emailUser;
     private User user;
@@ -134,10 +127,12 @@ public class    NavigationDrawer extends AppCompatActivity implements LoaderMana
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         root = getLayoutInflater().inflate(R.layout.activity_navigation_drawer, null);
         setContentView(root);
+        Pair<Pair<Context,String>,Pair<com.unal.tuapp.recapp.backend.model.userApi.model.User,String>> pair = new Pair<>(new Pair<>(getApplicationContext(),"nothing"),new Pair<>(new com.unal.tuapp.recapp.backend.model.userApi.model.User(),"allUser"));
+        new UserEndPoint().execute(pair);
         mAdView = (AdView) root.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
                 .build();
@@ -173,12 +168,16 @@ public class    NavigationDrawer extends AppCompatActivity implements LoaderMana
                 emailUser = account.getAccountName(mGooglePlus.mGoogleApiClient);
                 email.setText(emailUser);
 
-                Utility.addUser(this,emailUser,
+                try{
+                    Utility.addUser(this,emailUser,
                         currentPerson.getName().getGivenName(), currentPerson.getName().getFamilyName());
+                }catch (Exception e){}
                 new LoadProfileImage(root, imageView).execute(personPhotoUrl, account.getAccountName(mGooglePlus.mGoogleApiClient));
             }else {
                 emailUser = getIntent().getExtras().getString("email");
-                Utility.addUser(this,emailUser,"","");
+                try {
+                    Utility.addUser(this, emailUser, "", "");
+                }catch (Exception e){}
                 email.setText(emailUser);
 
             }
@@ -545,7 +544,7 @@ public class    NavigationDrawer extends AppCompatActivity implements LoaderMana
         categoriesDialog.show(fm, "fragment_categories");
     }
 
-    public void showSubCategoriesDialog(int idCategory){
+    public void showSubCategoriesDialog(long idCategory){
         FragmentManager fm = getSupportFragmentManager();
         FilterSubCategoriesDialogFragment subcategoriesDialog = new FilterSubCategoriesDialogFragment();
         subcategoriesDialog.setIdCategory(idCategory);
@@ -667,28 +666,7 @@ public class    NavigationDrawer extends AppCompatActivity implements LoaderMana
                         null,
                         null
                 );
-            case CATEGORY:
-                return new CursorLoader(
-                        this,
-                        RecappContract.CategoryEntry.CONTENT_URI,
-                        null,
-                        null,
-                        null,
-                        null
-                );
-            case SUB_CATEGORY:
-                String selection = buildSelection(subCategory);
-                return new CursorLoader(
-                        this,
-                        RecappContract.SubCategoryEntry.buildSubCategoryCategoryUri(),
-                        new String[]{RecappContract.SubCategoryEntry.TABLE_NAME+"."+ RecappContract.SubCategoryEntry._ID,
-                                RecappContract.SubCategoryEntry.TABLE_NAME+"."+ RecappContract.SubCategoryEntry.COLUMN_NAME,
-                                RecappContract.CategoryEntry.TABLE_NAME+"."+ RecappContract.CategoryEntry.COLUMN_IMAGE},
-                        selection,
-                        subCategory,
-                        null
 
-                );
             case PLACE:
                 return new CursorLoader(
                         this,
@@ -802,20 +780,7 @@ public class    NavigationDrawer extends AppCompatActivity implements LoaderMana
                     deepLinkIntent(deepLink);
                 }
                 break;
-            case CATEGORY:
-                List<Category> categories = Category.allCategories(data);
-                //adapter.setData(categories);
-                break;
-            case SUB_CATEGORY:
-                List<SubCategory> subCategories = SubCategory.allSubCategories(data);
-                //adapterSubCategory.setData(subCategories);
 
-                if(subCategories.size()>0){
-                    add.setVisibility(View.VISIBLE);
-                }else{
-                    add.setVisibility(View.GONE);
-                }
-                break;
             case PLACE:
                 if(filtersConstraint.isEmpty()) {
                     places = Place.allPlaces(data);
@@ -841,14 +806,12 @@ public class    NavigationDrawer extends AppCompatActivity implements LoaderMana
             case TUTORIAL:
                 if(filtersConstraint.isEmpty()) {
                     tutorials = Tutorial.allTutorials(data);
-                    addPreviewsToTutorial(tutorials);
                     tutorialsFragment.setDataTutorials(tutorials, data);
                 }
                 break;
             case TUTORIAL_FILTER:
                 if(!filtersConstraint.isEmpty()){
                     tutorials = Tutorial.allTutorials(data);
-                    addPreviewsToTutorial(tutorials);
                     tutorialsFragment.setDataTutorials(tutorials, data);
                 }
 
@@ -894,7 +857,7 @@ public class    NavigationDrawer extends AppCompatActivity implements LoaderMana
 
             SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
                     MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
-            searchView.setQuery(query, false);
+            searchView.setQuery(query,false);
             Snackbar.make(root.findViewById(R.id.coordination_navigation_drawer),"Place name : " +query,Snackbar.LENGTH_LONG).show();
             searchView.clearFocus();
             suggestions.saveRecentQuery(query, null);
@@ -976,119 +939,6 @@ public class    NavigationDrawer extends AppCompatActivity implements LoaderMana
             getSupportLoaderManager().initLoader(TUTORIAL_FILTER, null, this);
         } else {
             getSupportLoaderManager().restartLoader(TUTORIAL_FILTER, null, this);
-        }
-    }
-
-    private void addPreviewsToTutorial(List<Tutorial> tutorials){
-        if(Utility.isNetworkAvailable(getApplicationContext()))
-            for (int i = 0; i < tutorials.size(); i++){
-                Tutorial tutorial = tutorials.get(i);
-                getPreviewFromYouTube(tutorial);
-
-            }
-    }
-
-    private Bitmap getPreviewFromYouTube(Tutorial tutorial){
-        Bitmap bitmap = null;
-
-        Uri.Builder uri = new Uri.Builder();
-        uri.scheme("https");
-        uri.authority("www.youtube.com/oembed");
-        uri.appendQueryParameter("url", tutorial.getLink());
-        uri.appendQueryParameter("format", "json");
-
-        try {
-            URL url = new URL(URLDecoder.decode(uri.build().toString(), "UTF-8"));
-            new URLPreviewYouTube().execute(new Object[]{tutorial, url.toString()});
-        }catch (Exception e){
-            Log.e(TAG, e.getMessage());
-        }
-        return bitmap;
-    }
-
-    private class URLPreviewYouTube extends AsyncTask<Object, Void, Object[]> {
-
-        @Override
-        protected Object[] doInBackground(Object... objects) {
-            Tutorial tutorial = (Tutorial) objects[0];
-            String data = (String) objects[1];
-            StringBuilder description = null;
-            InputStream inputStream = null;
-            HttpURLConnection urlConnection = null;
-            String thumbnailURL = null;
-            try {
-                URL url = new URL(data);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.connect();
-                inputStream = urlConnection.getInputStream();
-                BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-                description = new StringBuilder();
-                String line="";
-                while ((line=br.readLine())!=null)
-                    description.append(line);
-                Log.d("Getting description", description.toString());
-                JSONObject object = new JSONObject(description.toString());
-                thumbnailURL = object.getString("thumbnail_url");
-
-
-            }catch (Exception e){
-                Log.d("Excepcion ", e.getMessage());
-            }finally {
-                urlConnection.disconnect();
-            }
-            return new Object[]{tutorial, thumbnailURL};
-        }
-
-        @Override
-        protected void onPostExecute(Object[] objects) {
-            super.onPostExecute(objects);
-            Tutorial tutorial = (Tutorial) objects[0];
-            String thumbnailURL = (String) objects[1];
-            tutorial.setPreviewURL(thumbnailURL);
-            new PreviewYouTube().execute(tutorial);
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
-    }
-
-    private class PreviewYouTube extends AsyncTask<Tutorial, Void, Object[]> {
-
-        @Override
-        protected Object[] doInBackground(Tutorial... tutorials) {
-            Tutorial tutorial = tutorials[0];
-            String data = tutorial.getPreviewURL();
-            InputStream inputStream = null;
-            HttpURLConnection urlConnection = null;
-            Bitmap image = null;
-            try {
-                URL url = new URL(data);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.connect();
-                inputStream = urlConnection.getInputStream();
-                image = BitmapFactory.decodeStream(inputStream);
-            }catch (Exception e){
-                Log.d("Excepcion ", e.getMessage());
-            }finally {
-                urlConnection.disconnect();
-            }
-            return new Object[]{tutorial, image};
-        }
-
-        @Override
-        protected void onPostExecute(Object[] objects) {
-            super.onPostExecute(objects);
-            Tutorial tutorial = (Tutorial) objects[0];
-            Bitmap bitmap = (Bitmap) objects[1];
-            tutorial.setPreview(bitmap);
-            tutorialsFragment.notifyDataSetChanged();
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
         }
     }
 }

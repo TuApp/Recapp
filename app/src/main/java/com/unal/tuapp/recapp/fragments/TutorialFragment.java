@@ -66,8 +66,4 @@ public class TutorialFragment  extends Fragment {
     public void closeData(){
         adapter.closeCursor();
     }
-
-    public void notifyDataSetChanged(){
-        adapter.notifyDataSetChanged();
-    }
 }

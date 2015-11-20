@@ -2,8 +2,10 @@ package com.unal.tuapp.recapp.fragments;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -13,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,10 +24,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.unal.tuapp.recapp.R;
+import com.unal.tuapp.recapp.activities.Recapp;
 import com.unal.tuapp.recapp.adapters.RecycleCommentsUserAdapter;
+import com.unal.tuapp.recapp.backend.model.placeApi.model.Place;
 import com.unal.tuapp.recapp.data.Comment;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.CommentEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceEndPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +99,9 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
         if(extras!=null){
             user = extras.getParcelable("user");
         }
+        /*Pair<Pair<Context,Pair<Long,Long>>,Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment,String>> pair =
+                new Pair<>(new Pair<>(getContext(),new Pair<>(user.getId(),-1L)),new Pair<>(new com.unal.tuapp.recapp.backend.model.commentApi.model.Comment(),"commentUser"));
+        new CommentEndPoint().execute(pair);*/
         recyclerView = (RecyclerView) root.findViewById(R.id.user_comments);
         List<Comment> comments = new ArrayList<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -147,7 +157,8 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
                         RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_DESCRIPTION,
                         RecappContract.CommentEntry.TABLE_NAME + "." + RecappContract.CommentEntry.COLUMN_RATING,
                         RecappContract.UserEntry.COLUMN_USER_IMAGE,
-                        RecappContract.CommentEntry.COLUMN_PLACE_KEY},
+                        RecappContract.CommentEntry.COLUMN_PLACE_KEY,
+                        RecappContract.CommentEntry.COLUMN_USER_KEY},
                 null,
                 null,
                 sortOrder
@@ -174,6 +185,11 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
                 RecappContract.CommentEntry._ID + " = ?",
                 new String[]{"" + idComment}
         );
+        com.unal.tuapp.recapp.backend.model.commentApi.model.Comment commentApi = new com.unal.tuapp.recapp.backend.model.commentApi.model.Comment();
+        commentApi.setId(idComment);
+        Pair<Pair<Context,Pair<Long,Long>>,Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment,String>> pair =
+                new Pair<>(new Pair<>(getContext(),new Pair<>(-1L,-1L)),new Pair<>(commentApi,"deleteComment"));
+        new CommentEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
         Cursor cursorRating = getActivity().getContentResolver().query(
                 RecappContract.CommentEntry.buildCommentPlaceUri(idPlaceComment),
                 new String[]{"AVG(" + RecappContract.CommentEntry.TABLE_NAME + "."
@@ -186,6 +202,11 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
         if(cursorRating.moveToFirst()) {
             newRating = cursorRating.getDouble(0);
         }
+        Place place = new Place();
+        place.setRating((float)newRating);
+        place.setId(idPlaceComment);
+        Pair<Context,Pair<Place,String>> pairPlace = new Pair<>(getContext(),new Pair<>(place,"updatePlaceRating"));
+        new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairPlace);
         ContentValues values = new ContentValues();
         values.put(RecappContract.PlaceEntry.COLUMN_RATING, newRating);
         getActivity().getContentResolver().update(

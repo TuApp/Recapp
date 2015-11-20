@@ -103,6 +103,7 @@ public class Event {
         this.name = name;
     }
 
+
     public static final ArrayList<Event> allEvents(Cursor cursor){
         ArrayList<Event> events = new ArrayList<>();
         while (cursor.moveToNext()){

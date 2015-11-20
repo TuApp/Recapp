@@ -10,7 +10,7 @@ import com.googlecode.objectify.annotation.Index;
 public class EventByUser {
     @Id private Long id;
     private Long eventId;
-    @Index private Long userId;
+    @Index private String email;
 
     public Long getEventId() {
         return eventId;
@@ -28,11 +28,11 @@ public class EventByUser {
         this.id = id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

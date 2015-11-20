@@ -3,19 +3,24 @@ package com.unal.tuapp.recapp.activities;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.View;
 
+import com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.MyAlarmReceiver;
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.dialogs.ReminderDialog;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.ReminderEndPoint;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
@@ -55,11 +60,19 @@ public class ReminderActivity extends AppCompatActivity implements ReminderDialo
     public void onAction(String action,Object...values) {
         //We should save the new reminder and put it in the notification manager
         if(action.equals("save")) {
-            long notificationId = System.currentTimeMillis();
+            Reminder reminder = new Reminder();
+            reminder.setId(System.currentTimeMillis());
+            reminder.setNotification(System.currentTimeMillis());
+            reminder.setEndDate(((Date) values[3]).getTime());
+            reminder.setName((String) values[0]);
+            reminder.setDescription((String) values[1]);
+            reminder.setUserId(user.getId());
+            reminder.setPlaceId(this.id);
+            long notificationId = reminder.getNotification();
             ContentValues valuesReminder = new ContentValues();
-            valuesReminder.put(RecappContract.ReminderEntry.COLUMN_END_DATE, ((Date) values[3]).getTime());
-            valuesReminder.put(RecappContract.ReminderEntry.COLUMN_NAME, (String) values[0]);
-            valuesReminder.put(RecappContract.ReminderEntry.COLUMN_DESCRIPTION, (String) values[1]);
+            valuesReminder.put(RecappContract.ReminderEntry.COLUMN_END_DATE, reminder.getEndDate());
+            valuesReminder.put(RecappContract.ReminderEntry.COLUMN_NAME, reminder.getName());
+            valuesReminder.put(RecappContract.ReminderEntry.COLUMN_DESCRIPTION, reminder.getDescription());
             //Log.e("algo",(String) values[1]);
             if((Boolean)values[2]){
                 valuesReminder.put(RecappContract.ReminderEntry.COLUMN_NOTIFICATION, notificationId); //Unique id for the notification
@@ -86,14 +99,17 @@ public class ReminderActivity extends AppCompatActivity implements ReminderDialo
 
 
             }else{
-                valuesReminder.put(RecappContract.ReminderEntry.COLUMN_NOTIFICATION,-1);
+                valuesReminder.put(RecappContract.ReminderEntry.COLUMN_NOTIFICATION,reminder.getNotification());
             }
-            valuesReminder.put(RecappContract.ReminderEntry.COLUMN_USER_KEY,user.getId());
-            valuesReminder.put(RecappContract.ReminderEntry.COLUMN_PLACE_KEY,this.id);
+            valuesReminder.put(RecappContract.ReminderEntry.COLUMN_USER_KEY,reminder.getUserId());
+            valuesReminder.put(RecappContract.ReminderEntry.COLUMN_PLACE_KEY, reminder.getPlaceId());
+            valuesReminder.put(RecappContract.ReminderEntry._ID,reminder.getId());
             getContentResolver().insert(
                     RecappContract.ReminderEntry.CONTENT_URI,
                     valuesReminder
             );
+            Pair<Context,Pair<Reminder,String>> pair = new Pair<>(getApplicationContext(),new Pair<>(reminder,"addReminder"));
+            new ReminderEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
 
 
 

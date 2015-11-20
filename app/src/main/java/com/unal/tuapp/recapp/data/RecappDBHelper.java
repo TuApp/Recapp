@@ -30,15 +30,14 @@ public class RecappDBHelper extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         final String CREATE_USER_TABLE = "CREATE TABLE " + UserEntry.TABLE_NAME + " ( "+
-                UserEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                UserEntry._ID + " INTEGER PRIMARY KEY , "+
                 UserEntry.COLUMN_EMAIL + " TEXT UNIQUE NOT NULL ," +
                 UserEntry.COLUMN_USER_NAME + " TEXT, " +
                 UserEntry.COLUMN_USER_LASTNAME + " TEXT, " +
-                UserEntry.COLUMN_USER_IMAGE + " BLOB," +
-                UserEntry.COLUMN_LAT + " REAL,"+
-                UserEntry.COLUMN_LOG + " REAL );";
+                UserEntry.COLUMN_USER_IMAGE + " BLOB ,"+
+                "UNIQUE( "+ UserEntry._ID+" ) ON CONFLICT REPLACE); " ;
         final String CREATE_PLACE_TABLE = "CREATE TABLE " + PlaceEntry.TABLE_NAME + " ( "+
-                PlaceEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                PlaceEntry._ID + " INTEGER PRIMARY KEY , "+
                 PlaceEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                 PlaceEntry.COLUMN_LAT + " REAL NOT NULL, " +
                 PlaceEntry.COLUMN_LOG + " REAL NOT NULL, " +
@@ -46,82 +45,92 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 PlaceEntry.COLUMN_ADDRESS + " TEXT UNIQUE NOT NULL, " +
                 PlaceEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
                 PlaceEntry.COLUMN_RATING + " REAL DEFAULT 0.0 , "+
-                PlaceEntry.COLUMN_IMAGE_FAVORITE + " BLOB NOT NULL ," +
+                PlaceEntry.COLUMN_IMAGE_FAVORITE + " BLOB NOT NULL , " +
                 PlaceEntry.COLUMN_EMAIL + " TEXT UNIQUE NOT NULL , " +
-                PlaceEntry.COLUMN_PASSWORD+" TEXT NOT NULL );";
+                PlaceEntry.COLUMN_PASSWORD+" TEXT NOT NULL, "+
+                "UNIQUE ( "+ PlaceEntry._ID+" ) ON CONFLICT REPLACE );";
 
         final String CREATE_REMINDER_TABLE = "CREATE TABLE "+ ReminderEntry.TABLE_NAME +" ( "+
-                ReminderEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                ReminderEntry._ID + " INTEGER PRIMARY KEY , " +
                 ReminderEntry.COLUMN_END_DATE + " INTEGER NOT NULL, "+
                 ReminderEntry.COLUMN_NAME + " TEXT NOT NULL, "+
                 ReminderEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
                 ReminderEntry.COLUMN_NOTIFICATION + " INTEGER NOT NULL, " +
                 ReminderEntry.COLUMN_USER_KEY + " INTEGER," +
                 ReminderEntry.COLUMN_PLACE_KEY + " INTEGER, "+
+                "UNIQUE ( " +ReminderEntry._ID+" ) ON CONFLICT REPLACE ,"+
                 "FOREIGN KEY ( " + ReminderEntry.COLUMN_USER_KEY +" ) REFERENCES " +
                 UserEntry.TABLE_NAME + " ( "+ UserEntry._ID +" ), " +
                 "FOREIGN KEY ( " + ReminderEntry.COLUMN_PLACE_KEY + " ) REFERENCES " +
                 PlaceEntry.TABLE_NAME + " ( " + PlaceEntry._ID + " ) );";
         final String CREATE_COMMENT_TABLE = "CREATE TABLE " + CommentEntry.TABLE_NAME + " ( "+
-                CommentEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                CommentEntry._ID + " INTEGER PRIMARY KEY , " +
                 CommentEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, "+
                 CommentEntry.COLUMN_RATING + " REAL NOT NULL," +
                 CommentEntry.COLUMN_DATE + " INTEGER NOT NULL, " +
-                CommentEntry.COLUMN_USER_KEY + " INTEGER, "+
-                CommentEntry.COLUMN_PLACE_KEY + " INTEGER, " +
+                CommentEntry.COLUMN_USER_KEY + " INTEGER , "+
+                CommentEntry.COLUMN_PLACE_KEY + " INTEGER , " +
+                "UNIQUE ( "+ CommentEntry._ID +" ) ON CONFLICT REPLACE ,"+
                 "FOREIGN KEY ("  + CommentEntry.COLUMN_USER_KEY + ") REFERENCES " +
                 UserEntry.TABLE_NAME + " ("+ UserEntry._ID +"), " +
                 "FOREIGN KEY ( " + CommentEntry.COLUMN_PLACE_KEY + " ) REFERENCES " +
                 PlaceEntry.TABLE_NAME + " ( " + PlaceEntry._ID + " ) );";
         final String CREATE_PLACE_IMAGE_TABLE = "CREATE TABLE "+ PlaceImageEntry.TABLE_NAME + " ( " +
-                PlaceImageEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                PlaceImageEntry._ID + " INTEGER PRIMARY KEY , "+
                 PlaceImageEntry.COLUMN_IMAGE + " BLOB NOT NULL, " +
                 PlaceImageEntry.COLUMN_WORTH + " INTEGER NOT NULL DEFAULT 0, " +
                 PlaceImageEntry.COLUMN_PLACE_KEY + " INTEGER, "+
+                "UNIQUE ( "+PlaceImageEntry.COLUMN_PLACE_KEY+" , "+ PlaceImageEntry._ID+" ) ON CONFLICT REPLACE , "+
                 "FOREIGN KEY ( " + PlaceImageEntry.COLUMN_PLACE_KEY + " ) REFERENCES " +
                 PlaceEntry.TABLE_NAME + " ( " + PlaceEntry._ID + " ) );";
         final String CREATE_TUTORIAL_TABLE = "CREATE TABLE " + TutorialEntry.TABLE_NAME + " ( " +
-                TutorialEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                TutorialEntry._ID + " INTEGER PRIMARY KEY , " +
                 TutorialEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                 TutorialEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL," +
-                TutorialEntry.COLUMN_LINK_VIDEO + " TEXT NOT NULL );";
+                TutorialEntry.COLUMN_LINK_VIDEO + " TEXT NOT NULL , " +
+                "UNIQUE ( "+ TutorialEntry._ID+" ) ON CONFLICT REPLACE );";
         final String CREATE_CATEGORY_TABLE = "CREATE TABLE " + CategoryEntry.TABLE_NAME + " ( " +
-                CategoryEntry._ID + "  INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                CategoryEntry._ID + "  INTEGER PRIMARY KEY , " +
                 CategoryEntry.COLUMN_NAME + " TEXT UNIQUE NOT NULL, "+
-                CategoryEntry.COLUMN_IMAGE + " BLOB NOT NULL );";
+                CategoryEntry.COLUMN_IMAGE + " BLOB NOT NULL ," +
+                "UNIQUE ( "+ CategoryEntry._ID +" ) ON CONFLICT REPLACE );";
         final String CREATE_SUB_CATEGORY_TABLE = "CREATE TABLE " + SubCategoryEntry.TABLE_NAME + "(" +
-                SubCategoryEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                SubCategoryEntry._ID + " INTEGER PRIMARY KEY , " +
                 SubCategoryEntry.COLUMN_NAME + " TEXT UNIQUE NOT NULL, " +
                 SubCategoryEntry.COLUMN_CATEGORY_KEY + " INTEGER, "+
+                "UNIQUE ( "+ SubCategoryEntry._ID +" ) ON CONFLICT REPLACE, "+
                 "FOREIGN KEY (" + SubCategoryEntry.COLUMN_CATEGORY_KEY +") REFERENCES " +
-                CategoryEntry.TABLE_NAME + "("+CategoryEntry._ID+") );";
+                CategoryEntry.TABLE_NAME + "( "+CategoryEntry._ID+" ) );";
         final String CREATE_SUB_CATEGORY_BY_PLACE = "CREATE TABLE "+ SubCategoryByPlaceEntry.TABLE_NAME + "("+
-                SubCategoryByPlaceEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                SubCategoryByPlaceEntry._ID + " INTEGER PRIMARY KEY , "+
                 SubCategoryByPlaceEntry.COLUMN_PLACE_KEY+ " INTEGER NOT NULL,"+
                 SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY+ " INTEGER NOT NULL, "+
+                "UNIQUE ( "+ SubCategoryByPlaceEntry._ID+" )  ON CONFLICT REPLACE ,"+
                 "FOREIGN KEY (" +SubCategoryByPlaceEntry.COLUMN_PLACE_KEY+") REFERENCES "+
                 PlaceEntry.TABLE_NAME+"(" +PlaceEntry._ID+") , "+
                 "FOREIGN KEY ("+SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY+") REFERENCES "+
                 SubCategoryEntry.TABLE_NAME+"("+SubCategoryEntry._ID+") );";
         final String CREATE_SUB_CATEGORY_BY_TUTORIAL = "CREATE TABLE "+ SubCategoryByTutorialEntry.TABLE_NAME +"("+
-                SubCategoryByTutorialEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                SubCategoryByTutorialEntry._ID + " INTEGER PRIMARY KEY , "+
                 SubCategoryByTutorialEntry.COLUMN_TUTORIAL_KEY+" INTEGER NOT NULL,"+
                 SubCategoryByTutorialEntry.COLUMN_SUBCATEGORY_KEY+" INTEGER NOT NULL, "+
+                "UNIQUE ( "+ SubCategoryByTutorialEntry._ID+" ) ON CONFLICT REPLACE, "+
                 "FOREIGN KEY (" + SubCategoryByTutorialEntry.COLUMN_TUTORIAL_KEY+") REFERENCES "+
                 TutorialEntry.TABLE_NAME+"("+TutorialEntry._ID+"), "+
                 "FOREIGN KEY (" +SubCategoryByTutorialEntry.COLUMN_SUBCATEGORY_KEY+") REFERENCES "+
                 SubCategoryEntry.TABLE_NAME+"("+SubCategoryEntry._ID+"));";
 
         final String CREATE_USER_BY_PLACE_TABLE = "CREATE TABLE " + UserByPlaceEntry.TABLE_NAME + "(" +
-                UserByPlaceEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                UserByPlaceEntry._ID + " INTEGER PRIMARY KEY , " +
                 UserByPlaceEntry.COLUMN_USER_KEY +" INTEGER NOT NULL, " +
                 UserByPlaceEntry.COLUMN_PLACE_KEY + " INTEGER NOT NULL, " +
+                "UNIQUE ( "+UserByPlaceEntry._ID+ " ) ON CONFLICT REPLACE, "+
                 "FOREIGN KEY (" + UserByPlaceEntry.COLUMN_USER_KEY + ") REFERENCES " +
                 UserEntry.TABLE_NAME + "(" + UserEntry._ID+"), " +
                 "FOREIGN KEY (" + UserByPlaceEntry.COLUMN_PLACE_KEY +") REFERENCES " +
                 PlaceEntry.TABLE_NAME + "(" + PlaceEntry._ID+") );";
         final String CREATE_EVENT_TABLE = "CREATE TABLE " + EventEntry.TABLE_NAME + "(" +
-                EventEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                EventEntry._ID + " INTEGER PRIMARY KEY , "+
                 EventEntry.COLUMN_NAME + " TEXT NOT NULL, "+
                 EventEntry.COLUMN_DESCRIPTION + " TEXT, "+
                 EventEntry.COLUMN_ADDRESS +" TEXT NOT NULL, "+
@@ -129,12 +138,14 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 EventEntry.COLUMN_DATE + " INTEGER NOT NULL, "+
                 EventEntry.COLUMN_IMAGE + " BLOB , "+
                 EventEntry.COLUMN_LAT + " REAL NOT NULL, "+
-                EventEntry.COLUMN_LOG +" REAL NOT NULL );";
+                EventEntry.COLUMN_LOG +" REAL NOT NULL , " +
+                "UNIQUE ( " + EventEntry._ID+" ) ON CONFLICT REPLACE );";
 
         final String CREATE_EVENT_BY_USER_TABLE = "CREATE TABLE " + EventByUserEntry.TABLE_NAME+ "(" +
-                EventByUserEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                EventByUserEntry._ID + " INTEGER PRIMARY KEY , "+
                 EventByUserEntry.COLUMN_KEY_EVENT +" INTEGER NOT NULL,  "+
                 EventByUserEntry.COLUMN_KEY_USER + " TEXT NOT NULL, "+
+                "UNIQUE ( "+EventByUserEntry._ID+" ) ON CONFLICT REPLACE, "+
                 "FOREIGN KEY ("+ EventByUserEntry.COLUMN_KEY_USER +") REFERENCES " +
                 UserEntry.TABLE_NAME +" ( "+ UserEntry.COLUMN_EMAIL +"), "+
                 "FOREIGN KEY (" + EventByUserEntry.COLUMN_KEY_EVENT + ") REFERENCES "+

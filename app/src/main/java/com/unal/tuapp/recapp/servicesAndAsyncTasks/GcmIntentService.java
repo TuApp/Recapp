@@ -3,6 +3,7 @@ package com.unal.tuapp.recapp.servicesAndAsyncTasks;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.unal.tuapp.recapp.R;
+import com.unal.tuapp.recapp.activities.Recapp;
 import com.unal.tuapp.recapp.backend.model.categoryApi.model.Category;
 import com.unal.tuapp.recapp.backend.model.categoryApi.model.CollectionResponseCategory;
 import com.unal.tuapp.recapp.backend.model.commentApi.model.CollectionResponseComment;
@@ -125,15 +127,7 @@ public class GcmIntentService extends IntentService {
 
 
     }
-    /*protected void showToast(final String message) {
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                }
-            });
 
-    }*/
     private void getCategories(){
         try {
             CollectionResponseCategory collectionResponseCategory = Utility.getCategoryApi().list().execute();
@@ -181,7 +175,7 @@ public class GcmIntentService extends IntentService {
                 if (places != null) {
                     for (Place i : places) {
                         query+="?,";
-                        queryComment ="?,";
+                        queryComment +="?,";
                         ids.add(i.getId()+"");
 
                         ContentValues value = new ContentValues();
@@ -210,7 +204,7 @@ public class GcmIntentService extends IntentService {
                 }
             }
             query = query.substring(0,query.length()-1);
-            query+=")";
+            query +=")";
             queryComment = queryComment.substring(0,queryComment.length()-1);
             queryComment+=")";
 
@@ -362,7 +356,7 @@ public class GcmIntentService extends IntentService {
                     ContentValues [] values = new ContentValues[valuesList.size()];
                     valuesList.toArray(values);
                     this.getContentResolver().bulkInsert(
-                            RecappContract.EventEntry.CONTENT_URI,
+                            RecappContract.EventByUserEntry.CONTENT_URI,
                             values
                     );
                     nextPage = collectionResponseEventByUser.getNextPageToken();
@@ -370,7 +364,7 @@ public class GcmIntentService extends IntentService {
                 }
             }
             query = query.substring(0,query.length()-1);
-            query = ")";
+            query += ")";
             String queryArgs [] = new String[ids.size()];
             if(ids.isEmpty()){
                 query = null;
@@ -424,18 +418,21 @@ public class GcmIntentService extends IntentService {
 
             }
             query = query.substring(0,query.length()-1);
-            query = ")";
+            query += ")";
             String [] queryArgs = new String[ids.size()];
             ids.toArray(queryArgs);
             switch (type){
                 case "addEvent":
                     //We should make the notification to the events
                     //NotificationCompat.InboxStyle inboxStyle = new NotificationCompat
+                    Intent newIntent = new Intent(this,Recapp.class);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, newIntent, 0);
                     Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                     Notification notification = new Notification.Builder(this)
                             .setContentTitle("There are new events")
                             .setContentText("which are waiting for you")
                             .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentIntent(pendingIntent)
                             .setLargeIcon(BitmapFactory.decodeResource(this.getResources(),R.mipmap.ic_launcher))
                             .setAutoCancel(true)
                             .setVibrate(new long[]{1000, 1000, 1000, 1000})
@@ -513,13 +510,14 @@ public class GcmIntentService extends IntentService {
                 }
             }
             query = query.substring(0,query.length()-1);
-            query = ")";
+            query += ")";
             String queryArgs[] = new String[ids.size()];
             ids.toArray(queryArgs);
             if(ids.isEmpty()){
                 query = null;
                 queryArgs = null;
             }
+
             this.getContentResolver().delete(
                     RecappContract.PlaceImageEntry.CONTENT_URI,
                     query,
@@ -614,6 +612,7 @@ public class GcmIntentService extends IntentService {
                             .execute();
                 }
                 query = query.substring(0,query.length()-1);
+                query += ")";
                 String queryArgs [] = new String[ids.size()];
                 ids.toArray(queryArgs);
                 if(ids.isEmpty()){
@@ -791,7 +790,7 @@ public class GcmIntentService extends IntentService {
                         ContentValues value = new ContentValues();
                         value.put(RecappContract.UserByPlaceEntry._ID,i.getId());
                         value.put(RecappContract.UserByPlaceEntry.COLUMN_USER_KEY,i.getUserId());
-                        value.put(RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY,i.getId());
+                        value.put(RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY,i.getPlaceId());
                         valuesList.add(value);
                     }
                     ContentValues values[] = new ContentValues[valuesList.size()];

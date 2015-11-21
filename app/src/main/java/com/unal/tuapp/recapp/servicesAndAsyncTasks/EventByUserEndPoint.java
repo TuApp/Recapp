@@ -35,28 +35,30 @@ public class EventByUserEndPoint extends AsyncTask<Pair<Context,Pair<EventByUser
                     CollectionResponseEventByUser collectionResponseEventByUser = Utility.getEventByUserApi().list().execute();
                     List<EventByUser> eventByUserList;
                     String nextPage = "";
-                    while (!collectionResponseEventByUser.getNextPageToken().equals(nextPage)){
-                        eventByUserList = collectionResponseEventByUser.getItems();
-                        if(eventByUserList!=null){
-                            List<ContentValues> valuesList = new ArrayList<>();
-                            for (EventByUser i : eventByUserList){
-                                ContentValues value = new ContentValues();
-                                value.put(RecappContract.EventByUserEntry._ID,i.getId());
-                                value.put(RecappContract.EventByUserEntry.COLUMN_KEY_EVENT,i.getEventId());
-                                value.put(RecappContract.EventByUserEntry.COLUMN_KEY_USER,i.getEmail());
-                                valuesList.add(value);
+                    if(collectionResponseEventByUser.getNextPageToken()!=null) {
+                        while (!collectionResponseEventByUser.getNextPageToken().equals(nextPage)) {
+                            eventByUserList = collectionResponseEventByUser.getItems();
+                            if (eventByUserList != null) {
+                                List<ContentValues> valuesList = new ArrayList<>();
+                                for (EventByUser i : eventByUserList) {
+                                    ContentValues value = new ContentValues();
+                                    value.put(RecappContract.EventByUserEntry._ID, i.getId());
+                                    value.put(RecappContract.EventByUserEntry.COLUMN_KEY_EVENT, i.getEventId());
+                                    value.put(RecappContract.EventByUserEntry.COLUMN_KEY_USER, i.getEmail());
+                                    valuesList.add(value);
+                                }
+                                ContentValues[] values = new ContentValues[valuesList.size()];
+                                valuesList.toArray(values);
+                                pairs[0].first.getContentResolver().bulkInsert(
+                                        RecappContract.EventByUserEntry.CONTENT_URI,
+                                        values
+                                );
+                                nextPage = collectionResponseEventByUser.getNextPageToken();
+                                collectionResponseEventByUser = Utility.getEventByUserApi().list().setCursor(nextPage).execute();
                             }
-                            ContentValues [] values = new ContentValues[valuesList.size()];
-                            valuesList.toArray(values);
-                            pairs[0].first.getContentResolver().bulkInsert(
-                                    RecappContract.EventEntry.CONTENT_URI,
-                                    values
-                            );
-                            nextPage = collectionResponseEventByUser.getNextPageToken();
-                            collectionResponseEventByUser = Utility.getEventByUserApi().list().setCursor(nextPage).execute();
+
+
                         }
-
-
                     }
                     break;
 

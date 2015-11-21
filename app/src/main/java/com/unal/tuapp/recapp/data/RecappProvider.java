@@ -1193,8 +1193,6 @@ public class RecappProvider extends ContentProvider {
             case PLACE_IMAGE:
                 rowsDeleted = db.delete(PlaceImageEntry.TABLE_NAME,selection,selectionArgs);
                 break;
-
-
             case SUB_CATEGORY:
                 rowsDeleted = db.delete(SubCategoryEntry.TABLE_NAME,selection,selectionArgs);
                 break;
@@ -1290,7 +1288,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try{
                     for(ContentValues value:values){
-                        long id = db.insert(UserEntry.TABLE_NAME,null,value);
+                        long id = db.insertWithOnConflict(UserEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
                         if(id!=-1){
                             returnCount++;
                         }
@@ -1307,7 +1305,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try{
                     for(ContentValues value:values){
-                        long id = db.insert(PlaceEntry.TABLE_NAME,null,value);
+                        long id = db.insertWithOnConflict(PlaceEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
                         if(id!=-1){
                             returnCount++;
                         }
@@ -1324,7 +1322,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try{
                     for(ContentValues value:values){
-                        long id = db.insert(ReminderEntry.TABLE_NAME,null,value);
+                        long id = db.insertWithOnConflict(ReminderEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
                         if(id!=-1){
                             returnCount++;
                         }
@@ -1341,7 +1339,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try{
                     for(ContentValues value:values){
-                        long id = db.insert(CommentEntry.TABLE_NAME,null,value);
+                        long id = db.insertWithOnConflict(CommentEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
                         if(id!=-1){
                             returnCount++;
                         }
@@ -1358,7 +1356,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try{
                     for(ContentValues value:values){
-                        long id = db.insert(CategoryEntry.TABLE_NAME,null,value);
+                        long id = db.insertWithOnConflict(CategoryEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
                         if(id!=-1){
                             returnCount++;
                         }
@@ -1375,7 +1373,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try{
                     for(ContentValues value:values){
-                        long id = db.insert(TutorialEntry.TABLE_NAME,null,value);
+                        long id = db.insertWithOnConflict(TutorialEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
                         if(id!=-1){
                             returnCount++;
                         }
@@ -1392,7 +1390,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try{
                     for(ContentValues value:values){
-                        long id = db.insert(PlaceImageEntry.TABLE_NAME,null,value);
+                        long id = db.insertWithOnConflict(PlaceImageEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
                         if(id!=-1){
                             returnCount++;
                         }
@@ -1409,7 +1407,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try{
                     for(ContentValues value:values){
-                        long id = db.insert(SubCategoryEntry.TABLE_NAME,null,value);
+                        long id = db.insertWithOnConflict(SubCategoryEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
                         if(id!=-1){
                             returnCount++;
                         }
@@ -1426,7 +1424,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try {
                     for (ContentValues value: values){
-                        long id = db.insert(SubCategoryByPlaceEntry.TABLE_NAME,null,value);
+                        long id = db.insertWithOnConflict(SubCategoryByPlaceEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
                         if(id!=-1){
                             returnCount++;
                         }
@@ -1443,7 +1441,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try{
                     for(ContentValues value:values){
-                        long id = db.insert(SubCategoryByTutorialEntry.TABLE_NAME,null,value);
+                        long id = db.insertWithOnConflict(SubCategoryByTutorialEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
                         if(id!=-1){
                             returnCount++;
                         }
@@ -1459,7 +1457,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try{
                     for (ContentValues value:values){
-                        long id = db.insert(UserByPlaceEntry.TABLE_NAME,null,value);
+                        long id = db.insertWithOnConflict(UserByPlaceEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
                         if(id!=-1){
                             returnCount++;
                         }
@@ -1475,7 +1473,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try{
                     for(ContentValues value:values){
-                        long id = db.insert(EventEntry.TABLE_NAME,null,value);
+                        long id = db.insertWithOnConflict(EventEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
                         if(id!=-1){
                             returnCount++;
                         }
@@ -1491,7 +1489,7 @@ public class RecappProvider extends ContentProvider {
                 returnCount = 0;
                 try{
                     for(ContentValues value:values){
-                        long id = db.insert(EventByUserEntry.TABLE_NAME,null,value);
+                        long id = db.insertWithOnConflict(EventByUserEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
                         if(id!=-1){
                             returnCount++;
                         }

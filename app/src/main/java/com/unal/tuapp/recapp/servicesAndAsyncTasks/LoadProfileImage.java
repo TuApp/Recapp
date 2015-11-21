@@ -69,8 +69,8 @@ public class LoadProfileImage extends AsyncTask<String, Void, Bitmap> {
                 user.setName(cursor.getString(cursor.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_NAME)));
                 user.setProfileImage(Utility.encodeImage(stream.toByteArray()));
                 //Log.e("algo1", ""+user.getId());
-                Pair<Pair<Context,String>,Pair<User,String>> pair = new Pair<>(new Pair<>(view.getContext(),email),new Pair<>(user,"updateUser"));
-                new UserEndPoint().execute(pair);
+                //Pair<Pair<Context,String>,Pair<User,String>> pair = new Pair<>(new Pair<>(view.getContext(),email),new Pair<>(user,"updateUser"));
+                //new UserEndPoint().execute(pair);
             }
             view.getContext().getContentResolver().update(
                     RecappContract.UserEntry.CONTENT_URI,

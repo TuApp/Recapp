@@ -27,26 +27,28 @@ public class TutorialEndPoint extends AsyncTask<Pair<Context,Pair<Tutorial,Strin
                     CollectionResponseTutorial collectionResponseTutorial = Utility.getTutorialApi().list().execute();
                     List<Tutorial> tutorialList ;
                     String nextPage = "";
-                    while (!collectionResponseTutorial.getNextPageToken().equals(nextPage)){
-                        tutorialList = collectionResponseTutorial.getItems();
-                        List<ContentValues> valuesList = new ArrayList<>();
-                        if(tutorialList!=null) {
-                            for (Tutorial i : tutorialList) {
-                                ContentValues value = new ContentValues();
-                                value.put(RecappContract.TutorialEntry._ID, i.getId());
-                                value.put(RecappContract.TutorialEntry.COLUMN_NAME, i.getName());
-                                value.put(RecappContract.TutorialEntry.COLUMN_DESCRIPTION, i.getDescription());
-                                value.put(RecappContract.TutorialEntry.COLUMN_LINK_VIDEO, i.getLink());
-                                valuesList.add(value);
+                    if(collectionResponseTutorial.getNextPageToken()!=null) {
+                        while (!collectionResponseTutorial.getNextPageToken().equals(nextPage)) {
+                            tutorialList = collectionResponseTutorial.getItems();
+                            List<ContentValues> valuesList = new ArrayList<>();
+                            if (tutorialList != null) {
+                                for (Tutorial i : tutorialList) {
+                                    ContentValues value = new ContentValues();
+                                    value.put(RecappContract.TutorialEntry._ID, i.getId());
+                                    value.put(RecappContract.TutorialEntry.COLUMN_NAME, i.getName());
+                                    value.put(RecappContract.TutorialEntry.COLUMN_DESCRIPTION, i.getDescription());
+                                    value.put(RecappContract.TutorialEntry.COLUMN_LINK_VIDEO, i.getLink());
+                                    valuesList.add(value);
+                                }
+                                nextPage = collectionResponseTutorial.getNextPageToken();
+                                ContentValues values[] = new ContentValues[valuesList.size()];
+                                valuesList.toArray(values);
+                                pairs[0].first.getContentResolver().bulkInsert(
+                                        RecappContract.TutorialEntry.CONTENT_URI,
+                                        values
+                                );
+                                collectionResponseTutorial = Utility.getTutorialApi().list().setCursor(nextPage).execute();
                             }
-                            nextPage = collectionResponseTutorial.getNextPageToken();
-                            ContentValues values[] = new ContentValues[valuesList.size()];
-                            valuesList.toArray(values);
-                            pairs[0].first.getContentResolver().bulkInsert(
-                                    RecappContract.TutorialEntry.CONTENT_URI,
-                                    values
-                            );
-                            collectionResponseTutorial = Utility.getTutorialApi().list().setCursor(nextPage).execute();
                         }
                     }
 

@@ -29,25 +29,27 @@ public class SubCategoryEndPoint extends AsyncTask<Pair<Context,Pair<SubCategory
                     List<SubCategory> subCategoryList ;
 
                     String nextPage = "";
-                    while (!collectionResponseSubCategory.getNextPageToken().equals(nextPage)){
-                        subCategoryList = collectionResponseSubCategory.getItems();
-                        List<ContentValues> valuesList = new ArrayList<>();
-                        if(subCategoryList!=null) {
-                            for (SubCategory i : subCategoryList) {
-                                ContentValues value = new ContentValues();
-                                value.put(RecappContract.SubCategoryEntry._ID, i.getId());
-                                value.put(RecappContract.SubCategoryEntry.COLUMN_NAME, i.getName());
-                                value.put(RecappContract.SubCategoryEntry.COLUMN_CATEGORY_KEY, i.getCategoryId());
-                                valuesList.add(value);
+                    if(collectionResponseSubCategory.getNextPageToken()!=null) {
+                        while (!collectionResponseSubCategory.getNextPageToken().equals(nextPage)) {
+                            subCategoryList = collectionResponseSubCategory.getItems();
+                            List<ContentValues> valuesList = new ArrayList<>();
+                            if (subCategoryList != null) {
+                                for (SubCategory i : subCategoryList) {
+                                    ContentValues value = new ContentValues();
+                                    value.put(RecappContract.SubCategoryEntry._ID, i.getId());
+                                    value.put(RecappContract.SubCategoryEntry.COLUMN_NAME, i.getName());
+                                    value.put(RecappContract.SubCategoryEntry.COLUMN_CATEGORY_KEY, i.getCategoryId());
+                                    valuesList.add(value);
+                                }
+                                nextPage = collectionResponseSubCategory.getNextPageToken();
+                                ContentValues values[] = new ContentValues[valuesList.size()];
+                                valuesList.toArray(values);
+                                pairs[0].first.getContentResolver().bulkInsert(
+                                        RecappContract.SubCategoryEntry.CONTENT_URI,
+                                        values
+                                );
+                                collectionResponseSubCategory = Utility.getSubCategoryApi().list().setCursor(nextPage).execute();
                             }
-                            nextPage = collectionResponseSubCategory.getNextPageToken();
-                            ContentValues values[] = new ContentValues[valuesList.size()];
-                            valuesList.toArray(values);
-                            pairs[0].first.getContentResolver().bulkInsert(
-                                    RecappContract.SubCategoryEntry.CONTENT_URI,
-                                    values
-                            );
-                            collectionResponseSubCategory = Utility.getSubCategoryApi().list().setCursor(nextPage).execute();
                         }
                     }
 

@@ -76,38 +76,38 @@
                         android:layout_marginLeft="8dp"/>
 
                     <!--flat button ?-->
-                    <ImageButton
-                        android:id="@+id/card_share"
-                        android:layout_below="@+id/card_address"
-                        android:layout_alignParentRight="true"
-                        android:layout_width="75dp"
-                        android:layout_height="75dp"
-                        android:text="SHARE"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:src="@drawable/google_plus"
-                        android:scaleType="centerCrop"
-                        style="?android:attr/borderlessButtonStyle"/>
 
-                    <ImageButton
-                        android:id="@+id/card_share_facebook"
-                        android:layout_below="@+id/card_address"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
                         android:layout_alignParentRight="true"
-                        android:layout_toLeftOf="@+id/card_share"
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
-                        android:text="SHARE FACEBOOK"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="70dp"
-                        android:src="@drawable/facebook"
-                        android:scaleType="centerCrop"
-                        style="?android:attr/borderlessButtonStyle"/>
+                        android:layout_below="@+id/card_address">
+                        <ImageButton
+                            android:id="@+id/card_share"
+                            android:layout_width="55dp"
+                            android:layout_height="55dp"
+                            android:text="SHARE"
+                            android:src="@drawable/google_plus"
+                            android:scaleType="centerCrop"
+                            style="?android:attr/borderlessButtonStyle"/>
+
+                        <ImageButton
+                            android:id="@+id/card_share_facebook"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:text="SHARE FACEBOOK"
+                            android:src="@drawable/facebook"
+                            android:scaleType="centerCrop"
+                            style="?android:attr/borderlessButtonStyle"/>
+
+                    </LinearLayout>
+
 
                     <ImageButton
                         android:id="@+id/card_favorite"
                         android:layout_below="@+id/card_address"
                         android:layout_alignParentLeft="true"
-                        android:layout_toRightOf="@+id/card_share"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_favorites"

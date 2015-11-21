@@ -68,25 +68,27 @@ public class UserByPlaceEndPoint extends AsyncTask<Pair<Context,Pair<UserByPlace
                     CollectionResponseUserByPlace collectionResponseUserByPlace = Utility.getUserByPlaceApi().list().execute();
                     List<UserByPlace> userByPlaceListAll;
                     String nextPage = "";
-                    while (!collectionResponseUserByPlace.getNextPageToken().equals(nextPage)){
-                        userByPlaceListAll = collectionResponseUserByPlace.getItems();
-                        if(userByPlaceListAll!=null){
-                            List<ContentValues> valuesList = new ArrayList<>();
-                            for (UserByPlace i:userByPlaceListAll){
-                                ContentValues value = new ContentValues();
-                                value.put(RecappContract.UserByPlaceEntry._ID,i.getId());
-                                value.put(RecappContract.UserByPlaceEntry.COLUMN_USER_KEY,i.getUserId());
-                                value.put(RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY,i.getId());
-                                valuesList.add(value);
+                    if(collectionResponseUserByPlace.getNextPageToken()!=null) {
+                        while (!collectionResponseUserByPlace.getNextPageToken().equals(nextPage)) {
+                            userByPlaceListAll = collectionResponseUserByPlace.getItems();
+                            if (userByPlaceListAll != null) {
+                                List<ContentValues> valuesList = new ArrayList<>();
+                                for (UserByPlace i : userByPlaceListAll) {
+                                    ContentValues value = new ContentValues();
+                                    value.put(RecappContract.UserByPlaceEntry._ID, i.getId());
+                                    value.put(RecappContract.UserByPlaceEntry.COLUMN_USER_KEY, i.getUserId());
+                                    value.put(RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY, i.getId());
+                                    valuesList.add(value);
+                                }
+                                ContentValues values[] = new ContentValues[valuesList.size()];
+                                valuesList.toArray(values);
+                                pairs[0].first.getContentResolver().bulkInsert(
+                                        RecappContract.UserByPlaceEntry.CONTENT_URI,
+                                        values
+                                );
+                                nextPage = collectionResponseUserByPlace.getNextPageToken();
+                                collectionResponseUserByPlace = Utility.getUserByPlaceApi().list().setCursor(nextPage).execute();
                             }
-                            ContentValues values[] = new ContentValues[valuesList.size()];
-                            valuesList.toArray(values);
-                            pairs[0].first.getContentResolver().bulkInsert(
-                                    RecappContract.UserByPlaceEntry.CONTENT_URI,
-                                    values
-                            );
-                            nextPage = collectionResponseUserByPlace.getNextPageToken();
-                            collectionResponseUserByPlace = Utility.getUserByPlaceApi().list().setCursor(nextPage).execute();
                         }
                     }
                     break;

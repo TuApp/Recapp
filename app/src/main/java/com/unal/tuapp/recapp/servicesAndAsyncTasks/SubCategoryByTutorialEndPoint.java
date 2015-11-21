@@ -28,26 +28,28 @@ public class SubCategoryByTutorialEndPoint extends AsyncTask<Pair<Context,Pair<S
                     List<SubCategoryByTutorial> subCategoryByTutorialList ;
 
                     String nextPage = "";
-                    while (collectionResponseSubCategoryByTutorial.getNextPageToken().equals(nextPage)) {
-                        subCategoryByTutorialList = collectionResponseSubCategoryByTutorial.getItems();
-                        List<ContentValues> valuesList = new ArrayList<>();
-                        if(subCategoryByTutorialList!=null) {
-                            for (SubCategoryByTutorial i : subCategoryByTutorialList) {
-                                ContentValues value = new ContentValues();
-                                value.put(RecappContract.SubCategoryByTutorialEntry._ID, i.getId());
-                                value.put(RecappContract.SubCategoryByTutorialEntry.COLUMN_SUBCATEGORY_KEY, i.getSubCategoryId());
-                                value.put(RecappContract.SubCategoryByTutorialEntry.COLUMN_TUTORIAL_KEY, i.getTutorialId());
-                                valuesList.add(value);
+                    if(collectionResponseSubCategoryByTutorial.getNextPageToken()!=null) {
+                        while (collectionResponseSubCategoryByTutorial.getNextPageToken().equals(nextPage)) {
+                            subCategoryByTutorialList = collectionResponseSubCategoryByTutorial.getItems();
+                            List<ContentValues> valuesList = new ArrayList<>();
+                            if (subCategoryByTutorialList != null) {
+                                for (SubCategoryByTutorial i : subCategoryByTutorialList) {
+                                    ContentValues value = new ContentValues();
+                                    value.put(RecappContract.SubCategoryByTutorialEntry._ID, i.getId());
+                                    value.put(RecappContract.SubCategoryByTutorialEntry.COLUMN_SUBCATEGORY_KEY, i.getSubCategoryId());
+                                    value.put(RecappContract.SubCategoryByTutorialEntry.COLUMN_TUTORIAL_KEY, i.getTutorialId());
+                                    valuesList.add(value);
+                                }
+                                ContentValues values[] = new ContentValues[subCategoryByTutorialList.size()];
+                                subCategoryByTutorialList.toArray(values);
+                                pairs[0].first.getContentResolver().bulkInsert(
+                                        RecappContract.SubCategoryByTutorialEntry.CONTENT_URI,
+                                        values
+                                );
+                                nextPage = collectionResponseSubCategoryByTutorial.getNextPageToken();
+                                collectionResponseSubCategoryByTutorial = Utility.getSubCategoryByTutorialApi().list()
+                                        .setCursor(nextPage).execute();
                             }
-                            ContentValues values[] = new ContentValues[subCategoryByTutorialList.size()];
-                            subCategoryByTutorialList.toArray(values);
-                            pairs[0].first.getContentResolver().bulkInsert(
-                                    RecappContract.SubCategoryByTutorialEntry.CONTENT_URI,
-                                    values
-                            );
-                            nextPage = collectionResponseSubCategoryByTutorial.getNextPageToken();
-                            collectionResponseSubCategoryByTutorial = Utility.getSubCategoryByTutorialApi().list()
-                                    .setCursor(nextPage).execute();
                         }
                     }
 

@@ -147,8 +147,6 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
         <service android:name=".servicesAndAsyncTasks.GeofenceTransitionsIntentService"
             android:exported="false"/>
-        <service android:name=".servicesAndAsyncTasks.DummyData"
-            android:exported="false"/>
     </application>
 
 </manifest>

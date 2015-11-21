@@ -28,28 +28,30 @@ public class SubCategoryByPlaceEndPoint extends AsyncTask<Pair<Context,Pair<SubC
                    List<SubCategoryByPlace> subCategoryByPlaceList;
 
                    String nextPage = "";
-                   while (!collectionResponseSubCategoryByPlace.getNextPageToken().equals(nextPage)){
-                       subCategoryByPlaceList = collectionResponseSubCategoryByPlace.getItems();
-                       List<ContentValues> valuesList = new ArrayList<>();
-                       if(subCategoryByPlaceList!=null) {
-                           for (SubCategoryByPlace i : subCategoryByPlaceList) {
-                               ContentValues value = new ContentValues();
-                               value.put(RecappContract.SubCategoryByPlaceEntry._ID, i.getId());
-                               value.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_PLACE_KEY, i.getPlaceId());
-                               value.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY, i.getSubCategoryId());
-                               valuesList.add(value);
+                   if(collectionResponseSubCategoryByPlace.getNextPageToken()!=null) {
+                       while (!collectionResponseSubCategoryByPlace.getNextPageToken().equals(nextPage)) {
+                           subCategoryByPlaceList = collectionResponseSubCategoryByPlace.getItems();
+                           List<ContentValues> valuesList = new ArrayList<>();
+                           if (subCategoryByPlaceList != null) {
+                               for (SubCategoryByPlace i : subCategoryByPlaceList) {
+                                   ContentValues value = new ContentValues();
+                                   value.put(RecappContract.SubCategoryByPlaceEntry._ID, i.getId());
+                                   value.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_PLACE_KEY, i.getPlaceId());
+                                   value.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY, i.getSubCategoryId());
+                                   valuesList.add(value);
+                               }
+                               ContentValues values[] = new ContentValues[valuesList.size()];
+                               valuesList.toArray(values);
+                               pairs[0].first.getContentResolver().bulkInsert(
+                                       RecappContract.SubCategoryByPlaceEntry.CONTENT_URI,
+                                       values
+                               );
+                               nextPage = collectionResponseSubCategoryByPlace.getNextPageToken();
+                               collectionResponseSubCategoryByPlace = Utility.getSubCategoryByPlaceApi().list().setCursor(nextPage)
+                                       .execute();
                            }
-                           ContentValues values[] = new ContentValues[valuesList.size()];
-                           valuesList.toArray(values);
-                           pairs[0].first.getContentResolver().bulkInsert(
-                                   RecappContract.SubCategoryByPlaceEntry.CONTENT_URI,
-                                   values
-                           );
-                           nextPage = collectionResponseSubCategoryByPlace.getNextPageToken();
-                           collectionResponseSubCategoryByPlace = Utility.getSubCategoryByPlaceApi().list().setCursor(nextPage)
-                                   .execute();
-                       }
 
+                       }
                    }
 
                    break;

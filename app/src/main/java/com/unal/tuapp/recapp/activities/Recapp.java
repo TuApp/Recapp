@@ -1,6 +1,7 @@
 package com.unal.tuapp.recapp.activities;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -86,6 +87,9 @@ public class Recapp extends AppCompatActivity {
         SharedPreferences pref = this.getPreferences(0);
         boolean data = pref.getBoolean("data",false);
         if(!data) {
+            /*ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Loading the information");
+            progressDialog.show();*/
             //We should call the async task
             new GcmRegistrationEndPoint(this).execute();
 
@@ -145,6 +149,8 @@ public class Recapp extends AppCompatActivity {
             Pair<Context,Pair<EventByUser,String>> pairEventByUser = new Pair<>(getApplicationContext(),new Pair<>(eventByUser,
                     "getEventByUser"));
             new EventByUserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairEventByUser);
+
+            //progressDialog.dismiss();
 
 
         }

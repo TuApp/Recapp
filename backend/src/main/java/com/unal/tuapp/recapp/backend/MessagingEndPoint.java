@@ -49,7 +49,7 @@ public class MessagingEndPoint {
         Message msg = new Message.Builder().addData("message", message).build();
         List<Registration> records = ofy().load().type(Registration.class).list();
         for (Registration record : records) {
-            Result result = sender.send(msg, record.getRegId(), 5);
+            Result result = sender.send(msg, record.getRegId(), 15);
             if (result.getMessageId() != null) {
                 log.info("Message sent to " + record.getRegId());
                 String canonicalRegId = result.getCanonicalRegistrationId();

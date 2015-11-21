@@ -73,29 +73,31 @@ public class ReminderEndPoint extends AsyncTask<Pair<Context,Pair<Reminder,Strin
                     CollectionResponseReminder collectionResponseReminderAll = Utility.getReminderApi().list().execute();
                     List<Reminder> reminderListAll ;
                     String nextPage = "";
-                    while (!collectionResponseReminderAll.getNextPageToken().equals(nextPage)){
-                        reminderListAll = collectionResponseReminderAll.getItems();
-                        if(reminderListAll!=null){
-                            List<ContentValues> valuesList = new ArrayList<>();
-                            for(Reminder i: reminderListAll){
-                                ContentValues value = new ContentValues();
-                                value.put(RecappContract.ReminderEntry._ID,i.getId());
-                                value.put(RecappContract.ReminderEntry.COLUMN_NOTIFICATION,i.getNotification());
-                                value.put(RecappContract.ReminderEntry.COLUMN_NAME,i.getName());
-                                value.put(RecappContract.ReminderEntry.COLUMN_END_DATE,i.getEndDate());
-                                value.put(RecappContract.ReminderEntry.COLUMN_DESCRIPTION,i.getDescription());
-                                value.put(RecappContract.ReminderEntry.COLUMN_PLACE_KEY,i.getPlaceId());
-                                value.put(RecappContract.ReminderEntry.COLUMN_USER_KEY,i.getUserId());
-                                valuesList.add(value);
+                    if(collectionResponseReminderAll.getNextPageToken()!=null) {
+                        while (!collectionResponseReminderAll.getNextPageToken().equals(nextPage)) {
+                            reminderListAll = collectionResponseReminderAll.getItems();
+                            if (reminderListAll != null) {
+                                List<ContentValues> valuesList = new ArrayList<>();
+                                for (Reminder i : reminderListAll) {
+                                    ContentValues value = new ContentValues();
+                                    value.put(RecappContract.ReminderEntry._ID, i.getId());
+                                    value.put(RecappContract.ReminderEntry.COLUMN_NOTIFICATION, i.getNotification());
+                                    value.put(RecappContract.ReminderEntry.COLUMN_NAME, i.getName());
+                                    value.put(RecappContract.ReminderEntry.COLUMN_END_DATE, i.getEndDate());
+                                    value.put(RecappContract.ReminderEntry.COLUMN_DESCRIPTION, i.getDescription());
+                                    value.put(RecappContract.ReminderEntry.COLUMN_PLACE_KEY, i.getPlaceId());
+                                    value.put(RecappContract.ReminderEntry.COLUMN_USER_KEY, i.getUserId());
+                                    valuesList.add(value);
+                                }
+                                ContentValues[] values = new ContentValues[valuesList.size()];
+                                valuesList.toArray(values);
+                                pairs[0].first.getContentResolver().bulkInsert(
+                                        RecappContract.ReminderEntry.CONTENT_URI,
+                                        values
+                                );
+                                nextPage = collectionResponseReminderAll.getNextPageToken();
+                                collectionResponseReminderAll = Utility.getReminderApi().list().setCursor(nextPage).execute();
                             }
-                            ContentValues [] values = new ContentValues[valuesList.size()];
-                            valuesList.toArray(values);
-                            pairs[0].first.getContentResolver().bulkInsert(
-                                    RecappContract.ReminderEntry.CONTENT_URI,
-                                    values
-                            );
-                            nextPage = collectionResponseReminderAll.getNextPageToken();
-                            collectionResponseReminderAll = Utility.getReminderApi().list().setCursor(nextPage).execute();
                         }
                     }
 

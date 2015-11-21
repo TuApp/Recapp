@@ -31,29 +31,32 @@ public class PlaceImageEndPoint extends AsyncTask<Pair<Pair<Context,Long>,Pair<P
                     CollectionResponsePlaceImage collectionResponsePlaceImage = Utility.getPlaceImageApi().list().execute();
                     List<PlaceImage> placeImageList ;
                     String nextPage = "";
-                    while (!collectionResponsePlaceImage.getNextPageToken().equals(nextPage)){
-                        placeImageList = collectionResponsePlaceImage.getItems();
-                        if(placeImageList!=null){
-                            List<ContentValues> valuesList = new ArrayList<>();
-                            for(PlaceImage i:placeImageList){
-                                ContentValues value = new ContentValues();
-                                value.put(RecappContract.PlaceImageEntry._ID,i.getId());
-                                value.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,i.getWorth());
-                                value.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,i.getPlaceId());
-                                value.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE,Utility.decodeImage(i.getImage()));
-                                valuesList.add(value);
+                    if(collectionResponsePlaceImage.getNextPageToken()!=null) {
+                        while (!collectionResponsePlaceImage.getNextPageToken().equals(nextPage)) {
+                            placeImageList = collectionResponsePlaceImage.getItems();
+                            if (placeImageList != null) {
+                                List<ContentValues> valuesList = new ArrayList<>();
+                                for (PlaceImage i : placeImageList) {
+                                    ContentValues value = new ContentValues();
+                                    value.put(RecappContract.PlaceImageEntry._ID, i.getId());
+                                    value.put(RecappContract.PlaceImageEntry.COLUMN_WORTH, i.getWorth());
+                                    value.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, i.getPlaceId());
+                                    value.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, Utility.decodeImage(i.getImage()));
+                                    valuesList.add(value);
+                                }
+                                ContentValues values[] = new ContentValues[valuesList.size()];
+                                valuesList.toArray(values);
+                                pairs[0].first.first.getContentResolver().bulkInsert(
+                                        RecappContract.PlaceImageEntry.CONTENT_URI,
+                                        values
+                                );
+                                nextPage = collectionResponsePlaceImage.getNextPageToken();
+                                collectionResponsePlaceImage = Utility.getPlaceImageApi().list().setCursor(nextPage).execute();
                             }
-                            ContentValues values [] = new ContentValues[valuesList.size()];
-                            valuesList.toArray(values);
-                            pairs[0].first.first.getContentResolver().bulkInsert(
-                                    RecappContract.PlaceImageEntry.CONTENT_URI,
-                                    values
-                            );
-                            nextPage = collectionResponsePlaceImage.getNextPageToken();
-                            collectionResponsePlaceImage = Utility.getPlaceImageApi().list().setCursor(nextPage).execute();
                         }
                     }
                     break;
+
                 case "getImagesPlace":
                     Long id = pairs[0].first.second;
                     PlaceImageCollection images = Utility.getPlaceImageApi().listPlaces(id).execute();
@@ -91,10 +94,11 @@ public class PlaceImageEndPoint extends AsyncTask<Pair<Pair<Context,Long>,Pair<P
                     }
                     break;
                 case "addImage":
+                    Log.e("algo","alog");
                     Utility.getPlaceImageApi().insert(pairs[0].second.first).execute();
                     break;
                 case "deleteImage":
-                    Utility.getPlaceImageApi().remove(pairs[0].second.first.getId());
+                    Utility.getPlaceImageApi().remove(pairs[0].second.first.getId()).execute();
                     break;
 
 

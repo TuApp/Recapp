@@ -6,8 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.design.widget.FloatingActionButton;
@@ -24,6 +26,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -63,12 +66,18 @@ import com.unal.tuapp.recapp.fragments.PlacesFragment;
 import com.unal.tuapp.recapp.fragments.TutorialFragment;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserEndPoint;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -807,12 +816,14 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 if(filtersConstraint.isEmpty()) {
                     tutorials = Tutorial.allTutorials(data);
                     tutorialsFragment.setDataTutorials(tutorials, data);
+                    addPreviewsToTutorial(tutorials);
                 }
                 break;
             case TUTORIAL_FILTER:
                 if(!filtersConstraint.isEmpty()){
                     tutorials = Tutorial.allTutorials(data);
                     tutorialsFragment.setDataTutorials(tutorials, data);
+                    addPreviewsToTutorial(tutorials);
                 }
 
                 break;
@@ -941,4 +952,117 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             getSupportLoaderManager().restartLoader(TUTORIAL_FILTER, null, this);
         }
     }
+    private void addPreviewsToTutorial(List<Tutorial> tutorials){
+        for (int i = 0; i < tutorials.size(); i++){
+            Tutorial tutorial = tutorials.get(i);
+            getPreviewFromYouTube(tutorial);
+
+        }
+    }
+
+    private Bitmap getPreviewFromYouTube(Tutorial tutorial){
+        Bitmap bitmap = null;
+
+        Uri.Builder uri = new Uri.Builder();
+        uri.scheme("https");
+        uri.authority("www.youtube.com/oembed");
+        uri.appendQueryParameter("url", tutorial.getLink());
+        uri.appendQueryParameter("format", "json");
+
+        try {
+            URL url = new URL(URLDecoder.decode(uri.build().toString(), "UTF-8"));
+            new URLPreviewYouTube().execute(new Object[]{tutorial, url.toString()});
+        }catch (Exception e){
+            Log.e(TAG, e.getMessage());
+        }
+        return bitmap;
+    }
+
+    private class URLPreviewYouTube extends AsyncTask<Object, Void, Object[]> {
+
+        @Override
+        protected Object[] doInBackground(Object... objects) {
+            Tutorial tutorial = (Tutorial) objects[0];
+            String data = (String) objects[1];
+            StringBuilder description = null;
+            InputStream inputStream = null;
+            HttpURLConnection urlConnection = null;
+            String thumbnailURL = null;
+            try {
+                URL url = new URL(data);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.connect();
+                inputStream = urlConnection.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+                description = new StringBuilder();
+                String line="";
+                while ((line=br.readLine())!=null)
+                    description.append(line);
+                Log.d("Getting description", description.toString());
+                JSONObject object = new JSONObject(description.toString());
+                thumbnailURL = object.getString("thumbnail_url");
+
+
+            }catch (Exception e){
+                Log.d("Excepcion ", e.getMessage());
+            }finally {
+                urlConnection.disconnect();
+            }
+            return new Object[]{tutorial, thumbnailURL};
+        }
+
+        @Override
+        protected void onPostExecute(Object[] objects) {
+            super.onPostExecute(objects);
+            Tutorial tutorial = (Tutorial) objects[0];
+            String thumbnailURL = (String) objects[1];
+            tutorial.setPreviewURL(thumbnailURL);
+            new PreviewYouTube().execute(tutorial);
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+    }
+
+    private class PreviewYouTube extends AsyncTask<Tutorial, Void, Object[]> {
+
+        @Override
+        protected Object[] doInBackground(Tutorial... tutorials) {
+            Tutorial tutorial = tutorials[0];
+            String data = tutorial.getPreviewURL();
+            InputStream inputStream = null;
+            HttpURLConnection urlConnection = null;
+            Bitmap image = null;
+            try {
+                URL url = new URL(data);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.connect();
+                inputStream = urlConnection.getInputStream();
+                image = BitmapFactory.decodeStream(inputStream);
+            }catch (Exception e){
+                Log.d("Excepcion ", e.getMessage());
+            }finally {
+                urlConnection.disconnect();
+            }
+            return new Object[]{tutorial, image};
+        }
+
+        @Override
+        protected void onPostExecute(Object[] objects) {
+            super.onPostExecute(objects);
+            Tutorial tutorial = (Tutorial) objects[0];
+            Bitmap bitmap = (Bitmap) objects[1];
+            tutorial.setPreview(bitmap);
+            tutorialsFragment.notifyDataSetChanged();
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+    }
+
+
 }

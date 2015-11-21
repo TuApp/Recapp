@@ -38,46 +38,48 @@ public class CommentEndPoint extends AsyncTask<Pair<Pair<Context,Pair<Long,Long>
                     String nextPage = "";
                     List<String> idsAll = new ArrayList<>();
                     String queryAll = RecappContract.CommentEntry._ID + " NOT IN ( ";
-                    while (!collectionResponseComment.getNextPageToken().equals(nextPage)){
-                        commentListAll = collectionResponseComment.getItems();
-                        if(commentListAll!=null){
-                            List<ContentValues> valuesList = new ArrayList<>();
-                            for (Comment i: commentListAll){
-                                queryAll+="?,";
-                                idsAll.add(i.getId()+"");
-                                ContentValues value = new ContentValues();
-                                value.put(RecappContract.CommentEntry.COLUMN_DESCRIPTION, i.getDescription());
-                                value.put(RecappContract.CommentEntry.COLUMN_DATE, i.getDate());
-                                value.put(RecappContract.CommentEntry.COLUMN_RATING, i.getRating());
-                                value.put(RecappContract.CommentEntry._ID, i.getId());
-                                value.put(RecappContract.CommentEntry.COLUMN_PLACE_KEY, i.getPlaceId());
-                                value.put(RecappContract.CommentEntry.COLUMN_USER_KEY, i.getUserId());
-                                valuesList.add(value);
-                            }
-                            ContentValues values[] = new ContentValues[valuesList.size()];
-                            valuesList.toArray(values);
-                            pairs[0].first.first.getContentResolver().bulkInsert(
-                                    RecappContract.CommentEntry.CONTENT_URI,
-                                    values
-                            );
-                            nextPage = collectionResponseComment.getNextPageToken();
-                            collectionResponseComment = Utility.getCommentApi().list().setCursor(nextPage).execute();
+                    if(collectionResponseComment.getNextPageToken()!=null) {
+                        while (!collectionResponseComment.getNextPageToken().equals(nextPage)) {
+                            commentListAll = collectionResponseComment.getItems();
+                            if (commentListAll != null) {
+                                List<ContentValues> valuesList = new ArrayList<>();
+                                for (Comment i : commentListAll) {
+                                    queryAll += "?,";
+                                    idsAll.add(i.getId() + "");
+                                    ContentValues value = new ContentValues();
+                                    value.put(RecappContract.CommentEntry.COLUMN_DESCRIPTION, i.getDescription());
+                                    value.put(RecappContract.CommentEntry.COLUMN_DATE, i.getDate());
+                                    value.put(RecappContract.CommentEntry.COLUMN_RATING, i.getRating());
+                                    value.put(RecappContract.CommentEntry._ID, i.getId());
+                                    value.put(RecappContract.CommentEntry.COLUMN_PLACE_KEY, i.getPlaceId());
+                                    value.put(RecappContract.CommentEntry.COLUMN_USER_KEY, i.getUserId());
+                                    valuesList.add(value);
+                                }
+                                ContentValues values[] = new ContentValues[valuesList.size()];
+                                valuesList.toArray(values);
+                                pairs[0].first.first.getContentResolver().bulkInsert(
+                                        RecappContract.CommentEntry.CONTENT_URI,
+                                        values
+                                );
+                                nextPage = collectionResponseComment.getNextPageToken();
+                                collectionResponseComment = Utility.getCommentApi().list().setCursor(nextPage).execute();
 
+                            }
                         }
+                        String idsListAll[] = new String[idsAll.size()];
+                        queryAll = queryAll.substring(0, queryAll.length() - 1);
+                        queryAll += ")";
+                        idsAll.toArray(idsListAll);
+                        if (idsAll.isEmpty()) {
+                            queryAll = null;
+                            idsListAll = null;
+                        }
+                        pairs[0].first.first.getContentResolver().delete(
+                                RecappContract.CommentEntry.CONTENT_URI,
+                                queryAll,
+                                idsListAll
+                        );
                     }
-                    String idsListAll[] = new String[idsAll.size()];
-                    queryAll=queryAll.substring(0,queryAll.length()-1);
-                    queryAll+=")";
-                    idsAll.toArray(idsListAll);
-                    if(idsAll.isEmpty()){
-                        queryAll = null;
-                        idsListAll = null;
-                    }
-                    pairs[0].first.first.getContentResolver().delete(
-                            RecappContract.CommentEntry.CONTENT_URI,
-                            queryAll,
-                            idsListAll
-                    );
                     break;
                 case "commentUser":
                     CommentCollection commentCollection = Utility.getCommentApi().listUser(pairs[0].first.second.first).execute();

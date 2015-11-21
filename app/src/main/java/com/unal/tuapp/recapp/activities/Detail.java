@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -19,10 +21,12 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -55,6 +59,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
     private FloatingActionButton reminder;
     private DetailFragment detailFragment;
     private InterstitialAd mInterstitialAd;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
 
 
     @Override
@@ -113,7 +118,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar);
+        collapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar);
         //collapsingToolbarLayout.setTitle(getString(R.string.title_activity_detail));
         collapsingToolbarLayout.setExpandedTitleColor(
                 getResources().getColor(android.R.color.transparent)
@@ -312,10 +317,23 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         detail = (ImageView) findViewById(R.id.detail_image);
-        data.moveToFirst();
-        detail.setImageBitmap(BitmapFactory.decodeByteArray(
-                data.getBlob(0),0,data.getBlob(0).length
-        ));
+        if(data.moveToFirst()){
+            Bitmap image  = BitmapFactory.decodeByteArray(
+                    data.getBlob(0), 0, data.getBlob(0).length);
+            //Bitmap scaledImage = Bitmap.createScaledBitmap(image,100,100,true);
+            Palette.from(image).generate(new Palette.PaletteAsyncListener() {
+                @Override
+                public void onGenerated(Palette palette) {
+                    int muttedDark = palette.getDarkMutedColor(getResources().getColor(R.color.my_primary_dark));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                        getWindow().setStatusBarColor(muttedDark);
+                    }
+                    collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(getResources().getColor(R.color.my_primary)));
+                }
+            });
+            detail.setImageBitmap(image);
+        }
 
     }
 

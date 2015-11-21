@@ -85,8 +85,8 @@ public class FilterCategoriesDialogFragment extends DialogFragment implements Lo
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         List<Category> categories = Category.allCategories(data);
-        adapter = new RecycleCategoriesAdapter(categories);
-        recyclerView.setAdapter(adapter);
+        Log.e("algo",""+categories.size());
+        adapter.swapData(categories);
         adapter.notifyDataSetChanged();
     }
 

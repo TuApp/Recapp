@@ -1,6 +1,7 @@
 package com.unal.tuapp.recapp.data;
 
 import android.database.Cursor;
+import android.graphics.Bitmap;
 
 import java.util.ArrayList;
 
@@ -11,6 +12,8 @@ public class Tutorial {
     private String tittle;
     private String description;
     private String link;
+    private String previewURL;
+    private Bitmap preview;
 
     public Tutorial(String tittle, String description, String link) {
         this.tittle = tittle;
@@ -40,6 +43,22 @@ public class Tutorial {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public Bitmap getPreview() {
+        return preview;
+    }
+
+    public void setPreview(Bitmap preview) {
+        this.preview = preview;
+    }
+
+    public String getPreviewURL() {
+        return previewURL;
+    }
+
+    public void setPreviewURL(String previewURL) {
+        this.previewURL = previewURL;
     }
 
     public static ArrayList<Tutorial> allTutorials(Cursor cursor){

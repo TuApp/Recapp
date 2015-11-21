@@ -42,29 +42,31 @@ public class UserEndPoint extends AsyncTask<Pair<Pair<Context,String>, Pair<User
                     CollectionResponseUser collectionResponseUser = Utility.getUserApi().list().execute();
                     String nextPage = "";
                     List<User> users;
-                    while (!collectionResponseUser.getNextPageToken().equals(nextPage)) {
-                        users = collectionResponseUser.getItems();
-                        if(users!=null) {
-                            List<ContentValues> valuesList = new ArrayList<>();
-                            for (User i : users) {
-                                ContentValues value = new ContentValues();
-                                value.put(RecappContract.UserEntry._ID, i.getId());
-                                value.put(RecappContract.UserEntry.COLUMN_EMAIL, i.getEmail());
-                                value.put(RecappContract.UserEntry.COLUMN_USER_LASTNAME, i.getLastname());
-                                value.put(RecappContract.UserEntry.COLUMN_USER_NAME, i.getName());
-                                value.put(RecappContract.UserEntry.COLUMN_USER_IMAGE, Utility.decodeImage(i.getProfileImage()));
-                                valuesList.add(value);
+                    if(collectionResponseUser.getNextPageToken()!=null) {
+                        while (!collectionResponseUser.getNextPageToken().equals(nextPage)) {
+                            users = collectionResponseUser.getItems();
+                            if (users != null) {
+                                List<ContentValues> valuesList = new ArrayList<>();
+                                for (User i : users) {
+                                    ContentValues value = new ContentValues();
+                                    value.put(RecappContract.UserEntry._ID, i.getId());
+                                    value.put(RecappContract.UserEntry.COLUMN_EMAIL, i.getEmail());
+                                    value.put(RecappContract.UserEntry.COLUMN_USER_LASTNAME, i.getLastname());
+                                    value.put(RecappContract.UserEntry.COLUMN_USER_NAME, i.getName());
+                                    value.put(RecappContract.UserEntry.COLUMN_USER_IMAGE, Utility.decodeImage(i.getProfileImage()));
+                                    valuesList.add(value);
+                                }
+                                ContentValues values[] = new ContentValues[valuesList.size()];
+                                valuesList.toArray(values);
+                                pairs[0].first.first.getContentResolver().bulkInsert(
+                                        RecappContract.UserEntry.CONTENT_URI,
+                                        values
+                                );
+                                nextPage = collectionResponseUser.getNextPageToken();
+                                collectionResponseUser = Utility.getUserApi().list().setCursor(nextPage).execute();
                             }
-                            ContentValues values[] = new ContentValues[valuesList.size()];
-                            valuesList.toArray(values);
-                            pairs[0].first.first.getContentResolver().bulkInsert(
-                                    RecappContract.UserEntry.CONTENT_URI,
-                                    values
-                            );
-                            nextPage = collectionResponseUser.getNextPageToken();
-                            collectionResponseUser = Utility.getUserApi().list().setCursor(nextPage).execute();
-                        }
 
+                        }
                     }
                     break;
                 case "getUser":

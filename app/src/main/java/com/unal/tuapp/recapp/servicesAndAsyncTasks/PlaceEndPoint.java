@@ -82,14 +82,13 @@ public class PlaceEndPoint extends AsyncTask<Pair<Context,Pair<Place,String>>,Vo
                 case "updatePlaceRating":
                     Place place = Utility.getPlaceApi().get(pairs[0].second.first.getId()).execute();
                     place.setRating(pairs[0].second.first.getRating());
-                    Utility.getPlaceApi().update(place.getId(),place);
+                    Utility.getPlaceApi().update(place.getId(),place).execute();
                     break;
                 case "updatePlace":
                     Place placeUpdate = Utility.getPlaceApi().get(pairs[0].second.first.getId()).execute();
                     pairs[0].second.first.setEmail(placeUpdate.getEmail());
                     pairs[0].second.first.setPassword(placeUpdate.getPassword());
                     pairs[0].second.first.setRating(placeUpdate.getRating());
-                    Log.e("algo",""+placeUpdate.getId());
                     Utility.getPlaceApi().update(pairs[0].second.first.getId(),pairs[0].second.first).execute();
                     break;
             }

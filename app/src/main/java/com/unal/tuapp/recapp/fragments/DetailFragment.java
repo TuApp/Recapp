@@ -262,9 +262,21 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     Pair<Pair<Context,Pair<Long,Long>>,Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment,String>> pair =
                             new Pair<>(new Pair<>(getContext(),new Pair<>(user.getId(),id)),new Pair<>(commentApi,"addComment"));
                     new CommentEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
-
+                    Cursor cursorRating = getActivity().getContentResolver().query(
+                            RecappContract.CommentEntry.buildCommentPlaceUri(id),
+                            new String[]{"AVG(" + RecappContract.CommentEntry.TABLE_NAME + "."
+                                    + RecappContract.CommentEntry.COLUMN_RATING + ")"},
+                            RecappContract.PlaceEntry.TABLE_NAME + "." + RecappContract.PlaceEntry._ID,
+                            null,
+                            null
+                    );
+                    double newRating = 0;
+                    if(cursorRating.moveToFirst()) {
+                        newRating = cursorRating.getDouble(0);
+                    }
                     com.unal.tuapp.recapp.backend.model.placeApi.model.Place place = new com.unal.tuapp.recapp.backend.model.placeApi.model.Place();
                     place.setId(id);
+                    place.setRating((float)newRating);
                     Pair<Context,Pair<com.unal.tuapp.recapp.backend.model.placeApi.model.Place,String>> pairPlace = new Pair<>(getContext(),new Pair<>(place,"updatePlaceRating"));
                     new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairPlace);
 

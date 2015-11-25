@@ -13,6 +13,7 @@ public class User {
     private String name;
     private String lastname;
     private String profileImage; //This is base64
+    private Long points;
 
     public String getEmail() {
         return email;
@@ -52,5 +53,13 @@ public class User {
 
     public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
+    }
+
+    public Long getPoints() {
+        return points;
+    }
+
+    public void setPoints(Long points) {
+        this.points = points;
     }
 }

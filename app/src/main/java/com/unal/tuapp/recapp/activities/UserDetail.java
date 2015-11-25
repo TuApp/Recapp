@@ -1,26 +1,41 @@
 package com.unal.tuapp.recapp.activities;
 
 
+
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.MifareClassic;
+import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.unal.tuapp.recapp.fragments.MyPointsFragment;
 import com.unal.tuapp.recapp.others.GooglePlus;
+import com.unal.tuapp.recapp.others.OnSendDataToActivity;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.LoadProfileImage;
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.others.Utility;
@@ -30,93 +45,105 @@ import com.unal.tuapp.recapp.fragments.MyEventsFragment;
 import com.unal.tuapp.recapp.fragments.PlacesFavoriteFragment;
 import com.unal.tuapp.recapp.fragments.RemindersFragment;
 
-public class UserDetail extends AppCompatActivity implements CommentsFragment.OnCommentListener {
-    private Toolbar toolbar;
-    private NavigationView navigationView;
-    private DrawerLayout drawerLayout;
-    private GooglePlus googlePlus;
-    private View root;
-    private User user;
-    private Fragment fragmentPlace;
-    private Fragment fragmentComment;
-    private Fragment fragmentReminder;
-    private Fragment fragmentEvents;
-    private String newType;
-    private AdView mAdView;
+
+public class UserDetail extends AppCompatActivity implements CommentsFragment.OnCommentListener,OnSendDataToActivity {
+    private  Toolbar toolbar;
+    private  NavigationView navigationView;
+    private  DrawerLayout drawerLayout;
+    private  GooglePlus googlePlus;
+    private  static View root;
+    private  User user;
+    private  Fragment fragmentPlace;
+    private  Fragment fragmentComment;
+    private  Fragment fragmentReminder;
+    private  Fragment fragmentEvents;
+    private  Fragment fragmentPoints;
+    private  String newType;
+    private  AdView mAdView;
+    private  String TAG = UserDetail.class.getSimpleName();
+    private  TextView name;
+    private  TextView email;
+    private  de.hdodenhof.circleimageview.CircleImageView imageView;
+    private PendingIntent pendingIntent;
+    private String point;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         root = getLayoutInflater().inflate(R.layout.activity_user_detail,null);
         setContentView(root);
+        pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+
+
         mAdView = (AdView) root.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
                 .build();
         mAdView.loadAd(adRequest);
         Bundle extras = getIntent().getExtras();
+        name = (TextView) findViewById(R.id.user_name);
+        email = (TextView) findViewById(R.id.user_email);
+        imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
+
         if(extras!=null){
             user = extras.getParcelable("user");
             newType = extras.getString("type");
         }
         if(savedInstanceState!=null){
-            newType = savedInstanceState.getString("newType");
+            newType = savedInstanceState.getString("type");
+            point = savedInstanceState.getString("points");
         }
-        googlePlus = GooglePlus.getInstance(this,null,null);
-        if(googlePlus.mGoogleApiClient.isConnected()){
+
+        googlePlus = GooglePlus.getInstance(this, null, null);
+        if (googlePlus.mGoogleApiClient.isConnected()) {
             //Account account = Plus.AccountApi;
+            name.setText(user.getName() + " " + user.getLastName());
 
-            TextView name = (TextView) findViewById(R.id.user_name);
-            name.setText(user.getName()+" "+user.getLastName());
-
-            TextView email = (TextView) findViewById(R.id.user_email);
             email.setText(user.getEmail());
-            de.hdodenhof.circleimageview.CircleImageView imageView;
-            imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
-            if(user.getProfileImage()!=null) {
+
+
+            if (user.getProfileImage() != null) {
                 imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
                         user.getProfileImage().length));
-            }else if(Utility.isNetworkAvailable(this)){
+            } else if (Utility.isNetworkAvailable(this)) {
                 Person currentPerson = Plus.PeopleApi.getCurrentPerson(googlePlus.mGoogleApiClient);
                 String personPhotoUrl = currentPerson.getImage().getUrl();
                 //We try to request a image with major size, the new image will be of 600*600 pixels
                 //The user doesn't have a image so we try to download one and put it to the user
-                personPhotoUrl = personPhotoUrl.substring(0,personPhotoUrl.length()-2) + googlePlus.PROFILE_PIC_SIZE;
-                new LoadProfileImage(root,imageView).execute(personPhotoUrl,user.getEmail());
+                personPhotoUrl = personPhotoUrl.substring(0, personPhotoUrl.length() - 2) + googlePlus.PROFILE_PIC_SIZE;
+                new LoadProfileImage(root, imageView).execute(personPhotoUrl, user.getEmail());
             }
 
         }
         toolbar = (Toolbar) root.findViewById(R.id.toolbar);
-
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         navigationView = (NavigationView) root.findViewById(R.id.nav_drawer);
         drawerLayout = (DrawerLayout) root.findViewById(R.id.user_detail);
-
-
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction;
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentPlace = new PlacesFavoriteFragment();
         ((PlacesFavoriteFragment) fragmentPlace).setOnPlaceListener(new PlacesFavoriteFragment.onPlaceListener() {
-            @Override
-            public void onPlace(View view, long position) {
-                Intent intent = new Intent(UserDetail.this, Detail.class);
-                intent.putExtra("id", position);
-                intent.putExtra("user", user);
-                startActivity(intent);
-            }
+                @Override
+                public void onPlace(View view, long position) {
+                    Intent intent = new Intent(UserDetail.this, Detail.class);
+                    intent.putExtra("id", position);
+                    intent.putExtra("user", user);
+                    startActivity(intent);
+                }
 
         });
         fragmentComment = new CommentsFragment();
         fragmentReminder = new RemindersFragment();
         fragmentEvents = new MyEventsFragment();
-        ((MyEventsFragment)fragmentEvents).setOnEventListener(new MyEventsFragment.OnEventListener() {
+        fragmentPoints = new MyPointsFragment();
+        ((MyEventsFragment) fragmentEvents).setOnEventListener(new MyEventsFragment.OnEventListener() {
             @Override
             public void onAction(long id) {
-                Intent intent = new Intent(UserDetail.this,EventUpdateActivity.class);
-                intent.putExtra("event",id);
-                intent.putExtra("user",user);
+                Intent intent = new Intent(UserDetail.this, EventUpdateActivity.class);
+                intent.putExtra("event", id);
+                intent.putExtra("user", user);
                 startActivity(intent);
             }
         });
@@ -124,101 +151,118 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                switch (menuItem.getItemId()){
+                switch (menuItem.getItemId()) {
                     case R.id.home:
-                        Intent intentHome = new Intent(UserDetail.this,NavigationDrawer.class);
+                        Intent intentHome = new Intent(UserDetail.this, NavigationDrawer.class);
                         intentHome.putExtra("email", user.getEmail());
                         startActivity(intentHome);
                     case R.id.favorites:
                         getSupportActionBar().setTitle("My Favorites");
                         newType = "favorite";
-                        if(fragmentPlace.isAdded()){
+                        if (fragmentPlace.isAdded()) {
                             fragmentTransaction.show(fragmentPlace);
                         }
 
                         fragmentTransaction.hide(fragmentComment);
-                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.setCommentPositon(-1);
-                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.notifyDataSetChanged();
+                        ((CommentsFragment) fragmentComment).recycleCommentsAdapter.setCommentPositon(-1);
+                        ((CommentsFragment) fragmentComment).recycleCommentsAdapter.notifyDataSetChanged();
                         fragmentTransaction.hide(fragmentReminder);
                         fragmentTransaction.hide(fragmentEvents);
+                        fragmentTransaction.hide(fragmentPoints);
                         fragmentTransaction.commit();
                         break;
                     case R.id.appointments:
                         getSupportActionBar().setTitle("My Reminders");
                         newType = "reminder";
-                        if(fragmentReminder.isAdded()){
+                        if (fragmentReminder.isAdded()) {
                             fragmentTransaction.show(fragmentReminder);
                         }
-                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.setCommentPositon(-1);
-                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.notifyDataSetChanged();
+                        ((CommentsFragment) fragmentComment).recycleCommentsAdapter.setCommentPositon(-1);
+                        ((CommentsFragment) fragmentComment).recycleCommentsAdapter.notifyDataSetChanged();
                         fragmentTransaction.hide(fragmentPlace);
                         fragmentTransaction.hide(fragmentComment);
                         fragmentTransaction.hide(fragmentEvents);
+                        fragmentTransaction.hide(fragmentPoints);
+
                         fragmentTransaction.commit();
                         break;
                     case R.id.comments:
                         getSupportActionBar().setTitle("My Comments");
                         newType = "comment";
-                        if(fragmentComment.isAdded()){
+                        if (fragmentComment.isAdded()) {
                             fragmentTransaction.show(fragmentComment);
                         }
-                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.setCommentPositon(-1);
-                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.notifyDataSetChanged();
+                        ((CommentsFragment) fragmentComment).recycleCommentsAdapter.setCommentPositon(-1);
+                        ((CommentsFragment) fragmentComment).recycleCommentsAdapter.notifyDataSetChanged();
                         fragmentTransaction.hide(fragmentPlace);
                         fragmentTransaction.hide(fragmentReminder);
                         fragmentTransaction.hide(fragmentEvents);
+                        fragmentTransaction.hide(fragmentPoints);
                         fragmentTransaction.commit();
 
                         break;
                     case R.id.events:
                         getSupportActionBar().setTitle("My Events");
                         newType = "event";
-                        if(fragmentEvents.isAdded()){
+                        if (fragmentEvents.isAdded()) {
                             fragmentTransaction.show(fragmentEvents);
                         }
-                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.setCommentPositon(-1);
-                        ((CommentsFragment)fragmentComment).recycleCommentsAdapter.notifyDataSetChanged();
+                        ((CommentsFragment) fragmentComment).recycleCommentsAdapter.setCommentPositon(-1);
+                        ((CommentsFragment) fragmentComment).recycleCommentsAdapter.notifyDataSetChanged();
                         fragmentTransaction.hide(fragmentPlace);
                         fragmentTransaction.hide(fragmentReminder);
                         fragmentTransaction.hide(fragmentComment);
+                        fragmentTransaction.hide(fragmentPoints);
                         fragmentTransaction.commit();
                         break;
                     case R.id.sign_out:
-                        if(GooglePlus.mGoogleApiClient.isConnected()){
+                        if (GooglePlus.mGoogleApiClient.isConnected()) {
                             Plus.AccountApi.clearDefaultAccount(GooglePlus.mGoogleApiClient);
                             GooglePlus.mGoogleApiClient.disconnect();
                             Intent intent = new Intent(UserDetail.this, Recapp.class);
                             startActivity(intent);
                             //animation = false;
-
                         }
                         break;
                     case R.id.disconnect:
-                        if(GooglePlus.mGoogleApiClient.isConnected()){
+                        if (GooglePlus.mGoogleApiClient.isConnected()) {
                             Plus.AccountApi.clearDefaultAccount(GooglePlus.mGoogleApiClient);
                             Plus.AccountApi.revokeAccessAndDisconnect(GooglePlus.mGoogleApiClient);
                             GooglePlus.mGoogleApiClient.disconnect();
                             Intent intent = new Intent(UserDetail.this, Recapp.class);
                             startActivity(intent);
                             //animation = false;
-
                         }
                         break;
+                    case R.id.points:
+                        getSupportActionBar().setTitle("My Points");
+                        newType = "points";
+                        if (fragmentPoints.isAdded()) {
+                            fragmentTransaction.show(fragmentPoints);
+                        }
+                        fragmentTransaction.hide(fragmentComment);
+                        fragmentTransaction.hide(fragmentPlace);
+                        fragmentTransaction.hide(fragmentReminder);
+                        fragmentTransaction.hide(fragmentEvents);
+                        fragmentTransaction.commit();
+
+                        break;
+
                 }
                 menuItem.setChecked(true);
                 drawerLayout.closeDrawers();
                 return false;
-
             }
         });
-
-        switch (newType){
+        switch (newType) {
             case "favorite":
                 getSupportActionBar().setTitle("My Favorites");
                 fragmentTransaction.replace(R.id.user_detail_container, fragmentPlace, "favorite");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentComment, "comment");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentReminder, "reminder");
-                fragmentTransaction.add(R.id.user_detail_container,fragmentEvents,"event");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentEvents, "event");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentPoints, "points");
+                fragmentTransaction.hide(fragmentPoints);
                 fragmentTransaction.hide(fragmentComment);
                 fragmentTransaction.hide(fragmentReminder);
                 fragmentTransaction.hide(fragmentEvents);
@@ -229,8 +273,10 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                 getSupportActionBar().setTitle("My Comments");
                 fragmentTransaction.replace(R.id.user_detail_container, fragmentComment, "comment");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentPlace, "favorite");
-                fragmentTransaction.add(R.id.user_detail_container,fragmentReminder,"reminder");
-                fragmentTransaction.add(R.id.user_detail_container,fragmentEvents,"event");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentReminder, "reminder");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentEvents, "event");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentPoints, "points");
+                fragmentTransaction.hide(fragmentPoints);
                 fragmentTransaction.hide(fragmentPlace);
                 fragmentTransaction.hide(fragmentReminder);
                 fragmentTransaction.hide(fragmentEvents);
@@ -239,11 +285,13 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                 break;
             case "reminder":
                 //We should delete all reminders which endDate < now
-                getSupportActionBar().setTitle("My reminders");
+                getSupportActionBar().setTitle("My Reminders");
                 fragmentTransaction.replace(R.id.user_detail_container, fragmentReminder, "reminder");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentPlace, "favorite");
-                fragmentTransaction.add(R.id.user_detail_container,fragmentComment,"comment");
-                fragmentTransaction.add(R.id.user_detail_container,fragmentEvents,"event");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentComment, "comment");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentEvents, "event");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentPoints, "points");
+                fragmentTransaction.hide(fragmentPoints);
                 fragmentTransaction.hide(fragmentPlace);
                 fragmentTransaction.hide(fragmentComment);
                 fragmentTransaction.hide(fragmentEvents);
@@ -251,24 +299,85 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                 navigationView.getMenu().findItem(R.id.appointments).setChecked(true);
                 break;
             case "event":
-                getSupportActionBar().setTitle("My events");
-                fragmentTransaction.replace(R.id.user_detail_container, fragmentReminder, "reminder");
+                getSupportActionBar().setTitle("My Events");
+                fragmentTransaction.replace(R.id.user_detail_container, fragmentEvents, "event");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentPlace, "favorite");
-                fragmentTransaction.add(R.id.user_detail_container,fragmentComment,"comment");
-                fragmentTransaction.add(R.id.user_detail_container,fragmentEvents,"event");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentComment, "comment");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentReminder, "reminder");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentPoints, "points");
+                fragmentTransaction.hide(fragmentPoints);
                 fragmentTransaction.hide(fragmentPlace);
                 fragmentTransaction.hide(fragmentComment);
                 fragmentTransaction.hide(fragmentReminder);
                 fragmentTransaction.commit();
                 navigationView.getMenu().findItem(R.id.events).setChecked(true);
                 break;
-
-
-
+            case "points":
+                getSupportActionBar().setTitle("My Points");
+                fragmentTransaction.replace(R.id.user_detail_container, fragmentPoints, "points");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentPlace, "favorite");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentComment, "comment");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentEvents, "event");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentReminder, "reminder");
+                fragmentTransaction.hide(fragmentPlace);
+                fragmentTransaction.hide(fragmentComment);
+                fragmentTransaction.hide(fragmentReminder);
+                fragmentTransaction.hide(fragmentEvents);
+                fragmentTransaction.commit();
+                navigationView.getMenu().findItem(R.id.points).setChecked(true);
+                break;
         }
+
+
 
     }
 
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        nfcAdapter.disableForegroundDispatch(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        //super.onNewIntent(intent);
+        if(getIntent().getExtras()!=null){
+            intent.putExtra("user",getIntent().getExtras().getParcelable("user"));
+            intent.putExtra("type", getIntent().getExtras().getString("type"));
+            setIntent(intent);
+        }
+        resolveIntent(intent);
+    }
+
+    public void  connectMifare(final MifareClassic mifare) {
+        if(user!=null) {
+            Utility.connectMifare(mifare, this, user);
+
+        }
+    }
+
+    private void resolveIntent(Intent intent) {
+        Log.i(TAG, "resolving intent");
+        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+
+        if (tag != null) {
+            Log.i(TAG, "found a tag");
+            MifareClassic mifare = MifareClassic.get(tag);
+
+            connectMifare(mifare);
+
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -298,12 +407,15 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
     }
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putString("newType", newType);
+        savedInstanceState.putString("type", newType);
+        savedInstanceState.putString("points",point);
     }
     @Override
     public void onBackPressed() {
 
     }
+
+
 
     @Override
     public void onCommentDelete(boolean comment) {
@@ -315,5 +427,10 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
             }
 
         }
+    }
+
+    @Override
+    public void sendData(com.unal.tuapp.recapp.backend.model.userApi.model.User user) {
+        ((MyPointsFragment) fragmentPoints).showPoint(user);
     }
 }

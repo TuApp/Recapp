@@ -23,6 +23,7 @@ public class Place {
     private String email;
     private String password;
     private String web;
+    private Long points;
 
 
     public String getAddress() {
@@ -112,5 +113,13 @@ public class Place {
 
     public void setWeb(String web) {
         this.web = web;
+    }
+
+    public Long getPoints() {
+        return points;
+    }
+
+    public void setPoints(Long points) {
+        this.points = points;
     }
 }

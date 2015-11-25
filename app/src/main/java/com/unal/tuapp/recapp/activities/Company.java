@@ -1,6 +1,7 @@
 package com.unal.tuapp.recapp.activities;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.MifareClassic;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -26,6 +30,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +39,7 @@ import android.widget.TextView;
 
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.backend.model.placeImageApi.model.PlaceImage;
+import com.unal.tuapp.recapp.backend.model.userApi.model.User;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.fragments.CompanyCommentsFragment;
@@ -41,6 +47,9 @@ import com.unal.tuapp.recapp.fragments.CompanyEventsFragment;
 import com.unal.tuapp.recapp.fragments.CompanyImagesFragment;
 import com.unal.tuapp.recapp.fragments.CompanyInformationFragment;
 import com.unal.tuapp.recapp.fragments.CompanyMainFragment;
+import com.unal.tuapp.recapp.fragments.CompanyPointsFragment;
+import com.unal.tuapp.recapp.others.OnSendDataToActivity;
+import com.unal.tuapp.recapp.others.OnSendDataToActivityPlace;
 import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceImageEndPoint;
 
@@ -54,7 +63,7 @@ import java.util.List;
 /**
  * Created by andresgutierrez on 11/3/15.
  */
-public class Company extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class Company extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,OnSendDataToActivity,OnSendDataToActivityPlace{
     private FloatingActionButton companyEvent;
     private FloatingActionButton companyImages;
     private FloatingActionButton companyImagesCamera;
@@ -75,10 +84,13 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
     private Fragment companyComments;
     private Fragment companyEventFragment;
     private Fragment companyImagesFragment;
+    private Fragment companyPointsFragment;
     private String menu;
     private boolean addImages;
     private String imagePath;
     private Bitmap image;
+    private PendingIntent pendingIntent;
+    private final String TAG = Company.class.getSimpleName();
 
 
     @Override
@@ -86,6 +98,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
         super.onCreate(savedInstanceState);
         root = getLayoutInflater().inflate(R.layout.activity_company, null);
         setContentView(root);
+        pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         menu = "home";
         if(savedInstanceState!=null){
             menu = savedInstanceState.getString("type");
@@ -162,6 +175,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
         companyComments = new CompanyCommentsFragment();
         companyEventFragment =  new CompanyEventsFragment();
         companyImagesFragment = new CompanyImagesFragment();
+        companyPointsFragment = new CompanyPointsFragment();
         ((CompanyEventsFragment) companyEventFragment).setOnEventCompanyListener(new CompanyEventsFragment.OnEventCompanyListener() {
             @Override
             public void onAction(long id) {
@@ -198,6 +212,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             ft.hide(companyComments);
                             ft.hide(companyEventFragment);
                             ft.hide(companyImagesFragment);
+                            ft.hide(companyPointsFragment);
                             ft.commit();
                             companyEvent.hide();
                             companyImages.hide();
@@ -215,9 +230,12 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             ft.hide(companyComments);
                             ft.hide(companyEventFragment);
                             ft.hide(companyImagesFragment);
+                            ft.hide(companyPointsFragment);
+
                             ft.commit();
                             companyEvent.hide();
                             companyImages.hide();
+
                             if(addImages){
                                 companyImagesCamera.hide();
                                 companyImagesGallery.hide();
@@ -232,6 +250,8 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             ft.hide(companyInformation);
                             ft.hide(companyEventFragment);
                             ft.hide(companyImagesFragment);
+                            ft.hide(companyPointsFragment);
+
                             ft.commit();
                             companyEvent.hide();
                             companyImages.hide();
@@ -249,6 +269,8 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             ft.hide(companyInformation);
                             ft.hide(companyComments);
                             ft.hide(companyImagesFragment);
+                            ft.hide(companyPointsFragment);
+
                             ft.commit();
                             companyEvent.show();
                             companyImages.hide();
@@ -266,6 +288,8 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             ft.hide(companyInformation);
                             ft.hide(companyComments);
                             ft.hide(companyEventFragment);
+                            ft.hide(companyPointsFragment);
+
                             ft.commit();
                             companyImages.show();
                             companyImages.setImageResource(R.drawable.ic_add_white_24dp);
@@ -274,6 +298,26 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             companyEvent.hide();
                             addImages = false;
                             menu = "images";
+                            break;
+                        case R.id.points:
+                            if(companyPointsFragment.isAdded()){
+                                ft.show(companyPointsFragment);
+                            }
+                            ft.hide(companyHome);
+                            ft.hide(companyInformation);
+                            ft.hide(companyComments);
+                            ft.hide(companyImagesFragment);
+                            ft.hide(companyEventFragment);
+
+                            ft.commit();
+                            companyEvent.hide();
+                            companyImages.hide();
+                            if(addImages){
+                                companyImagesCamera.hide();
+                                companyImagesGallery.hide();
+                            }
+                            menu = "points";
+
                             break;
                         case R.id.sign_out:
                             Intent intent = new Intent(Company.this, Recapp.class);
@@ -284,96 +328,165 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                     navigationDrawer.closeDrawers();
                     return true;
                 }
-            });
-            switch (menu){
-                case "home":
-                    fragmentTransaction.replace(R.id.company_container, companyHome,"home");
-                    fragmentTransaction.add(R.id.company_container, companyInformation, "information");
-                    fragmentTransaction.add(R.id.company_container, companyComments, "comments");
-                    fragmentTransaction.add(R.id.company_container, companyEventFragment,"events");
-                    fragmentTransaction.add(R.id.company_container, companyImagesFragment,"images");
-                    fragmentTransaction.hide(companyImagesFragment);
-                    fragmentTransaction.hide(companyEventFragment);
-                    fragmentTransaction.hide(companyInformation);
-                    fragmentTransaction.hide(companyComments);
-                    fragmentTransaction.commit();
-                    companyEvent.hide();
-                    navDrawer.getMenu().findItem(R.id.home).setChecked(true);
-                    break;
-                case "information":
-                    fragmentTransaction.replace(R.id.company_container, companyInformation,"information");
-                    fragmentTransaction.add(R.id.company_container, companyHome, "home");
-                    fragmentTransaction.add(R.id.company_container, companyComments, "comments");
-                    fragmentTransaction.add(R.id.company_container, companyEventFragment,"events");
-                    fragmentTransaction.add(R.id.company_container, companyImagesFragment,"images");
-                    fragmentTransaction.hide(companyImagesFragment);
-                    fragmentTransaction.hide(companyEventFragment);
-                    fragmentTransaction.hide(companyHome);
-                    fragmentTransaction.hide(companyComments);
-                    fragmentTransaction.commit();
-                    companyEvent.hide();
-                    navDrawer.getMenu().findItem(R.id.information).setChecked(true);
+        });
+        switch (menu){
+            case "home":
+                fragmentTransaction.replace(R.id.company_container, companyHome,"home");
+                fragmentTransaction.add(R.id.company_container, companyInformation, "information");
+                fragmentTransaction.add(R.id.company_container, companyComments, "comments");
+                fragmentTransaction.add(R.id.company_container, companyEventFragment,"events");
+                fragmentTransaction.add(R.id.company_container, companyImagesFragment,"images");
+                fragmentTransaction.add(R.id.company_container, companyPointsFragment, "points");
+                fragmentTransaction.hide(companyPointsFragment);
+                fragmentTransaction.hide(companyImagesFragment);
+                fragmentTransaction.hide(companyEventFragment);
+                fragmentTransaction.hide(companyInformation);
+                fragmentTransaction.hide(companyComments);
+                fragmentTransaction.commit();
+                companyEvent.hide();
+                navDrawer.getMenu().findItem(R.id.home).setChecked(true);
+                break;
+            case "information":
+                fragmentTransaction.replace(R.id.company_container, companyInformation,"information");
+                fragmentTransaction.add(R.id.company_container, companyHome, "home");
+                fragmentTransaction.add(R.id.company_container, companyComments, "comments");
+                fragmentTransaction.add(R.id.company_container, companyEventFragment,"events");
+                fragmentTransaction.add(R.id.company_container, companyImagesFragment,"images");
+                fragmentTransaction.add(R.id.company_container, companyPointsFragment, "points");
+                fragmentTransaction.hide(companyPointsFragment);
+                fragmentTransaction.hide(companyImagesFragment);
+                fragmentTransaction.hide(companyEventFragment);
+                fragmentTransaction.hide(companyHome);
+                fragmentTransaction.hide(companyComments);
+                fragmentTransaction.commit();
+                companyEvent.hide();
+                navDrawer.getMenu().findItem(R.id.information).setChecked(true);
+                break;
+            case "comments":
+                fragmentTransaction.replace(R.id.company_container, companyComments, "comments");
+                fragmentTransaction.add(R.id.company_container, companyInformation, "information");
+                fragmentTransaction.add(R.id.company_container, companyHome, "home");
+                fragmentTransaction.add(R.id.company_container, companyEventFragment, "events");
+                fragmentTransaction.add(R.id.company_container, companyImagesFragment,"images");
+                fragmentTransaction.add(R.id.company_container, companyPointsFragment, "points");
+                fragmentTransaction.hide(companyPointsFragment);
+                fragmentTransaction.hide(companyImagesFragment);
+                fragmentTransaction.hide(companyEventFragment);
+                fragmentTransaction.hide(companyInformation);
+                fragmentTransaction.hide(companyHome);
+                fragmentTransaction.commit();
+                companyEvent.hide();
+                navDrawer.getMenu().findItem(R.id.comments).setChecked(true);
+                break;
+            case "events":
+                fragmentTransaction.replace(R.id.company_container, companyEventFragment, "events");
+                fragmentTransaction.add(R.id.company_container, companyInformation, "information");
+                fragmentTransaction.add(R.id.company_container, companyHome, "home");
+                fragmentTransaction.add(R.id.company_container, companyComments,"comments");
+                fragmentTransaction.add(R.id.company_container, companyImagesFragment,"images");
+                fragmentTransaction.add(R.id.company_container, companyPointsFragment, "points");
+                fragmentTransaction.hide(companyPointsFragment);
+                fragmentTransaction.hide(companyImagesFragment);
+                fragmentTransaction.hide(companyComments);
+                fragmentTransaction.hide(companyInformation);
+                fragmentTransaction.hide(companyHome);
+                fragmentTransaction.commit();
+                companyEvent.show();
+                navDrawer.getMenu().findItem(R.id.events).setChecked(true);
+                break;
+            case "images":
+                fragmentTransaction.replace(R.id.company_container, companyImagesFragment, "images");
+                fragmentTransaction.add(R.id.company_container, companyHome, "home");
+                fragmentTransaction.add(R.id.company_container, companyInformation, "information");
+                fragmentTransaction.add(R.id.company_container, companyComments, "comments");
+                fragmentTransaction.add(R.id.company_container, companyEventFragment, "events");
+                fragmentTransaction.add(R.id.company_container, companyPointsFragment, "points");
+                fragmentTransaction.hide(companyPointsFragment);
+                fragmentTransaction.hide(companyHome);
+                fragmentTransaction.hide(companyEventFragment);
+                fragmentTransaction.hide(companyInformation);
+                fragmentTransaction.hide(companyComments);
+                fragmentTransaction.commit();
+                companyImages.show();
+                if(addImages){
+                    companyImagesCamera.show();
+                    companyImagesGallery.show();
+                }
+                companyEvent.hide();
+                navDrawer.getMenu().findItem(R.id.images).setChecked(true);
+                break;
+            case "points":
+                fragmentTransaction.replace(R.id.company_container, companyPointsFragment, "points");
+                fragmentTransaction.add(R.id.company_container, companyInformation, "information");
+                fragmentTransaction.add(R.id.company_container, companyHome, "home");
+                fragmentTransaction.add(R.id.company_container, companyComments,"comments");
+                fragmentTransaction.add(R.id.company_container, companyImagesFragment,"images");
+                fragmentTransaction.add(R.id.company_container, companyEventFragment, "event");
+                fragmentTransaction.hide(companyImagesFragment);
+                fragmentTransaction.hide(companyComments);
+                fragmentTransaction.hide(companyInformation);
+                fragmentTransaction.hide(companyHome);
+                fragmentTransaction.hide(companyEventFragment);
+                fragmentTransaction.commit();
+                companyEvent.hide();
+                navDrawer.getMenu().findItem(R.id.points).setChecked(true);
 
-                    break;
-                case "comments":
-                    fragmentTransaction.replace(R.id.company_container, companyComments, "comments");
-                    fragmentTransaction.add(R.id.company_container, companyInformation, "information");
-                    fragmentTransaction.add(R.id.company_container, companyHome, "home");
-                    fragmentTransaction.add(R.id.company_container, companyEventFragment, "events");
-                    fragmentTransaction.add(R.id.company_container, companyImagesFragment,"images");
-                    fragmentTransaction.hide(companyImagesFragment);
-                    fragmentTransaction.hide(companyEventFragment);
-                    fragmentTransaction.hide(companyInformation);
-                    fragmentTransaction.hide(companyHome);
-                    fragmentTransaction.commit();
-                    companyEvent.hide();
-                    navDrawer.getMenu().findItem(R.id.comments).setChecked(true);
+                break;
+        }
 
-                    break;
-                case "events":
-                    fragmentTransaction.replace(R.id.company_container, companyEventFragment, "events");
-                    fragmentTransaction.add(R.id.company_container, companyInformation, "information");
-                    fragmentTransaction.add(R.id.company_container, companyHome, "home");
-                    fragmentTransaction.add(R.id.company_container, companyComments,"comments");
-                    fragmentTransaction.add(R.id.company_container, companyImagesFragment,"images");
-                    fragmentTransaction.hide(companyImagesFragment);
-                    fragmentTransaction.hide(companyComments);
-                    fragmentTransaction.hide(companyInformation);
-                    fragmentTransaction.hide(companyHome);
-                    fragmentTransaction.commit();
-                    companyEvent.show();
-                    navDrawer.getMenu().findItem(R.id.events).setChecked(true);
+        if(getSupportLoaderManager().getLoader(PLACE)==null){
+            getSupportLoaderManager().initLoader(PLACE,null,this);
+        }else{
+            getSupportLoaderManager().restartLoader(PLACE,null,this);
+        }
 
-                    break;
-                case "images":
-                    fragmentTransaction.replace(R.id.company_container, companyImagesFragment, "images");
-                    fragmentTransaction.add(R.id.company_container, companyHome, "home");
-                    fragmentTransaction.add(R.id.company_container, companyInformation, "information");
-                    fragmentTransaction.add(R.id.company_container, companyComments, "comments");
-                    fragmentTransaction.add(R.id.company_container, companyEventFragment, "events");
-                    fragmentTransaction.hide(companyHome);
-                    fragmentTransaction.hide(companyEventFragment);
-                    fragmentTransaction.hide(companyInformation);
-                    fragmentTransaction.hide(companyComments);
-                    fragmentTransaction.commit();
-                    companyImages.show();
-                    if(addImages){
-                        companyImagesCamera.show();
-                        companyImagesGallery.show();
-                    }
-                    companyEvent.hide();
-                    navDrawer.getMenu().findItem(R.id.images).setChecked(true);
-                    break;
 
-            }
+    }
 
-            if(getSupportLoaderManager().getLoader(PLACE)==null){
-                getSupportLoaderManager().initLoader(PLACE,null,this);
-            }else{
-                getSupportLoaderManager().restartLoader(PLACE,null,this);
-            }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        nfcAdapter.disableForegroundDispatch(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        if(getIntent().getExtras()!=null){
+            intent.putExtra("email",getIntent().getExtras().getString("email"));
+            intent.putExtra("id", getIntent().getExtras().getLong("id"));
+            setIntent(intent);
+        }
+        resolveIntent(intent);
+    }
+    public void  connectMifare(final MifareClassic mifare) {
+        Log.e("algo",""+placeId);
+        Utility.readMifare(mifare, this,placeId);
+
+
+    }
+
+    private void resolveIntent(Intent intent) {
+        Log.i(TAG, "resolving intent");
+        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+
+        if (tag != null) {
+            Log.i(TAG, "found a tag");
+            MifareClassic mifare = MifareClassic.get(tag);
+
+            connectMifare(mifare);
 
         }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -499,5 +612,15 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
         companyImagesCamera.hide();
         companyImages.setImageResource(R.drawable.ic_add_white_24dp);
 
+    }
+
+    @Override
+    public void sendData(User user) {
+        ((CompanyPointsFragment) companyPointsFragment).showPoint(user);
+    }
+
+    @Override
+    public void onSendDataPlace(com.unal.tuapp.recapp.backend.model.placeApi.model.Place place) {
+        ((CompanyPointsFragment) companyPointsFragment).showCompanyPoint(place);
     }
 }

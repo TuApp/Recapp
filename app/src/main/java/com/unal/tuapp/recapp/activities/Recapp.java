@@ -86,12 +86,13 @@ public class Recapp extends AppCompatActivity {
     private void addData(){
         SharedPreferences pref = this.getPreferences(0);
         boolean data = pref.getBoolean("data",false);
+        new GcmRegistrationEndPoint(this).execute();
         if(!data) {
             /*ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setMessage("Loading the information");
             progressDialog.show();*/
             //We should call the async task
-            new GcmRegistrationEndPoint(this).execute();
+
 
             Place place = new com.unal.tuapp.recapp.backend.model.placeApi.model.Place();
             Pair<Context,Pair<Place,String>> pair = new Pair<>(this.getApplicationContext(),new Pair<>(place,"getPlaces"));

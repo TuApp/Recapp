@@ -1,17 +1,27 @@
 package com.unal.tuapp.recapp.others;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.nfc.tech.MifareClassic;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.util.Pair;
+import android.widget.Toast;
+
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
-import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Base64;
+import com.unal.tuapp.recapp.activities.Company;
+import com.unal.tuapp.recapp.activities.UserDetail;
 import com.unal.tuapp.recapp.backend.model.categoryApi.CategoryApi;
 import com.unal.tuapp.recapp.backend.model.commentApi.CommentApi;
 import com.unal.tuapp.recapp.backend.model.eventApi.EventApi;
@@ -28,9 +38,11 @@ import com.unal.tuapp.recapp.backend.model.userApi.UserApi;
 import com.unal.tuapp.recapp.backend.model.userApi.model.User;
 import com.unal.tuapp.recapp.backend.model.userByPlaceApi.UserByPlaceApi;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserEndPoint;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
@@ -53,6 +65,9 @@ public class Utility {
     private static EventApi eventApi = null;
     private static EventByUserApi eventByUserApi = null;
     private static RegistrationApi registrationApi = null;
+    private static String points = "";
+    private static  ProgressDialog progressDialog;
+    private static final String TAG = Utility.class.getSimpleName();
     public static String getDate(long time){
         Date date = new Date(time);
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
@@ -83,12 +98,11 @@ public class Utility {
             user.setLastname(lastname);
             user.setName(name);
             user.setEmail(email);
+            user.setPoints(0L);
 
 
 
             Pair<Pair<Context,String>,Pair<User,String>> pair = new Pair<>(new Pair<>(context,email),new Pair<>(user,"getUser"));
-
-
             String answer = new UserEndPoint().execute(pair).get();
             if(answer.equals("nothing")){
                 Pair<Pair<Context,String>,Pair<User,String>> newPair = new Pair<>(new Pair<>(context,email),new Pair<>(user,"addUser"));
@@ -317,10 +331,234 @@ public class Utility {
         return registrationApi;
     }
 
+    public static void readMifare(final MifareClassic mifare,  Company company,long placeId){
+        try{
+            mifare.connect();
+            int sector = 25;
+            int sectorNumber = sector;
+            if (mifare.authenticateSectorWithKeyA(sectorNumber,
+                    MifareClassic.KEY_MIFARE_APPLICATION_DIRECTORY)) {
+                Log.d("TAG", "Authorized sector with MAD key");
+
+            } else if (mifare.authenticateSectorWithKeyA(
+                    sectorNumber, MifareClassic.KEY_DEFAULT)) {
+                Log.d("TAG",
+                        "Authorization granted to sector  with DEFAULT key");
+
+            } else if (mifare
+                    .authenticateSectorWithKeyA(sectorNumber,
+                            MifareClassic.KEY_NFC_FORUM)) {
+                Log.d("TAG",
+                        "Authorization granted to sector with NFC_FORUM key");
+
+            }else if (mifare.authenticateSectorWithKeyB(sectorNumber,
+                    MifareClassic.KEY_MIFARE_APPLICATION_DIRECTORY)) {
+                Log.d("TAG", "Authorized sector with MAD key");
+
+            } else if (mifare.authenticateSectorWithKeyB(
+                    sectorNumber, MifareClassic.KEY_DEFAULT)) {
+                Log.d("TAG",
+                        "Authorization granted to sector  with DEFAULT key");
+
+            } else if (mifare
+                    .authenticateSectorWithKeyB(sectorNumber,
+                            MifareClassic.KEY_NFC_FORUM)) {
+                Log.d("TAG",
+                        "Authorization granted to sector with NFC_FORUM key");
+
+            } else {
+                Log.d("TAG", "Authorization denied ");
+            }
+
+            int blockCount = mifare.getBlockCount();
+            int blockCountForSector = mifare.getBlockCountInSector(sector);
+            int sectorCount = mifare.getSectorCount();
+            int indexOfFirstBlock = mifare.sectorToBlock(sector);
+            Log.i(TAG, "block count: " + blockCount);
+            Log.i(TAG, "sector count: " + sectorCount);
+            Log.i(TAG, "block for sector count: " + blockCountForSector);
+            Log.i(TAG, "first block of sector " + sector +": " + indexOfFirstBlock);
+
+            byte []blockData = mifare.readBlock(indexOfFirstBlock);
+            long idUserCard = ByteBuffer.wrap(blockData, 0, 16).getLong();
+
+            com.unal.tuapp.recapp.backend.model.placeApi.model.Place pointsPlace = new com.unal.tuapp.recapp.backend.model.placeApi.model.Place();
+            pointsPlace.setId(placeId);
+            Pair<Context,Pair<com.unal.tuapp.recapp.backend.model.placeApi.model.Place,String>> pair =
+                    new Pair<>(company.getApplicationContext(),new Pair<>(pointsPlace,"getPlace"));
+            new PlaceEndPoint(company).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
+
+            com.unal.tuapp.recapp.backend.model.userApi.model.User userPoint = new com.unal.tuapp.recapp.backend.model.userApi.model.User();
+            userPoint.setId(idUserCard);
+            Pair<Pair<Context,String>,Pair<com.unal.tuapp.recapp.backend.model.userApi.model.User,String>> pairUser =
+                    new Pair<>(new Pair<>(company.getApplicationContext(),"nothing"),new Pair<>(userPoint,"getUserId"));
+            new UserEndPoint(company).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairUser);
+
+        }catch (Exception e){
+        }finally {
+            try {
+                mifare.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public static void connectMifare(final MifareClassic mifare, final UserDetail userDetail,final com.unal.tuapp.recapp.data.User user){
+        try {
+            mifare.connect();
+            int sector = 25;
+            int sectorNumber = sector;
+
+            if (mifare.authenticateSectorWithKeyA(sectorNumber,
+                    MifareClassic.KEY_MIFARE_APPLICATION_DIRECTORY)) {
+                Log.d("TAG", "Authorized sector with MAD key");
+
+            } else if (mifare.authenticateSectorWithKeyA(
+                    sectorNumber, MifareClassic.KEY_DEFAULT)) {
+                Log.d("TAG",
+                        "Authorization granted to sector  with DEFAULT key");
+
+            } else if (mifare
+                    .authenticateSectorWithKeyA(sectorNumber,
+                            MifareClassic.KEY_NFC_FORUM)) {
+                Log.d("TAG",
+                        "Authorization granted to sector with NFC_FORUM key");
+
+            }else if (mifare.authenticateSectorWithKeyB(sectorNumber,
+                    MifareClassic.KEY_MIFARE_APPLICATION_DIRECTORY)) {
+                Log.d("TAG", "Authorized sector with MAD key");
+
+            } else if (mifare.authenticateSectorWithKeyB(
+                    sectorNumber, MifareClassic.KEY_DEFAULT)) {
+                Log.d("TAG",
+                        "Authorization granted to sector  with DEFAULT key");
+
+            } else if (mifare
+                    .authenticateSectorWithKeyB(sectorNumber,
+                            MifareClassic.KEY_NFC_FORUM)) {
+                Log.d("TAG",
+                        "Authorization granted to sector with NFC_FORUM key");
+
+            } else {
+                Log.d("TAG", "Authorization denied ");
+            }
+
+            int blockCount = mifare.getBlockCount();
+            int blockCountForSector = mifare.getBlockCountInSector(sector);
+            int sectorCount = mifare.getSectorCount();
+            int indexOfFirstBlock = mifare.sectorToBlock(sector);
+            Log.i(TAG, "block count: " + blockCount);
+            Log.i(TAG, "sector count: " + sectorCount);
+            Log.i(TAG, "block for sector count: " + blockCountForSector);
+            Log.i(TAG, "first block of sector " + sector +": " + indexOfFirstBlock);
+
+            if(user != null){
+                byte []blockData = mifare.readBlock(indexOfFirstBlock);
+                long idUserCard = ByteBuffer.wrap(blockData, 0, 16).getLong();
+
+                if(idUserCard  == -1L){
+                    long idUserBD = user.getId();
+                    byte[] numToWriteArray = ByteBuffer.allocate(16).putLong(idUserBD).array();
+                    int sectorToWrite = 25;
+                    int blockToWrite = mifare.sectorToBlock(sectorToWrite);
+                    mifare.writeBlock(blockToWrite, numToWriteArray);
+                    com.unal.tuapp.recapp.backend.model.userApi.model.User userPoint = new com.unal.tuapp.recapp.backend.model.userApi.model.User();
+                    userPoint.setId(user.getId());
+                    Pair<Pair<Context,String>,Pair<com.unal.tuapp.recapp.backend.model.userApi.model.User,String>> pair =
+                            new Pair<>(new Pair<>(userDetail.getApplicationContext(),"nothing"),new Pair<>(userPoint,"getUserId"));
+                    new UserEndPoint(userDetail).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
+
+                }else if(idUserCard == user.getId()){
+                    com.unal.tuapp.recapp.backend.model.userApi.model.User userPoint = new com.unal.tuapp.recapp.backend.model.userApi.model.User();
+                    userPoint.setId(user.getId());
+                    Pair<Pair<Context,String>,Pair<com.unal.tuapp.recapp.backend.model.userApi.model.User,String>> pair =
+                            new Pair<>(new Pair<>(userDetail.getApplicationContext(),"nothing"),new Pair<>(userPoint,"getUserId"));
+
+                    new UserEndPoint(userDetail).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
+
+
+                }else{
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(userDetail.getApplicationContext());
+                    alertDialog.setTitle("Do you want to override the card?");
+                    alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            try {
+                                mifare.connect();
+                                int sector = 25;
+                                int sectorNumber = sector;
+                                if (mifare.authenticateSectorWithKeyA(sectorNumber,
+                                        MifareClassic.KEY_MIFARE_APPLICATION_DIRECTORY)) {
+                                    Log.d("TAG", "Authorized sector with MAD key");
+
+                                } else if (mifare.authenticateSectorWithKeyA(
+                                        sectorNumber, MifareClassic.KEY_DEFAULT)) {
+                                    Log.d("TAG",
+                                            "Authorization granted to sector  with DEFAULT key");
+
+                                } else if (mifare
+                                        .authenticateSectorWithKeyA(sectorNumber,
+                                                MifareClassic.KEY_NFC_FORUM)) {
+                                    Log.d("TAG",
+                                            "Authorization granted to sector with NFC_FORUM key");
+
+                                }else if (mifare.authenticateSectorWithKeyB(sectorNumber,
+                                        MifareClassic.KEY_MIFARE_APPLICATION_DIRECTORY)) {
+                                    Log.d("TAG", "Authorized sector with MAD key");
+
+                                } else if (mifare.authenticateSectorWithKeyB(
+                                        sectorNumber, MifareClassic.KEY_DEFAULT)) {
+                                    Log.d("TAG",
+                                            "Authorization granted to sector  with DEFAULT key");
+
+                                } else if (mifare
+                                        .authenticateSectorWithKeyB(sectorNumber,
+                                                MifareClassic.KEY_NFC_FORUM)) {
+                                    Log.d("TAG",
+                                            "Authorization granted to sector with NFC_FORUM key");
+
+                                } else {
+                                    Log.d("TAG", "Authorization denied ");
+                                }
+                                long idUserBD = user.getId();
+                                byte[] numToWriteArray = ByteBuffer.allocate(16).putLong(idUserBD).array();
+                                int sectorToWrite = 25;
+                                int blockToWrite = mifare.sectorToBlock(sectorToWrite);
+                                mifare.writeBlock(blockToWrite, numToWriteArray);
+                                Toast.makeText(userDetail.getApplicationContext(),"The card was override now You should put the card again to see your points ",Toast.LENGTH_SHORT).show();
+
+                            } catch (Exception e) {
+                                Log.e("TAG",e.toString());
+                            }
+                        }
+                    });
+                    alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    alertDialog.create().show();
+
+                }
+            }
+
+        } catch (IOException e) {
+            Log.e(TAG, "caught IO exception while connection to mifare", e);
+        }finally {
+            try {
+                mifare.close();
+            } catch(IOException e) {
+                Log.e(TAG, "IOException while closing mifare", e);
+            }
+        }
+        Log.i(TAG, "done reading mifare");
+    }
     public static String encodeImage(byte[] image){
         return new String(Base64.encodeBase64String(image));
     }
-
     public static byte[] decodeImage(String image){
         return Base64.decodeBase64(image);
     }

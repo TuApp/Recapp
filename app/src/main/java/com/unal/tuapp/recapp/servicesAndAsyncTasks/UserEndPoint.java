@@ -1,13 +1,20 @@
 package com.unal.tuapp.recapp.servicesAndAsyncTasks;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.Pair;
 
+import com.unal.tuapp.recapp.activities.Company;
+import com.unal.tuapp.recapp.activities.UserDetail;
 import com.unal.tuapp.recapp.backend.model.userApi.model.CollectionResponseUser;
 import com.unal.tuapp.recapp.backend.model.userApi.model.User;
+import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.others.Utility;
 
@@ -21,9 +28,24 @@ import java.util.List;
 
 //This asynctask is for addUser and UpdateUser
 public class UserEndPoint extends AsyncTask<Pair<Pair<Context,String>, Pair<User,String>>,Void,String> {
+    private User userTemp;
+    private Activity activity;
+    private ProgressDialog progressDialog;
+
+    public UserEndPoint(Activity activity) {
+        this.activity = activity;
+        progressDialog = new ProgressDialog(activity);
+    }
+
+    public UserEndPoint() {
+    }
+
     @Override
     protected void onPreExecute() {
-        super.onPreExecute();
+        if(activity!=null){
+            progressDialog.setMessage("We are downloading the user's information");
+            progressDialog.show();
+        }
     }
 
     @Override
@@ -35,7 +57,9 @@ public class UserEndPoint extends AsyncTask<Pair<Pair<Context,String>, Pair<User
                     break;
                 case "updateUser":
                     //Log.e("algo","algo");
+                    User oldUser = Utility.getUserApi().get(pairs[0].second.first.getId()).execute();
                     User user = pairs[0].second.first;
+                    user.setPoints(oldUser.getPoints());
                     Utility.getUserApi().update(user.getId(),user).execute();
                     break;
                 case "getUsers":
@@ -87,6 +111,16 @@ public class UserEndPoint extends AsyncTask<Pair<Pair<Context,String>, Pair<User
                         return "success";
                     }
                     break;
+                case "getUserId":
+                    userTemp = Utility.getUserApi().get(pairs[0].second.first.getId()).execute();
+                    break;
+                case "getUserPoint":
+                    return Utility.getUserApi().get(pairs[0].second.first.getId()).execute().getPoints()+"";
+                case "addPointsUser":
+                    User newPoints = Utility.getUserApi().get(pairs[0].second.first.getId()).execute();
+                    newPoints.setPoints(newPoints.getPoints() + pairs[0].second.first.getPoints());
+                    Utility.getUserApi().update(newPoints.getId(),newPoints).execute();
+                    break;
 
             }
 
@@ -96,4 +130,15 @@ public class UserEndPoint extends AsyncTask<Pair<Pair<Context,String>, Pair<User
         return "nothing";
     }
 
+    @Override
+    protected void onPostExecute(String s) {
+        if(userTemp!=null && activity!=null){
+            progressDialog.dismiss();
+            if(activity instanceof Company) {
+                ((Company)activity).sendData(userTemp);
+            }else if(activity instanceof UserDetail){
+                ((UserDetail)activity).sendData(userTemp);
+            }
+        }
+    }
 }

@@ -24,6 +24,10 @@
             android:title="@string/my_images"
             android:icon="@android:drawable/ic_menu_gallery"/>
 
+        <item android:id="@+id/points"
+            android:title="@string/company_points"
+            android:icon="@drawable/ic_calendar" />
+
         <item android:id="@+id/account"
             android:title="@string/my_account">
             <menu>

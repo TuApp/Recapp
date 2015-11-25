@@ -335,6 +335,12 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         intentEvent.putExtra("type","event");
                         startActivity(intentEvent);
                         break;
+                    case R.id.points:
+                        Intent intentPoint = new Intent(NavigationDrawer.this,UserDetail.class);
+                        intentPoint.putExtra("user",user);
+                        intentPoint.putExtra("type", "points");
+                        startActivity(intentPoint);
+                        break;
                     case R.id.sign_out:
                         if(mGooglePlus.mGoogleApiClient.isConnected()){
                             Plus.AccountApi.clearDefaultAccount(mGooglePlus.mGoogleApiClient);
@@ -389,7 +395,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             }
         });
         deepLink = PlusShare.getDeepLinkId(getIntent());
-
+        navDrawer.getMenu().findItem(R.id.home).setChecked(true);
 
         //handleIntent(getIntent());
     }

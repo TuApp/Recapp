@@ -1,11 +1,13 @@
 package com.unal.tuapp.recapp.servicesAndAsyncTasks;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.Pair;
 
+import com.unal.tuapp.recapp.activities.Company;
 import com.unal.tuapp.recapp.backend.model.placeApi.model.CollectionResponsePlace;
 import com.unal.tuapp.recapp.backend.model.placeApi.model.Place;
 import com.unal.tuapp.recapp.backend.model.userApi.model.CollectionResponseUser;
@@ -20,6 +22,19 @@ import java.util.List;
  * Created by andresgutierrez on 11/15/15.
  */
 public class PlaceEndPoint extends AsyncTask<Pair<Context,Pair<Place,String>>,Void,Void> {
+    private Company company;
+    private ProgressDialog progressDialog;
+    private Place placeId;
+    public PlaceEndPoint() {
+    }
+
+    public PlaceEndPoint(Company company) {
+        this.company = company;
+
+    }
+
+
+
     @Override
     protected Void doInBackground(Pair<Context, Pair<Place,String>>... pairs) {
         try{
@@ -89,7 +104,16 @@ public class PlaceEndPoint extends AsyncTask<Pair<Context,Pair<Place,String>>,Vo
                     pairs[0].second.first.setEmail(placeUpdate.getEmail());
                     pairs[0].second.first.setPassword(placeUpdate.getPassword());
                     pairs[0].second.first.setRating(placeUpdate.getRating());
+                    pairs[0].second.first.setPoints(placeUpdate.getPoints());
                     Utility.getPlaceApi().update(pairs[0].second.first.getId(),pairs[0].second.first).execute();
+                    break;
+                case "removePoints":
+                    Place newPoints = Utility.getPlaceApi().get(pairs[0].second.first.getId()).execute();
+                    newPoints.setPoints(newPoints.getPoints() - pairs[0].second.first.getPoints());
+                    Utility.getPlaceApi().update(newPoints.getId(),newPoints).execute();
+                    break;
+                case "getPlace":
+                    placeId = Utility.getPlaceApi().get(pairs[0].second.first.getId()).execute();
                     break;
             }
         }catch (IOException e) {
@@ -103,6 +127,10 @@ public class PlaceEndPoint extends AsyncTask<Pair<Context,Pair<Place,String>>,Vo
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        if(placeId!=null){
+            company.onSendDataPlace(placeId);
+        }
+
     }
 
     @Override

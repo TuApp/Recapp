@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="16dp"
+        android:layout_gravity="center">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_margin="16dp"
+            android:id="@+id/company_frame">
+
+            <ImageView
+                android:id="@+id/company_point"
+                android:layout_width="220dp"
+                android:layout_height="150dp"
+                android:src="@drawable/card"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop"/>
+
+            <android.support.v7.widget.CardView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_marginTop="32dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:gravity="center"
+                android:id="@+id/company_point_card"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_margin="8dp">
+
+                    <ImageView
+                        android:id="@+id/user_image"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_marginBottom="16dp" />
+
+                    <TextView
+                        android:id="@+id/user_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_below="@id/user_image"/>
+
+                    <TextView
+                        android:id="@+id/user_lastname"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_below="@id/user_name"/>
+
+                    <TextView
+                        android:id="@+id/user_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_below="@id/user_lastname"/>
+
+                    <TextView
+                        android:id="@+id/user_points"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_below="@id/user_email"/>
+
+                </RelativeLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/company_linear"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_below="@id/company_frame"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp">
+
+            <TextView
+                android:id="@+id/point_min"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:visibility="gone"/>
+
+            <SeekBar
+                android:id="@+id/point_company"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/point_max"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/company_add_points"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_points"
+            android:layout_below="@+id/company_linear"
+            android:layout_margin="16dp"
+            android:visibility="gone"/>
+
+
+
+    </RelativeLayout>
+
+
+
+</android.support.v4.widget.NestedScrollView>

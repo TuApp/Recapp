@@ -188,6 +188,12 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
                         intentEvent.putExtra("type","event");
                         startActivity(intentEvent);
                         break;
+                    case R.id.points:
+                        Intent intentPoint = new Intent(Detail.this,UserDetail.class);
+                        intentPoint.putExtra("user",user);
+                        intentPoint.putExtra("type","points");
+                        startActivity(intentPoint);
+                        break;
                     case R.id.sign_out:
                         if (mGooglePlus.mGoogleApiClient.isConnected()) {
                             Plus.AccountApi.clearDefaultAccount(mGooglePlus.mGoogleApiClient);

@@ -8,40 +8,50 @@
     android:layout_margin="8dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <LinearLayout
-        android:id="@+id/list_event"
-        android:layout_width="match_parent"
+
+    <android.support.v4.widget.SwipeRefreshLayout
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:id="@+id/events_refresh">
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/list_event"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="10sp"
-            android:text="@string/going_to"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="4dp"/>
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/event_going_recycler"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_margin="8dp" />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="10sp"
-            android:text="@string/events"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/event_recycler"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:text="@string/going_to"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/event_going_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_margin="8dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:text="@string/events"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"/>
 
-    </LinearLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/event_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"/>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
 
 
 

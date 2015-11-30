@@ -12,6 +12,7 @@ import com.unal.tuapp.recapp.backend.model.placeApi.model.CollectionResponsePlac
 import com.unal.tuapp.recapp.backend.model.placeApi.model.Place;
 import com.unal.tuapp.recapp.backend.model.userApi.model.CollectionResponseUser;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.fragments.PlacesFragment;
 import com.unal.tuapp.recapp.others.Utility;
 
 import java.io.IOException;
@@ -25,6 +26,12 @@ public class PlaceEndPoint extends AsyncTask<Pair<Context,Pair<Place,String>>,Vo
     private Company company;
     private ProgressDialog progressDialog;
     private Place placeId;
+    private boolean swipe;
+
+    public PlaceEndPoint(boolean swipe) {
+        this.swipe = swipe;
+    }
+
     public PlaceEndPoint() {
     }
 
@@ -127,6 +134,9 @@ public class PlaceEndPoint extends AsyncTask<Pair<Context,Pair<Place,String>>,Vo
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        if(swipe){
+            PlacesFragment.mySwipeRefresh.setRefreshing(false);
+        }
         if(placeId!=null){
             company.onSendDataPlace(placeId);
         }

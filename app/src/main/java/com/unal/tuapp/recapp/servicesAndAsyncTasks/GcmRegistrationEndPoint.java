@@ -39,9 +39,9 @@ public class GcmRegistrationEndPoint extends AsyncTask<Void,Void,String> {
         return msg;
     }
 
-    @Override
+    /*@Override
     protected void onPostExecute(String msg) {
         Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
 
-    }
+    }*/
 }

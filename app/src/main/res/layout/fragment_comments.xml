@@ -5,11 +5,20 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/user_comments"
+    <android.support.v4.widget.SwipeRefreshLayout
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:scrollbars="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        android:id="@+id/comments_refresh">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/user_comments"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:scrollbars="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
 
 </android.support.design.widget.CoordinatorLayout>

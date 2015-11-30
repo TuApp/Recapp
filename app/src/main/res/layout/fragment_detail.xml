@@ -174,7 +174,7 @@
                 android:id="@+id/comment_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="100dp"
+                android:minHeight="200dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:scrollbars="vertical" />

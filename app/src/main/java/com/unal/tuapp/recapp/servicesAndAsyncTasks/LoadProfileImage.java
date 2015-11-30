@@ -52,35 +52,38 @@ public class LoadProfileImage extends AsyncTask<String, Void, Bitmap> {
         if(email!=null){
             ContentValues values = new ContentValues();
             ByteArrayOutputStream stream =  new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            values.put(RecappContract.UserEntry.COLUMN_USER_IMAGE, stream.toByteArray());
-            Cursor cursor = view.getContext().getContentResolver().query(
-                    RecappContract.UserEntry.buildUserEmail(email),
-                    null,
-                    null,
-                    null,
-                    null
-            );
-            if(cursor.moveToFirst()){
-                User user = new User();
-                user.setId(cursor.getLong(cursor.getColumnIndexOrThrow(RecappContract.UserEntry._ID)));
-                user.setEmail(email);
-                user.setLastname(cursor.getString(cursor.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_LASTNAME)));
-                user.setName(cursor.getString(cursor.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_NAME)));
-                user.setProfileImage(Utility.encodeImage(stream.toByteArray()));
-                //Log.e("algo1", ""+user.getId());
-                //Pair<Pair<Context,String>,Pair<User,String>> pair = new Pair<>(new Pair<>(view.getContext(),email),new Pair<>(user,"updateUser"));
-                //new UserEndPoint().execute(pair);
+            if(stream!=null) {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                values.put(RecappContract.UserEntry.COLUMN_USER_IMAGE, stream.toByteArray());
+                Cursor cursor = view.getContext().getContentResolver().query(
+                        RecappContract.UserEntry.buildUserEmail(email),
+                        null,
+                        null,
+                        null,
+                        null
+                );
+                if (cursor.moveToFirst()) {
+                    User user = new User();
+                    user.setId(cursor.getLong(cursor.getColumnIndexOrThrow(RecappContract.UserEntry._ID)));
+                    user.setEmail(email);
+                    user.setLastname(cursor.getString(cursor.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_LASTNAME)));
+                    user.setName(cursor.getString(cursor.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_NAME)));
+                    user.setProfileImage(Utility.encodeImage(stream.toByteArray()));
+                    //Log.e("algo1", ""+user.getId());
+                    //Pair<Pair<Context,String>,Pair<User,String>> pair = new Pair<>(new Pair<>(view.getContext(),email),new Pair<>(user,"updateUser"));
+                    //new UserEndPoint().execute(pair);
+                }
+                view.getContext().getContentResolver().update(
+                        RecappContract.UserEntry.CONTENT_URI,
+                        values,
+                        RecappContract.UserEntry.COLUMN_EMAIL + " = ? ",
+                        new String[]{email}
+                );
+                imageView.setImageBitmap(bitmap);
+                imageView.invalidate();
             }
-            view.getContext().getContentResolver().update(
-                    RecappContract.UserEntry.CONTENT_URI,
-                    values,
-                    RecappContract.UserEntry.COLUMN_EMAIL + " = ? ",
-                    new String[]{email}
-            );
         }
-        imageView.setImageBitmap(bitmap);
-        imageView.invalidate();
+
     }
 
     @Override

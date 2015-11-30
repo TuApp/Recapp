@@ -469,7 +469,6 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
         resolveIntent(intent);
     }
     public void  connectMifare(final MifareClassic mifare) {
-        Log.e("algo",""+placeId);
         Utility.readMifare(mifare, this,placeId);
 
 

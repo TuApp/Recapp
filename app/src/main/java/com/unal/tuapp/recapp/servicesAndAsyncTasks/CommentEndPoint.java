@@ -11,6 +11,7 @@ import com.unal.tuapp.recapp.backend.model.commentApi.model.CollectionResponseCo
 import com.unal.tuapp.recapp.backend.model.commentApi.model.Comment;
 import com.unal.tuapp.recapp.backend.model.commentApi.model.CommentCollection;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.fragments.CommentsFragment;
 import com.unal.tuapp.recapp.others.Utility;
 
 import java.io.IOException;
@@ -21,6 +22,14 @@ import java.util.List;
  * Created by andresgutierrez on 11/15/15.
  */
 public class CommentEndPoint extends AsyncTask<Pair<Pair<Context,Pair<Long,Long>>,Pair<Comment,String>>,Void,Void> {
+    private boolean swipe;
+
+    public CommentEndPoint() {
+    }
+
+    public CommentEndPoint(boolean swipe) {
+        this.swipe = swipe;
+    }
 
     @Override
     protected Void doInBackground(Pair<Pair<Context, Pair<Long, Long>>, Pair<Comment, String>>... pairs) {
@@ -174,6 +183,9 @@ public class CommentEndPoint extends AsyncTask<Pair<Pair<Context,Pair<Long,Long>
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        if(swipe){
+            CommentsFragment.mySwipeRefresh.setRefreshing(false);
+        }
     }
 
     @Override

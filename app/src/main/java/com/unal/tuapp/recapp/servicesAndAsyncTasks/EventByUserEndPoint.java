@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Pair;
 
+import com.unal.tuapp.recapp.activities.Recapp;
 import com.unal.tuapp.recapp.backend.model.eventByUserApi.model.CollectionResponseEventByUser;
 import com.unal.tuapp.recapp.backend.model.eventByUserApi.model.EventByUser;
 import com.unal.tuapp.recapp.data.RecappContract;
@@ -71,6 +72,10 @@ public class EventByUserEndPoint extends AsyncTask<Pair<Context,Pair<EventByUser
 
     @Override
     protected void onPostExecute(Void aVoid) {
+        if(Recapp.initValue>0){
+            Recapp.init.hide();
+            Recapp.initValue = 0;
+        }
         super.onPostExecute(aVoid);
     }
 

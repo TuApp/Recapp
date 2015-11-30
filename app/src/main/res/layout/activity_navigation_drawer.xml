@@ -28,11 +28,13 @@
 
         <!-- We use this to show the main content it can be a fragment
         that we can change dynamically'-->
+
         <android.support.v4.view.ViewPager
             android:id="@+id/view_pager"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/event_create"

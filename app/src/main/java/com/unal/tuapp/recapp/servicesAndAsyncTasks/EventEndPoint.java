@@ -8,6 +8,7 @@ import android.util.Pair;
 import com.unal.tuapp.recapp.backend.model.eventApi.model.CollectionResponseEvent;
 import com.unal.tuapp.recapp.backend.model.eventApi.model.Event;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.fragments.EventsFragment;
 import com.unal.tuapp.recapp.others.Utility;
 
 import java.io.IOException;
@@ -18,6 +19,14 @@ import java.util.List;
  * Created by andresgutierrez on 11/15/15.
  */
 public class EventEndPoint extends AsyncTask <Pair<Context,Pair<Event,String>>,Void,Void> {
+    private boolean swipe;
+
+    public EventEndPoint(boolean swipe) {
+        this.swipe = swipe;
+    }
+    public EventEndPoint() {
+    }
+
     @Override
     protected Void doInBackground(Pair<Context, Pair<Event, String>>... pairs) {
         try{
@@ -77,6 +86,9 @@ public class EventEndPoint extends AsyncTask <Pair<Context,Pair<Event,String>>,V
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        if (swipe){
+            EventsFragment.mySwipeRefresh.setRefreshing(false);
+        }
     }
 
     @Override

@@ -26,10 +26,9 @@ public class SubCategoryByTutorialEndPoint extends AsyncTask<Pair<Context,Pair<S
                     CollectionResponseSubCategoryByTutorial collectionResponseSubCategoryByTutorial =
                             Utility.getSubCategoryByTutorialApi().list().execute();
                     List<SubCategoryByTutorial> subCategoryByTutorialList ;
-
                     String nextPage = "";
                     if(collectionResponseSubCategoryByTutorial.getNextPageToken()!=null) {
-                        while (collectionResponseSubCategoryByTutorial.getNextPageToken().equals(nextPage)) {
+                        while (!collectionResponseSubCategoryByTutorial.getNextPageToken().equals(nextPage)) {
                             subCategoryByTutorialList = collectionResponseSubCategoryByTutorial.getItems();
                             List<ContentValues> valuesList = new ArrayList<>();
                             if (subCategoryByTutorialList != null) {
@@ -41,7 +40,7 @@ public class SubCategoryByTutorialEndPoint extends AsyncTask<Pair<Context,Pair<S
                                     valuesList.add(value);
                                 }
                                 ContentValues values[] = new ContentValues[subCategoryByTutorialList.size()];
-                                subCategoryByTutorialList.toArray(values);
+                                valuesList.toArray(values);
                                 pairs[0].first.getContentResolver().bulkInsert(
                                         RecappContract.SubCategoryByTutorialEntry.CONTENT_URI,
                                         values

@@ -100,13 +100,11 @@ public class Utility {
             user.setEmail(email);
             user.setPoints(0L);
 
-
-
             Pair<Pair<Context,String>,Pair<User,String>> pair = new Pair<>(new Pair<>(context,email),new Pair<>(user,"getUser"));
             String answer = new UserEndPoint().execute(pair).get();
             if(answer.equals("nothing")){
                 Pair<Pair<Context,String>,Pair<User,String>> newPair = new Pair<>(new Pair<>(context,email),new Pair<>(user,"addUser"));
-                new UserEndPoint().execute(newPair).get();
+                new UserEndPoint().execute(newPair);
                 ContentValues values = new ContentValues();
                 values.put(RecappContract.UserEntry.COLUMN_EMAIL,user.getEmail());
                 values.put(RecappContract.UserEntry.COLUMN_USER_NAME, user.getName());
@@ -386,13 +384,13 @@ public class Utility {
             pointsPlace.setId(placeId);
             Pair<Context,Pair<com.unal.tuapp.recapp.backend.model.placeApi.model.Place,String>> pair =
                     new Pair<>(company.getApplicationContext(),new Pair<>(pointsPlace,"getPlace"));
-            new PlaceEndPoint(company).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
+            new PlaceEndPoint(company).execute(pair);
 
             com.unal.tuapp.recapp.backend.model.userApi.model.User userPoint = new com.unal.tuapp.recapp.backend.model.userApi.model.User();
             userPoint.setId(idUserCard);
             Pair<Pair<Context,String>,Pair<com.unal.tuapp.recapp.backend.model.userApi.model.User,String>> pairUser =
                     new Pair<>(new Pair<>(company.getApplicationContext(),"nothing"),new Pair<>(userPoint,"getUserId"));
-            new UserEndPoint(company).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairUser);
+            new UserEndPoint(company).execute(pairUser);
 
         }catch (Exception e){
         }finally {
@@ -468,19 +466,20 @@ public class Utility {
                     userPoint.setId(user.getId());
                     Pair<Pair<Context,String>,Pair<com.unal.tuapp.recapp.backend.model.userApi.model.User,String>> pair =
                             new Pair<>(new Pair<>(userDetail.getApplicationContext(),"nothing"),new Pair<>(userPoint,"getUserId"));
-                    new UserEndPoint(userDetail).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
+                    new UserEndPoint(userDetail).execute(pair);
 
                 }else if(idUserCard == user.getId()){
+                    Log.e("algo",user.getId()+"");
                     com.unal.tuapp.recapp.backend.model.userApi.model.User userPoint = new com.unal.tuapp.recapp.backend.model.userApi.model.User();
                     userPoint.setId(user.getId());
                     Pair<Pair<Context,String>,Pair<com.unal.tuapp.recapp.backend.model.userApi.model.User,String>> pair =
                             new Pair<>(new Pair<>(userDetail.getApplicationContext(),"nothing"),new Pair<>(userPoint,"getUserId"));
 
-                    new UserEndPoint(userDetail).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
+                    new UserEndPoint(userDetail).execute(pair);
 
 
                 }else{
-                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(userDetail.getApplicationContext());
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(userDetail);
                     alertDialog.setTitle("Do you want to override the card?");
                     alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override

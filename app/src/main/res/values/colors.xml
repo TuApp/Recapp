@@ -10,4 +10,11 @@
     <color name="divider">#B6B6B6</color>
     <color name="header_nav_filter">#BBDEFB</color>
     <color name="contextual_toolbar">#9E9E9E</color>
+
+    <color name="black">#000</color>
+    <color name="white">#fff</color>
+    <color name="red">#D50F25</color>
+    <color name="yellow">#EEB211</color>
+    <color name="green">#009925</color>
+    <color name="blue">#3369E8</color>
 </resources>

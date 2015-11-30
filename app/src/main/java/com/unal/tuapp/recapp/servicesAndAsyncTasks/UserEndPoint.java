@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.util.Pair;
+import android.widget.Toast;
 
 import com.unal.tuapp.recapp.activities.Company;
 import com.unal.tuapp.recapp.activities.UserDetail;
@@ -106,9 +107,14 @@ public class UserEndPoint extends AsyncTask<Pair<Pair<Context,String>, Pair<User
                                     RecappContract.UserEntry.CONTENT_URI,
                                     values
                             );
-                        }catch (Exception e){}
+                        }catch (Exception e){
+                            Log.e("erorr",e.toString());
+                        }
+                        finally {
+                            return "success";
+                        }
 
-                        return "success";
+
                     }
                     break;
                 case "getUserId":
@@ -126,13 +132,16 @@ public class UserEndPoint extends AsyncTask<Pair<Pair<Context,String>, Pair<User
 
         } catch (IOException e) {
             Log.e("erorr",e.toString());
+        }finally {
+            return "nothing";
         }
-        return "nothing";
+
     }
+
 
     @Override
     protected void onPostExecute(String s) {
-        if(userTemp!=null && activity!=null){
+        if(activity!=null){
             progressDialog.dismiss();
             if(activity instanceof Company) {
                 ((Company)activity).sendData(userTemp);

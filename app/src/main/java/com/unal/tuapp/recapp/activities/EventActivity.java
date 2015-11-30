@@ -90,7 +90,7 @@ public class EventActivity extends AppCompatActivity {
                             values
                     );
                     Pair<Context, Pair<Event, String>> pairEvent = new Pair<>(getApplicationContext(), new Pair<>(event, "addEvent"));
-                    new EventEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEvent);
+                    new EventEndPoint(true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEvent);
                     if (user != null) {
                             //The user who creates the event also should attend to it
                         EventByUser eventByUser = new EventByUser();

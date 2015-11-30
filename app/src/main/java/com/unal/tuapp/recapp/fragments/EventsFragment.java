@@ -1,10 +1,14 @@
 package com.unal.tuapp.recapp.fragments;
 
+import android.content.Context;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +17,7 @@ import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.adapters.RecycleEventsAdapter;
 import com.unal.tuapp.recapp.adapters.RecycleEventsGoingAdapter;
 import com.unal.tuapp.recapp.data.Event;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.EventEndPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +31,7 @@ public class EventsFragment extends Fragment {
     private static RecyclerView eventsGoing;
     private static RecycleEventsAdapter eventsAdapter;
     private static RecycleEventsGoingAdapter eventsGoingAdapter;
+    public static SwipeRefreshLayout mySwipeRefresh;
 
     private static OnEventListener onEventListener;
 
@@ -40,6 +46,20 @@ public class EventsFragment extends Fragment {
         root = inflater.inflate(R.layout.fragment_events,container,false);
         events = (RecyclerView) root.findViewById(R.id.event_recycler);
         eventsGoing = (RecyclerView) root.findViewById(R.id.event_going_recycler);
+        mySwipeRefresh = (SwipeRefreshLayout) root.findViewById(R.id.events_refresh);
+        mySwipeRefresh.setColorSchemeResources(
+                R.color.blue,       //This method will rotate
+                R.color.red,        //colors given to it when
+                R.color.yellow,     //loader continues to
+                R.color.green);
+        mySwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                com.unal.tuapp.recapp.backend.model.eventApi.model.Event event = new com.unal.tuapp.recapp.backend.model.eventApi.model.Event();
+                Pair<Context, Pair<com.unal.tuapp.recapp.backend.model.eventApi.model.Event, String>> pairEvent = new Pair<>(getContext(), new Pair<>(event, "getEvents"));
+                new EventEndPoint(true).execute(pairEvent);
+            }
+        });
 
 
         LinearLayoutManager eventManager = new LinearLayoutManager(getActivity());

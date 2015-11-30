@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
@@ -51,6 +52,7 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
     private long idComment;
     private long idPlaceComment;
     private OnCommentListener onCommentListener;
+    public static SwipeRefreshLayout mySwipeRefresh;
 
     public interface OnCommentListener{
          void onCommentDelete(boolean comment);
@@ -95,6 +97,21 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         root = inflater.inflate(R.layout.fragment_comments,container,false);
+        mySwipeRefresh = (SwipeRefreshLayout) root.findViewById(R.id.comments_refresh);
+        mySwipeRefresh.setColorSchemeResources(
+                R.color.blue,       //This method will rotate
+                R.color.red,        //colors given to it when
+                R.color.yellow,     //loader continues to
+                R.color.green);
+        mySwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                com.unal.tuapp.recapp.backend.model.commentApi.model.Comment comment = new com.unal.tuapp.recapp.backend.model.commentApi.model.Comment();
+                Pair<Pair<Context, Pair<Long, Long>>, Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment, String>> pairComment = new Pair<>(new Pair<>(getContext(), new Pair<>(-1L, -1L)),
+                        new Pair<>(comment, "getComments"));
+                new CommentEndPoint(true).execute(pairComment);
+            }
+        });
         Bundle extras = getActivity().getIntent().getExtras();
         if(extras!=null){
             user = extras.getParcelable("user");

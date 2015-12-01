@@ -6,6 +6,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -53,7 +54,7 @@ public class FilterSubCategoriesDialogFragment extends DialogFragment implements
         View view = inflater.inflate(R.layout.subcategories_filter, container);
         getDialog().setTitle(R.string.sub_category);
         getDialog().setCancelable(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        RecyclerView.LayoutManager linearLayoutManager = new GridLayoutManager(getContext(),2);
         recyclerView = (RecyclerView) view.findViewById(R.id.subcategories_recycler);
         recyclerView.setLayoutManager(linearLayoutManager);
         List<SubCategory> subCategories = new ArrayList<>();

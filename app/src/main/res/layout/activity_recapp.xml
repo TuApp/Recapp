@@ -1,4 +1,8 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/fragment"
-    android:name="com.unal.tuapp.recapp.fragments.RecappFragment" tools:layout="@layout/fragment_recapp"
-    android:layout_width="match_parent" android:layout_height="match_parent" />
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.view.ViewPager
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/view_pager_recapp"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+</android.support.v4.view.ViewPager>

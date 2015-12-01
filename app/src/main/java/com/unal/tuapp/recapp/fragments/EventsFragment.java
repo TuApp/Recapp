@@ -16,7 +16,9 @@ import android.view.ViewGroup;
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.adapters.RecycleEventsAdapter;
 import com.unal.tuapp.recapp.adapters.RecycleEventsGoingAdapter;
+import com.unal.tuapp.recapp.backend.model.eventByUserApi.model.EventByUser;
 import com.unal.tuapp.recapp.data.Event;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.EventByUserEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.EventEndPoint;
 
 import java.util.ArrayList;
@@ -57,7 +59,12 @@ public class EventsFragment extends Fragment {
             public void onRefresh() {
                 com.unal.tuapp.recapp.backend.model.eventApi.model.Event event = new com.unal.tuapp.recapp.backend.model.eventApi.model.Event();
                 Pair<Context, Pair<com.unal.tuapp.recapp.backend.model.eventApi.model.Event, String>> pairEvent = new Pair<>(getContext(), new Pair<>(event, "getEvents"));
-                new EventEndPoint(true).execute(pairEvent);
+                new EventEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairEvent);
+
+                EventByUser eventByUser = new EventByUser();
+                Pair<Context, Pair<EventByUser, String>> pairEventByUser = new Pair<>(getContext(), new Pair<>(eventByUser,
+                        "getEventByUser"));
+                new EventByUserEndPoint(true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEventByUser);
             }
         });
 

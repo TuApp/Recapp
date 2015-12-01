@@ -9,6 +9,7 @@ import com.unal.tuapp.recapp.activities.Recapp;
 import com.unal.tuapp.recapp.backend.model.eventByUserApi.model.CollectionResponseEventByUser;
 import com.unal.tuapp.recapp.backend.model.eventByUserApi.model.EventByUser;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.fragments.EventsFragment;
 import com.unal.tuapp.recapp.others.Utility;
 
 import java.io.IOException;
@@ -19,6 +20,15 @@ import java.util.List;
  * Created by andresgutierrez on 11/15/15.
  */
 public class EventByUserEndPoint extends AsyncTask<Pair<Context,Pair<EventByUser,String>>,Void,Void> {
+    private boolean swipe;
+
+    public EventByUserEndPoint() {
+    }
+
+    public EventByUserEndPoint(boolean swipe) {
+        this.swipe = swipe;
+    }
+
     @Override
     protected Void doInBackground(Pair<Context, Pair<EventByUser, String>>... pairs) {
         try {
@@ -72,6 +82,9 @@ public class EventByUserEndPoint extends AsyncTask<Pair<Context,Pair<EventByUser
 
     @Override
     protected void onPostExecute(Void aVoid) {
+        if(swipe){
+            EventsFragment.mySwipeRefresh.setRefreshing(false);
+        }
         if(Recapp.initValue>0){
             Recapp.init.hide();
             Recapp.initValue = 0;

@@ -68,5 +68,7 @@
     <string name="company_points">Transfer points</string>
     <string name="company">Company</string>
     <string name="add_points">Add points</string>
+    <string name="skip">Skip</string>
+    <string name="news">News</string>
 
 </resources>

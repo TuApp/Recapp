@@ -174,16 +174,17 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
     public void onConnected(Bundle bundle) {
         mSignInProgress = mGooglePlus.STATE_DEFAULT;
         //Toast.makeText(getActivity(),"User connected",Toast.LENGTH_SHORT).show();
-        String email = Plus.AccountApi.getAccountName(mGooglePlus.mGoogleApiClient);
-        Intent intent = new Intent(getActivity(),NavigationDrawer.class);
-        intent.putExtra("email",email);
-        startActivity(intent);
+        if(mGooglePlus.mGoogleApiClient.isConnected()) {
+            String email = Plus.AccountApi.getAccountName(mGooglePlus.mGoogleApiClient);
+            Intent intent = new Intent(getActivity(), NavigationDrawer.class);
+            intent.putExtra("email", email);
+            startActivity(intent);
+        }
 
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-
         mGooglePlus.mGoogleApiClient.connect();
     }
 

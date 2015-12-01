@@ -20,13 +20,10 @@ import java.util.List;
  * Created by andresgutierrez on 11/15/15.
  */
 public class TutorialEndPoint extends AsyncTask<Pair<Context,Pair<Tutorial,String>>,Void,Void> {
-    private boolean swipe;
     public TutorialEndPoint() {
     }
 
-    public TutorialEndPoint(boolean swipe) {
-        this.swipe = swipe;
-    }
+
 
     @Override
     protected Void doInBackground(Pair<Context, Pair<Tutorial, String>>... pairs) {
@@ -72,9 +69,7 @@ public class TutorialEndPoint extends AsyncTask<Pair<Context,Pair<Tutorial,Strin
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        if (swipe){
-            TutorialFragment.mySwipeRefresh.setRefreshing(false);
-        }
+
     }
 
     @Override

@@ -16,6 +16,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -45,6 +46,8 @@ import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.PlusShare;
 import com.google.android.gms.plus.model.people.Person;
+import com.unal.tuapp.recapp.data.News;
+import com.unal.tuapp.recapp.fragments.NewsFragment;
 import com.unal.tuapp.recapp.others.GooglePlus;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.LoadProfileImage;
 import com.unal.tuapp.recapp.R;
@@ -66,6 +69,7 @@ import com.unal.tuapp.recapp.fragments.PlacesFragment;
 import com.unal.tuapp.recapp.fragments.TutorialFragment;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserEndPoint;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -117,6 +121,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private PlacesFragment placesFragment;
     private EventsFragment eventsFragment;
     private TutorialFragment tutorialsFragment;
+    private NewsFragment newsFragment;
 
     private String [] subCategory;
     private List<String> filtersConstraint;
@@ -133,6 +138,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private FloatingActionButton eventCreate;
     private AdView mAdView;
     private InterstitialAd mInterstitialAd;
+    private List<News> news;
 
 
     @Override
@@ -259,8 +265,8 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         eventCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(NavigationDrawer.this,EventActivity.class);
-                intent.putExtra("user",user);
+                Intent intent = new Intent(NavigationDrawer.this, EventActivity.class);
+                intent.putExtra("user", user);
                 startActivity(intent);
             }
         });
@@ -272,9 +278,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
 
             @Override
             public void onPageSelected(int position) {
-                if(position==2){
+                if (position == 2) {
                     eventCreate.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     eventCreate.setVisibility(View.GONE);
                 }
             }
@@ -396,6 +402,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         });
         deepLink = PlusShare.getDeepLinkId(getIntent());
         navDrawer.getMenu().findItem(R.id.home).setChecked(true);
+        new NewsAsync().execute("https://ajax.googleapis.com/ajax/services/search/news?v=1.0&q=reciclaje&rsz=8");
 
         //handleIntent(getIntent());
     }
@@ -484,6 +491,8 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.map)));
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.events)));
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.tutorial)));
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.news)));
+
 
         final ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         placesFragment = new PlacesFragment();
@@ -503,8 +512,8 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             @Override
             public void onMap(Place place) {
                 Intent intent = new Intent(NavigationDrawer.this, Detail.class);
-                intent.putExtra("id",place.getId());
-                intent.putExtra("user",user);
+                intent.putExtra("id", place.getId());
+                intent.putExtra("user", user);
                 startActivity(intent);
             }
         });
@@ -514,9 +523,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             @Override
             public void onAction(long id) {
                 //We should open an activity to the user can sign up in the event
-                Intent intent = new Intent(NavigationDrawer.this,EventActivityGoing.class);
-                intent.putExtra("user",user);
-                intent.putExtra("event",id);
+                Intent intent = new Intent(NavigationDrawer.this, EventActivityGoing.class);
+                intent.putExtra("user", user);
+                intent.putExtra("event", id);
                 startActivity(intent);
             }
         });
@@ -535,19 +544,21 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                     }
                 });
 
-                if(mInterstitialAd.isLoaded()) {
+                if (mInterstitialAd.isLoaded()) {
                     mInterstitialAd.show();
-                }else{
+                } else {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(linkTutorial)));
                 }
 
             }
         });
+        newsFragment = new NewsFragment();
         viewPagerAdapter.addFragment(placesFragment, getResources().getString(R.string.places));
         viewPagerAdapter.addFragment(mapFragment, getResources().getString(R.string.map));
         viewPagerAdapter.addFragment(eventsFragment, getResources().getString(R.string.events));
         viewPagerAdapter.addFragment(tutorialsFragment, getResources().getString(R.string.tutorial));
-        viewPager.setOffscreenPageLimit(4);
+        viewPagerAdapter.addFragment(newsFragment,getResources().getString(R.string.news));
+        viewPager.setOffscreenPageLimit(5);
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -1068,6 +1079,84 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         protected void onProgressUpdate(Void... values) {
             super.onProgressUpdate(values);
         }
+    }
+
+    private class NewsAsync extends AsyncTask<String,Void,Void>{
+        private boolean swipe;
+
+        public NewsAsync() {
+        }
+
+        public NewsAsync(boolean swipe) {
+            this.swipe = swipe;
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            String urlAddress = strings[0];
+            StringBuilder newsJson;
+            HttpURLConnection urlConnection = null;
+            HttpURLConnection urlConnectionImage =  null;
+            news = new ArrayList<>();
+            try {
+                URL url = new URL(urlAddress);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.connect();
+                BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String line = "";
+                newsJson = new StringBuilder();
+
+                while ((line=br.readLine())!=null){
+                    newsJson.append(line);
+                }
+                JSONObject object = new JSONObject(newsJson.toString());
+                JSONObject response = object.getJSONObject("responseData");
+                JSONArray results = response.getJSONArray("results");
+
+                for(int i=0; i<results.length(); i++){
+                    News mNews = new News();
+                    mNews.setDescription(results.getJSONObject(i).getString("content"));
+                    mNews.setTitle(results.getJSONObject(i).getString("titleNoFormatting"));
+                    mNews.setEditor(results.getJSONObject(i).getString("publisher"));
+                    mNews.setDate(results.getJSONObject(i).getString("publishedDate"));
+                    mNews.setUrl(results.getJSONObject(i).getString("unescapedUrl"));
+                    if(results.getJSONObject(i).has("image")){
+                        JSONObject images = results.getJSONObject(i).getJSONObject("image");
+
+                        URL urlImage = new URL(images.getString("url"));
+                        urlConnectionImage = (HttpURLConnection) urlImage.openConnection();
+                        urlConnectionImage.connect();
+                        Bitmap bitmap = BitmapFactory.decodeStream(urlConnectionImage.getInputStream());
+                        mNews.setImage(bitmap);
+                    }
+                    news.add(mNews);
+                }
+
+            }catch (Exception e){
+                Log.e("NewsFragment", e.toString());
+            }finally {
+                urlConnection.disconnect();
+                if(urlConnectionImage!=null){
+                    urlConnectionImage.disconnect();
+                }
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            newsFragment.setNews(news,swipe);
+            if(swipe){
+                newsFragment.swipeRefreshLayout.setRefreshing(false);
+            }
+        }
+    }
+
+    public void callNewsRefresh(String url){
+        new NewsAsync(true).execute(url);
+
     }
 
 

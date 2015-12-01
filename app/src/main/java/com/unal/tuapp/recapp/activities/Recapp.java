@@ -6,13 +6,16 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.unal.tuapp.recapp.R;
+import com.unal.tuapp.recapp.adapters.ScreenSlidePagerAdapter;
 import com.unal.tuapp.recapp.backend.model.categoryApi.model.Category;
 import com.unal.tuapp.recapp.backend.model.commentApi.model.Comment;
 import com.unal.tuapp.recapp.backend.model.eventApi.model.Event;
@@ -26,6 +29,8 @@ import com.unal.tuapp.recapp.backend.model.subCategoryByTutorialApi.model.SubCat
 import com.unal.tuapp.recapp.backend.model.tutorialApi.model.Tutorial;
 import com.unal.tuapp.recapp.backend.model.userApi.model.User;
 import com.unal.tuapp.recapp.backend.model.userByPlaceApi.model.UserByPlace;
+import com.unal.tuapp.recapp.fragments.ImageFragment;
+import com.unal.tuapp.recapp.fragments.RecappFragment;
 import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.CategoryEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.CommentEndPoint;
@@ -44,14 +49,22 @@ import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserEndPoint;
 
 
 public class Recapp extends AppCompatActivity {
+    private View root;
+    public static ViewPager carrousel;
+    private ScreenSlidePagerAdapter screenSlidePagerAdapter;
+
     public static ProgressDialog init;
     public static int initValue = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recapp);
+        root = getLayoutInflater().inflate(R.layout.activity_recapp, null);
+        carrousel = (ViewPager) root.findViewById(R.id.view_pager_recapp);
+        setContentView(root);
+        setUpViewPager();
         addData();
+
 
     }
 
@@ -79,11 +92,28 @@ public class Recapp extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void setUpViewPager(){
+        screenSlidePagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        ImageFragment main1 = ImageFragment.newInstance(R.drawable.main1,"asdfadf asdf asdf dfasdf dasf");
+        ImageFragment main2 = ImageFragment.newInstance(R.drawable.main2,"asdfadf asdf asdf dfasdf dasf");
+        ImageFragment main3 = ImageFragment.newInstance(R.drawable.main3,"asdfadf asdf asdf dfasdf dasf");
+        screenSlidePagerAdapter.addFrament(main1);
+        screenSlidePagerAdapter.addFrament(main2);
+        screenSlidePagerAdapter.addFrament(main3);
+        screenSlidePagerAdapter.addFrament(new RecappFragment());
+        carrousel.setOffscreenPageLimit(4);
+        carrousel.setAdapter(screenSlidePagerAdapter);
+    }
+
     @Override
     public void onBackPressed() {
-        moveTaskToBack(true);
-
+        if (carrousel.getCurrentItem() == 0) {
+            super.onBackPressed();
+        } else {
+            carrousel.setCurrentItem(carrousel.getCurrentItem() - 1);
+        }
     }
+
 
     private void addData(){
         SharedPreferences pref = this.getPreferences(0);
@@ -97,6 +127,7 @@ public class Recapp extends AppCompatActivity {
                 //We should call the async task
                 init = new ProgressDialog(this);
                 init.setMessage("We are downloading the initial information");
+                init.setCancelable(false);
                 init.show();
 
 

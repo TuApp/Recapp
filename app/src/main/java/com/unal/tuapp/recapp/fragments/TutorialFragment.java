@@ -15,7 +15,9 @@ import android.view.ViewGroup;
 
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.adapters.RecycleTutorialAdapter;
+import com.unal.tuapp.recapp.backend.model.subCategoryByTutorialApi.model.SubCategoryByTutorial;
 import com.unal.tuapp.recapp.data.Tutorial;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.SubCategoryByTutorialEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.TutorialEndPoint;
 
 import java.util.ArrayList;
@@ -52,7 +54,11 @@ public class TutorialFragment  extends Fragment {
             public void onRefresh() {
                 com.unal.tuapp.recapp.backend.model.tutorialApi.model.Tutorial tutorial = new com.unal.tuapp.recapp.backend.model.tutorialApi.model.Tutorial();
                 Pair<Context, Pair<com.unal.tuapp.recapp.backend.model.tutorialApi.model.Tutorial, String>> pairTutorial = new Pair<>(getContext(), new Pair<>(tutorial, "getTutorials"));
-                new TutorialEndPoint(true).execute(pairTutorial);
+                new TutorialEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairTutorial);
+
+                SubCategoryByTutorial subCategoryByTutorial = new SubCategoryByTutorial();
+                Pair<Context, Pair<SubCategoryByTutorial, String>> pairSubCategoryByTutorial = new Pair<>(getContext(), new Pair<>(subCategoryByTutorial, "getSubCategoryByTutorial"));
+                new SubCategoryByTutorialEndPoint(true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairSubCategoryByTutorial);
             }
         });
         recyclerView.setLayoutManager(linearLayoutManager);

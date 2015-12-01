@@ -40,6 +40,7 @@ public class RecycleSubCategoriesAdapter extends RecyclerView.Adapter<RecyclerVi
             mCategoryImage = (ImageView) itemView.findViewById(R.id.category_image);
             mCategoryText = (TextView) itemView.findViewById(R.id.category_item);
             mCategoryId = (TextView) itemView.findViewById(R.id.category_id);
+            mCategoryImage.setVisibility(View.GONE);
 
             itemView.setOnClickListener(this);
         }
@@ -73,18 +74,7 @@ public class RecycleSubCategoriesAdapter extends RecyclerView.Adapter<RecyclerVi
         SubcategoryViewHolder subcategoryViewHolder = (SubcategoryViewHolder) holder;
         SubCategory subCategory =subCategories.get(position);
         subcategoryViewHolder.mCategoryText.setText(subCategory.getName());
-        byte[] image = subCategory.getImage();
-        subcategoryViewHolder.mCategoryImage.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-        int width =  subcategoryViewHolder.mCategoryImage.getMeasuredWidth();
-        int height =  subcategoryViewHolder.mCategoryImage.getMeasuredHeight();
-        Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
 
-        if(bitmap!=null) {
-            Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap, width * 4, height * 4, true);
-            subcategoryViewHolder.mCategoryImage.setImageBitmap(bitmapScaled);
-        }
-        subcategoryViewHolder.mCategoryImage.setImageResource(R.drawable.ic_home);
-        //subcategoryViewHolder.mCategoryImage.setImageBitmap(bitmapScaled);
     }
 
     public interface OnItemClickListener{

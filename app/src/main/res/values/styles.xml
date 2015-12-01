@@ -14,6 +14,11 @@
 
     </style>
 
+    <style name="MineCustomTabText" parent="TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
 
 
 

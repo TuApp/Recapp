@@ -83,25 +83,34 @@ public class CompanyPointsFragment extends Fragment {
                 public void onClick(View view) {
                     com.unal.tuapp.recapp.backend.model.placeApi.model.Place pointsPlace = new com.unal.tuapp.recapp.backend.model.placeApi.model.Place();
                     pointsPlace.setId(placeId);
-                    pointsPlace.setPoints((long)pointsValue);
+                    pointsPlace.setPoints((long) pointsValue);
                     Pair<Context,Pair<Place,String>> pair =
                             new Pair<>(getContext(),new Pair<>(pointsPlace,"removePoints"));
                     new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
 
                     com.unal.tuapp.recapp.backend.model.userApi.model.User userPoint = new com.unal.tuapp.recapp.backend.model.userApi.model.User();
                     userPoint.setId(userId);
-                    userPoint.setPoints((long)pointsValue);
+                    userPoint.setPoints((long) pointsValue);
                     Pair<Pair<Context,String>,Pair<com.unal.tuapp.recapp.backend.model.userApi.model.User,String>> pairUser =
                             new Pair<>(new Pair<>(getContext(),"nothing"),new Pair<>(userPoint,"addPointsUser"));
-                    new UserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairUser);
-                    Toast.makeText(getContext(),"Put again the card to check your points",Toast.LENGTH_SHORT).show();
+                    new UserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairUser);
+                    hideCompanyPoint();
+                    Toast.makeText(getContext(),"Put again the card to check your points",Toast.LENGTH_LONG).show();
+
                 }
             });
         }
     }
+    public void hideCompanyPoint(){
+        points.setVisibility(View.GONE);
+        maxPoints.setVisibility(View.GONE);
+        minPoints.setVisibility(View.GONE);
+        addPoints.setVisibility(View.GONE);
+    }
     public void showCompanyPoint(Place place){
         if(place!=null){
             placeId = place.getId();
+            addPoints.setVisibility(View.VISIBLE);
             minPoints.setText("min Points: 0");
             maxPoints.setText("max Points:" +place.getPoints()+"");
             maxPoints.setVisibility(View.VISIBLE);

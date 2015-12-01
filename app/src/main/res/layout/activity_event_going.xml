@@ -7,7 +7,7 @@
     <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="16dp"
+        android:layout_margin="@dimen/activity_vertical_margin"
         android:layout_weight="7">
 
         <LinearLayout
@@ -21,20 +21,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:src="@android:drawable/ic_input_add"
-                android:layout_marginBottom="16dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"/>
             <TextView
                 android:id="@+id/event_going_title"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:singleLine="true"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:textSize="25sp"
                 android:textStyle="bold"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:paddingLeft="8dp" />
             <TextView
                 android:id="@+id/event_going_description"
@@ -44,9 +44,9 @@
                 android:minLines="1"
                 android:lines="4"
                 android:maxLines="8"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:paddingLeft="8dp"/>
 
             <TextView
@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="10sp"
                 android:text="@string/to"
-                android:layout_marginLeft="8dp"/>
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
 
 
 
@@ -65,7 +65,7 @@
                 android:textSize="15sp"
                 android:editable="false"
                 android:paddingLeft="8dp"
-                android:layout_marginLeft="8dp"/>
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
 
 
 
@@ -73,14 +73,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="10sp"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:text="@string/place"/>
 
             <TextView
                 android:id="@+id/event_going_place"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
+                android:layout_margin="@dimen/activity_vertical_margin"
                 android:editable="false"
                 android:textSize="15sp"/>
 
@@ -90,8 +90,8 @@
                  android:layout_height="wrap_content"
                  android:text="@string/going"
                  android:textSize="15sp"
-                 android:layout_marginLeft="8dp"
-                 android:layout_marginTop="8dp"/>
+                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                 android:layout_marginTop="@dimen/activity_vertical_margin"/>
 
         </LinearLayout>
 

@@ -12,6 +12,7 @@ import com.unal.tuapp.recapp.backend.model.commentApi.model.Comment;
 import com.unal.tuapp.recapp.backend.model.commentApi.model.CommentCollection;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.fragments.CommentsFragment;
+import com.unal.tuapp.recapp.fragments.CompanyCommentsFragment;
 import com.unal.tuapp.recapp.others.Utility;
 
 import java.io.IOException;
@@ -185,6 +186,7 @@ public class CommentEndPoint extends AsyncTask<Pair<Pair<Context,Pair<Long,Long>
         super.onPostExecute(aVoid);
         if(swipe){
             CommentsFragment.mySwipeRefresh.setRefreshing(false);
+            CompanyCommentsFragment.class.getSimpleName();
         }
     }
 

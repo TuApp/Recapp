@@ -8,6 +8,7 @@ import android.util.Pair;
 import com.unal.tuapp.recapp.backend.model.subCategoryByPlaceApi.model.CollectionResponseSubCategoryByPlace;
 import com.unal.tuapp.recapp.backend.model.subCategoryByPlaceApi.model.SubCategoryByPlace;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.fragments.PlacesFragment;
 import com.unal.tuapp.recapp.others.Utility;
 
 import java.io.IOException;
@@ -18,6 +19,15 @@ import java.util.List;
  * Created by andresgutierrez on 11/15/15.
  */
 public class SubCategoryByPlaceEndPoint extends AsyncTask<Pair<Context,Pair<SubCategoryByPlace,String>>,Void,Void> {
+    private boolean swipe;
+
+    public SubCategoryByPlaceEndPoint() {
+    }
+
+    public SubCategoryByPlaceEndPoint(boolean swipe) {
+        this.swipe = swipe;
+    }
+
     @Override
     protected Void doInBackground(Pair<Context, Pair<SubCategoryByPlace, String>>... pairs) {
        try {
@@ -65,6 +75,9 @@ public class SubCategoryByPlaceEndPoint extends AsyncTask<Pair<Context,Pair<SubC
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        if(swipe){
+            PlacesFragment.mySwipeRefresh.setRefreshing(false);
+        }
     }
 
     @Override

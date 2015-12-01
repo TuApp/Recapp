@@ -17,9 +17,11 @@ import android.view.ViewGroup;
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.adapters.RecyclePlaceAdapter;
 import com.unal.tuapp.recapp.backend.model.categoryApi.model.Category;
+import com.unal.tuapp.recapp.backend.model.subCategoryByPlaceApi.model.SubCategoryByPlace;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.CategoryEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.SubCategoryByPlaceEndPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +56,10 @@ public class PlacesFragment extends Fragment {
 
                 com.unal.tuapp.recapp.backend.model.placeApi.model.Place place = new com.unal.tuapp.recapp.backend.model.placeApi.model.Place();
                 Pair<Context, Pair<com.unal.tuapp.recapp.backend.model.placeApi.model.Place, String>> pair = new Pair<>(getContext(), new Pair<>(place, "getPlaces"));
-                new PlaceEndPoint(true).execute(pair);
+                new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
+                SubCategoryByPlace subCategoryByPlace = new SubCategoryByPlace();
+                Pair<Context, Pair<SubCategoryByPlace, String>> pairSubCategoryByPlace = new Pair<>(getContext(), new Pair<>(subCategoryByPlace, "getSubCategoryByPlace"));
+                new SubCategoryByPlaceEndPoint(true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairSubCategoryByPlace);
 
 
             }

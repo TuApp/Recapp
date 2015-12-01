@@ -8,17 +8,18 @@
         android:id="@+id/googlePlus"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_centerInParent="true"/>
 
     <Button
         android:id="@+id/companyLogin"
         android:layout_height="48dp"
         android:layout_width="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:layout_below="@+id/googlePlus"
         android:text="@string/company_loging"
         android:background="@color/my_primary"

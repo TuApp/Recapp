@@ -8,6 +8,7 @@ import android.util.Pair;
 import com.unal.tuapp.recapp.backend.model.subCategoryByTutorialApi.model.CollectionResponseSubCategoryByTutorial;
 import com.unal.tuapp.recapp.backend.model.subCategoryByTutorialApi.model.SubCategoryByTutorial;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.fragments.TutorialFragment;
 import com.unal.tuapp.recapp.others.Utility;
 
 import java.io.IOException;
@@ -18,6 +19,15 @@ import java.util.List;
  * Created by andresgutierrez on 11/15/15.
  */
 public class SubCategoryByTutorialEndPoint extends AsyncTask<Pair<Context,Pair<SubCategoryByTutorial,String>>,Void,Void> {
+    private boolean swipe;
+
+    public SubCategoryByTutorialEndPoint() {
+    }
+
+    public SubCategoryByTutorialEndPoint(boolean swipe) {
+        this.swipe = swipe;
+    }
+
     @Override
     protected Void doInBackground(Pair<Context, Pair<SubCategoryByTutorial, String>>... pairs) {
         try {
@@ -64,6 +74,9 @@ public class SubCategoryByTutorialEndPoint extends AsyncTask<Pair<Context,Pair<S
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        if(swipe){
+            TutorialFragment.mySwipeRefresh.setRefreshing(false);
+        }
     }
 
     @Override

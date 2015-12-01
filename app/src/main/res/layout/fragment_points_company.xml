@@ -7,14 +7,17 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:layout_gravity="center">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_margin="16dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:id="@+id/company_frame">
 
             <ImageView
@@ -29,8 +32,8 @@
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:layout_marginTop="32dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:gravity="center"
                 android:id="@+id/company_point_card"
                 android:visibility="gone">
@@ -39,20 +42,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:layout_margin="8dp">
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin">
 
                     <ImageView
                         android:id="@+id/user_image"
                         android:layout_width="150dp"
                         android:layout_height="150dp"
-                        android:layout_marginBottom="16dp" />
+                        android:layout_marginBottom="@dimen/activity_vertical_margin" />
 
                     <TextView
                         android:id="@+id/user_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
-                        android:layout_marginBottom="16dp"
+                        android:layout_marginBottom="@dimen/activity_vertical_margin"
                         android:layout_below="@id/user_image"/>
 
                     <TextView
@@ -60,7 +66,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
-                        android:layout_marginBottom="16dp"
+                        android:layout_marginBottom="@dimen/activity_vertical_margin"
                         android:layout_below="@id/user_name"/>
 
                     <TextView
@@ -76,7 +82,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
-                        android:layout_marginBottom="16dp"
+                        android:layout_marginBottom="@dimen/activity_vertical_margin"
                         android:layout_below="@id/user_email"/>
 
                 </RelativeLayout>

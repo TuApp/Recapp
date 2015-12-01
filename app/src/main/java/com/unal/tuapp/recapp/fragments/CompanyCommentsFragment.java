@@ -1,14 +1,18 @@
 package com.unal.tuapp.recapp.fragments;
 
+import android.content.Context;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +21,7 @@ import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.adapters.RecycleCommentsUserAdapter;
 import com.unal.tuapp.recapp.data.Comment;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.CommentEndPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +34,7 @@ public class CompanyCommentsFragment  extends Fragment implements LoaderManager.
     private RecyclerView companyComments;
     private RecycleCommentsUserAdapter companyCommentsAdapter;
     private final int PLACE_COMMENT = 1376;
+    public static SwipeRefreshLayout mySwipeRefresh;
     private long id;
     @Nullable
     @Override
@@ -37,6 +43,21 @@ public class CompanyCommentsFragment  extends Fragment implements LoaderManager.
         if(getActivity().getIntent().getExtras()!=null){
             id = getActivity().getIntent().getExtras().getLong("id");
         }
+        mySwipeRefresh = (SwipeRefreshLayout) root.findViewById(R.id.company_comments_refresh);
+        mySwipeRefresh.setColorSchemeResources(
+                R.color.blue,       //This method will rotate
+                R.color.red,        //colors given to it when
+                R.color.yellow,     //loader continues to
+                R.color.green);
+        mySwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                com.unal.tuapp.recapp.backend.model.commentApi.model.Comment comment = new com.unal.tuapp.recapp.backend.model.commentApi.model.Comment();
+                Pair<Pair<Context, Pair<Long, Long>>, Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment, String>> pairComment = new Pair<>(new Pair<>(getContext(), new Pair<>(-1L, -1L)),
+                        new Pair<>(comment, "getComments"));
+                new CommentEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairComment);
+            }
+        });
         companyComments = (RecyclerView) root.findViewById(R.id.company_comments);
         companyComments.setLayoutManager(new LinearLayoutManager(getActivity()));
         companyCommentsAdapter = new RecycleCommentsUserAdapter(new ArrayList<Comment>());

@@ -19,11 +19,7 @@ import java.util.List;
  * Created by andresgutierrez on 11/15/15.
  */
 public class EventEndPoint extends AsyncTask <Pair<Context,Pair<Event,String>>,Void,Void> {
-    private boolean swipe;
 
-    public EventEndPoint(boolean swipe) {
-        this.swipe = swipe;
-    }
     public EventEndPoint() {
     }
 
@@ -86,9 +82,7 @@ public class EventEndPoint extends AsyncTask <Pair<Context,Pair<Event,String>>,V
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        if (swipe){
-            EventsFragment.mySwipeRefresh.setRefreshing(false);
-        }
+
     }
 
     @Override

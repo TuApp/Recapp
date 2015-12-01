@@ -16,21 +16,21 @@
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:src="@android:drawable/ic_input_add"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"/>
         <EditText
             android:id="@+id/event_dialog_title"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:singleLine="true"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:textSize="25sp"
             android:hint="@string/eventName"
             android:textStyle="bold"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:paddingLeft="8dp"/>
         <EditText
             android:id="@+id/event_dialog_description"
@@ -41,9 +41,9 @@
             android:lines="4"
             android:maxLines="8"
             android:hint="@string/description"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:paddingLeft="8dp"/>
 
         <TextView
@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:textSize="10sp"
             android:text="@string/to"
-            android:layout_marginLeft="8dp"/>
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
 
         <LinearLayout
             android:id="@+id/event_dialog_to"
@@ -67,8 +67,8 @@
                 android:layout_weight="4"
                 android:drawableRight="@android:drawable/arrow_down_float"
                 android:editable="false"
-                android:paddingLeft="8dp"
-                android:layout_marginLeft="8dp"/>
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
 
             <EditText
                 android:id="@+id/event_dialog_time"
@@ -79,7 +79,7 @@
                 android:drawableRight="@android:drawable/arrow_down_float"
                 android:editable="false"
                 android:paddingLeft="8dp"
-                android:layout_marginRight="8dp"/>
+                android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
         </LinearLayout>
 
@@ -87,14 +87,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="10sp"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:text="@string/place"/>
 
         <EditText
             android:id="@+id/event_dialog_place"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:drawableRight="@android:drawable/arrow_down_float"
             android:editable="false"
             android:textSize="15sp"/>

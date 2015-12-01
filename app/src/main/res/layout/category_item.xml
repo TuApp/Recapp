@@ -4,7 +4,7 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/category_card"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="60dp"
     android:layout_gravity="center"
     android:layout_margin="4dp"
     android:foreground="?android:attr/selectableItemBackground"

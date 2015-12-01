@@ -70,5 +70,8 @@
     <string name="add_points">Add points</string>
     <string name="skip">Skip</string>
     <string name="news">News</string>
+    <string name="first_general">Find the best recycle points and events</string>
+    <string name="first_points">Find the recycle points close to you</string>
+    <string name="first_events">Visit the most important recycle events</string>
 
 </resources>

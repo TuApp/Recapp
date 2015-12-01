@@ -2,29 +2,29 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"  tools:context=".RecappFragment">
 
-    <include layout="@layout/toolbar"/>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/main1"
+        android:scaleType="centerCrop"/>
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/googlePlus"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_centerInParent="true"/>
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:id="@+id/companyLogin"
         android:layout_height="48dp"
         android:layout_width="match_parent"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:layout_below="@+id/googlePlus"
         android:text="@string/company_loging"
         android:background="@color/my_primary"
         android:textColor="@android:color/white"
-        android:textAllCaps="false"/>
+        android:textAllCaps="false"
+        android:layout_above="@+id/googlePlus"
+        android:layout_centerHorizontal="true" />
 
 
 </RelativeLayout>

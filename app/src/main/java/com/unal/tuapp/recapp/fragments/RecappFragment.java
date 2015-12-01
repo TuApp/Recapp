@@ -47,8 +47,8 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_recapp,container,false);
-        Toolbar toolbar = (Toolbar) root.findViewById(R.id.toolbar);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        /*Toolbar toolbar = (Toolbar) root.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);*/
         mGooglePlus=GooglePlus.getInstance(getActivity(), this, this);
         mSignInProgress = mGooglePlus.STATE_DEFAULT;
         mSignInButton = (SignInButton) root.findViewById(R.id.googlePlus);

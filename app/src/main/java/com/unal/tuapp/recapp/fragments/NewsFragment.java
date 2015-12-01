@@ -18,6 +18,7 @@ import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.activities.NavigationDrawer;
 import com.unal.tuapp.recapp.adapters.RecycleNewsAdapter;
 import com.unal.tuapp.recapp.data.News;
+import com.unal.tuapp.recapp.others.Utility;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -54,8 +55,8 @@ public class NewsFragment extends Fragment{
 
             }
         });
-        LinearLayoutManager linearLayoutManager =  new LinearLayoutManager(getContext());
-        recyclerNews.setLayoutManager(linearLayoutManager);
+        RecyclerView.LayoutManager layoutManager = Utility.getLayoutManager(getActivity(), getResources().getConfiguration().orientation, 3);
+        recyclerNews.setLayoutManager(layoutManager);
         recycleNewsAdapter.setOnNewsListener(new RecycleNewsAdapter.OnNewsListener() {
             @Override
             public void onNews(String link) {

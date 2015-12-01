@@ -94,9 +94,9 @@ public class Recapp extends AppCompatActivity {
 
     private void setUpViewPager(){
         screenSlidePagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
-        ImageFragment main1 = ImageFragment.newInstance(R.drawable.main1,"asdfadf asdf asdf dfasdf dasf");
-        ImageFragment main2 = ImageFragment.newInstance(R.drawable.main2,"asdfadf asdf asdf dfasdf dasf");
-        ImageFragment main3 = ImageFragment.newInstance(R.drawable.main3,"asdfadf asdf asdf dfasdf dasf");
+        ImageFragment main1 = ImageFragment.newInstance(R.drawable.main1,getString(R.string.first_general));
+        ImageFragment main2 = ImageFragment.newInstance(R.drawable.main2,getString(R.string.first_points));
+        ImageFragment main3 = ImageFragment.newInstance(R.drawable.main3,getString(R.string.first_events));
         screenSlidePagerAdapter.addFrament(main1);
         screenSlidePagerAdapter.addFrament(main2);
         screenSlidePagerAdapter.addFrament(main3);

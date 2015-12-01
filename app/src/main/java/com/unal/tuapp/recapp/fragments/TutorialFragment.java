@@ -17,6 +17,7 @@ import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.adapters.RecycleTutorialAdapter;
 import com.unal.tuapp.recapp.backend.model.subCategoryByTutorialApi.model.SubCategoryByTutorial;
 import com.unal.tuapp.recapp.data.Tutorial;
+import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.SubCategoryByTutorialEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.TutorialEndPoint;
 
@@ -41,7 +42,7 @@ public class TutorialFragment  extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tutorial, container,false);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        RecyclerView.LayoutManager layoutManager = Utility.getLayoutManager(getActivity(), getResources().getConfiguration().orientation, 3);
         recyclerView = (RecyclerView) view.findViewById(R.id.tutorial_recycler);
         mySwipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.tutorial_refresh);
         mySwipeRefresh.setColorSchemeResources(
@@ -61,7 +62,7 @@ public class TutorialFragment  extends Fragment {
                 new SubCategoryByTutorialEndPoint(true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairSubCategoryByTutorial);
             }
         });
-        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setLayoutManager(layoutManager);
         List<Tutorial> tutorials = new ArrayList<>();
         adapter = new RecycleTutorialAdapter(tutorials);
         adapter.setOnItemClickListener(new RecycleTutorialAdapter.OnItemClickListener() {

@@ -1,11 +1,13 @@
 package com.unal.tuapp.recapp.fragments;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
@@ -19,6 +21,7 @@ import com.unal.tuapp.recapp.adapters.RecyclePlaceAdapter;
 import com.unal.tuapp.recapp.backend.model.categoryApi.model.Category;
 import com.unal.tuapp.recapp.backend.model.subCategoryByPlaceApi.model.SubCategoryByPlace;
 import com.unal.tuapp.recapp.data.Place;
+import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.CategoryEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.SubCategoryByPlaceEndPoint;
@@ -70,8 +73,8 @@ public class PlacesFragment extends Fragment {
         //recyclerView.setHasFixedSize(true);
         filters = new ArrayList<>();
         List<Place> places = new ArrayList<>();
-        LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(linearLayout);
+        RecyclerView.LayoutManager layoutManager = Utility.getLayoutManager(getActivity(), getResources().getConfiguration().orientation, 3);
+        recyclerView.setLayoutManager(layoutManager);
         recyclePlaceAdapter = new RecyclePlaceAdapter(places);
         recyclePlaceAdapter.setOnItemClickListener(new RecyclePlaceAdapter.OnItemClickListener() {
             @Override

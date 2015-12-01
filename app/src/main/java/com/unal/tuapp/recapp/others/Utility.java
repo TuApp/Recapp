@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -11,7 +12,11 @@ import android.nfc.tech.MifareClassic;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
@@ -450,7 +455,7 @@ public class Utility {
             Log.i(TAG, "block count: " + blockCount);
             Log.i(TAG, "sector count: " + sectorCount);
             Log.i(TAG, "block for sector count: " + blockCountForSector);
-            Log.i(TAG, "first block of sector " + sector +": " + indexOfFirstBlock);
+            Log.i(TAG, "first block of sector " + sector + ": " + indexOfFirstBlock);
 
             if(user != null){
                 byte []blockData = mifare.readBlock(indexOfFirstBlock);
@@ -560,6 +565,13 @@ public class Utility {
     }
     public static byte[] decodeImage(String image){
         return Base64.decodeBase64(image);
+    }
+
+    public static RecyclerView.LayoutManager getLayoutManager(FragmentActivity fragmentActivity, int orientation, int columns){
+        if(orientation == Configuration.ORIENTATION_PORTRAIT)
+            return new LinearLayoutManager(fragmentActivity);
+        else
+            return new GridLayoutManager(fragmentActivity, columns);
     }
 
 }

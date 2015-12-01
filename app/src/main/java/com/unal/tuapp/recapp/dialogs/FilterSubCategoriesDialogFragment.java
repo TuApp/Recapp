@@ -20,6 +20,7 @@ import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.adapters.RecycleSubCategoriesAdapter;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.SubCategory;
+import com.unal.tuapp.recapp.others.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,7 @@ public class FilterSubCategoriesDialogFragment extends DialogFragment implements
         View view = inflater.inflate(R.layout.subcategories_filter, container);
         getDialog().setTitle(R.string.sub_category);
         getDialog().setCancelable(true);
-        RecyclerView.LayoutManager linearLayoutManager = new GridLayoutManager(getContext(),2);
+        RecyclerView.LayoutManager linearLayoutManager = Utility.getLayoutManager(getActivity(), getResources().getConfiguration().orientation, 1);
         recyclerView = (RecyclerView) view.findViewById(R.id.subcategories_recycler);
         recyclerView.setLayoutManager(linearLayoutManager);
         List<SubCategory> subCategories = new ArrayList<>();

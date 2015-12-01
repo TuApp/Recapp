@@ -4,7 +4,7 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/tutorial_card"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="250dp"
     android:layout_gravity="center"
     android:layout_margin="4dp"
     android:foreground="?android:attr/selectableItemBackground"
@@ -15,26 +15,26 @@
     <!--this is the layout the we will use to inflate each row of our recycleview -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="10dp">
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:clickable="false">
         <TextView android:id="@+id/tutorial_tittle_item"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:textSize="25sp"
             android:text="Tittle"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/tutorial_icon"
-            android:layout_toEndOf="@+id/tutorial_icon"
-            android:paddingLeft="15dp" />
+            android:layout_below="@+id/tutorial_icon"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
         <TextView android:id="@+id/tutorial_description_item"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:textSize="20sp"
             android:text="Description"
             android:layout_below="@+id/tutorial_tittle_item"
-            android:layout_toRightOf="@+id/tutorial_icon"
-            android:layout_toEndOf="@+id/tutorial_icon"
-            android:paddingLeft="15dp" />
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:visibility="gone" />
         <TextView android:id="@+id/tutorial_link_item"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
@@ -42,18 +42,18 @@
             android:text="www.youtube.com"
             android:textStyle="bold|italic"
             android:layout_below="@+id/tutorial_description_item"
-            android:layout_toRightOf="@+id/tutorial_icon"
-            android:layout_toEndOf="@+id/tutorial_icon"
-            android:paddingLeft="15dp" />
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:visibility="gone" />
 
         <ImageView
-            android:layout_width="120dp"
+            android:layout_width="match_parent"
             android:layout_height="120dp"
             android:id="@+id/tutorial_icon"
             android:src="@drawable/youtube"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>

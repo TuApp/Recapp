@@ -31,25 +31,28 @@
             android:id="@+id/description_news"
             android:textSize="20sp"
             android:layout_below="@+id/image_news"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/editor_news"
-            android:layout_below="@+id/description_news"
             android:textSize="15sp"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="8dp"/>
+            android:text="editor"
+            android:layout_below="@+id/description_news"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/date_news"
-            android:layout_below="@+id/description_news"
             android:textSize="15sp"
-            android:layout_alignParentLeft="true"
-            android:layout_marginBottom="8dp"/>
+            android:text="fecha"
+            android:layout_below="@+id/editor_news"
+            android:layout_toRightOf="@+id/image_news"
+            android:layout_toEndOf="@+id/image_news" />
 
     </RelativeLayout>
 

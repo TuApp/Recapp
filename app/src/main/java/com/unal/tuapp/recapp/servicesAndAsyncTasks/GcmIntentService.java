@@ -253,46 +253,48 @@ public class GcmIntentService extends IntentService {
             String nextPage = "";
             List<String> idsAll = new ArrayList<>();
             String queryAll = RecappContract.CommentEntry._ID + " NOT IN ( ";
-            while (!collectionResponseComment.getNextPageToken().equals(nextPage)){
-                commentListAll = collectionResponseComment.getItems();
-                if(commentListAll!=null){
-                    List<ContentValues> valuesList = new ArrayList<>();
-                    for (Comment i: commentListAll){
-                        queryAll+="?,";
-                        idsAll.add(i.getId()+"");
-                        ContentValues value = new ContentValues();
-                        value.put(RecappContract.CommentEntry.COLUMN_DESCRIPTION, i.getDescription());
-                        value.put(RecappContract.CommentEntry.COLUMN_DATE, i.getDate());
-                        value.put(RecappContract.CommentEntry.COLUMN_RATING, i.getRating());
-                        value.put(RecappContract.CommentEntry._ID, i.getId());
-                        value.put(RecappContract.CommentEntry.COLUMN_PLACE_KEY, i.getPlaceId());
-                        value.put(RecappContract.CommentEntry.COLUMN_USER_KEY, i.getUserId());
-                        valuesList.add(value);
-                    }
-                    ContentValues values[] = new ContentValues[valuesList.size()];
-                    valuesList.toArray(values);
-                    this.getContentResolver().bulkInsert(
-                            RecappContract.CommentEntry.CONTENT_URI,
-                            values
-                    );
-                    nextPage = collectionResponseComment.getNextPageToken();
-                    collectionResponseComment = Utility.getCommentApi().list().setCursor(nextPage).execute();
+            if(collectionResponseComment.getNextPageToken()!=null) {
+                while (!collectionResponseComment.getNextPageToken().equals(nextPage)) {
+                    commentListAll = collectionResponseComment.getItems();
+                    if (commentListAll != null) {
+                        List<ContentValues> valuesList = new ArrayList<>();
+                        for (Comment i : commentListAll) {
+                            queryAll += "?,";
+                            idsAll.add(i.getId() + "");
+                            ContentValues value = new ContentValues();
+                            value.put(RecappContract.CommentEntry.COLUMN_DESCRIPTION, i.getDescription());
+                            value.put(RecappContract.CommentEntry.COLUMN_DATE, i.getDate());
+                            value.put(RecappContract.CommentEntry.COLUMN_RATING, i.getRating());
+                            value.put(RecappContract.CommentEntry._ID, i.getId());
+                            value.put(RecappContract.CommentEntry.COLUMN_PLACE_KEY, i.getPlaceId());
+                            value.put(RecappContract.CommentEntry.COLUMN_USER_KEY, i.getUserId());
+                            valuesList.add(value);
+                        }
+                        ContentValues values[] = new ContentValues[valuesList.size()];
+                        valuesList.toArray(values);
+                        this.getContentResolver().bulkInsert(
+                                RecappContract.CommentEntry.CONTENT_URI,
+                                values
+                        );
+                        nextPage = collectionResponseComment.getNextPageToken();
+                        collectionResponseComment = Utility.getCommentApi().list().setCursor(nextPage).execute();
 
+                    }
                 }
+                String idsListAll[] = new String[idsAll.size()];
+                queryAll = queryAll.substring(0, queryAll.length() - 1);
+                queryAll += ")";
+                idsAll.toArray(idsListAll);
+                if (idsAll.isEmpty()) {
+                    queryAll = null;
+                    idsListAll = null;
+                }
+                this.getContentResolver().delete(
+                        RecappContract.CommentEntry.CONTENT_URI,
+                        queryAll,
+                        idsListAll
+                );
             }
-            String idsListAll[] = new String[idsAll.size()];
-            queryAll=queryAll.substring(0,queryAll.length()-1);
-            queryAll+=")";
-            idsAll.toArray(idsListAll);
-            if(idsAll.isEmpty()){
-                queryAll = null;
-                idsListAll = null;
-            }
-            this.getContentResolver().delete(
-                    RecappContract.CommentEntry.CONTENT_URI,
-                    queryAll,
-                    idsListAll
-            );
         }catch (IOException e){
 
         }
@@ -340,41 +342,43 @@ public class GcmIntentService extends IntentService {
             List<String> ids = new ArrayList<>();
             String query = RecappContract.EventByUserEntry._ID + " NOT IN ( ";
             String nextPage = "";
-            while (!collectionResponseEventByUser.getNextPageToken().equals(nextPage)){
-                eventByUserList = collectionResponseEventByUser.getItems();
-                if(eventByUserList!=null){
-                    List<ContentValues> valuesList = new ArrayList<>();
-                    for (EventByUser i : eventByUserList){
-                        ids.add(i.getId()+"");
-                        query+="?,";
-                        ContentValues value = new ContentValues();
-                        value.put(RecappContract.EventByUserEntry._ID,i.getId());
-                        value.put(RecappContract.EventByUserEntry.COLUMN_KEY_EVENT,i.getEventId());
-                        value.put(RecappContract.EventByUserEntry.COLUMN_KEY_USER,i.getEmail());
-                        valuesList.add(value);
+            if(collectionResponseEventByUser.getNextPageToken()!=null) {
+                while (!collectionResponseEventByUser.getNextPageToken().equals(nextPage)) {
+                    eventByUserList = collectionResponseEventByUser.getItems();
+                    if (eventByUserList != null) {
+                        List<ContentValues> valuesList = new ArrayList<>();
+                        for (EventByUser i : eventByUserList) {
+                            ids.add(i.getId() + "");
+                            query += "?,";
+                            ContentValues value = new ContentValues();
+                            value.put(RecappContract.EventByUserEntry._ID, i.getId());
+                            value.put(RecappContract.EventByUserEntry.COLUMN_KEY_EVENT, i.getEventId());
+                            value.put(RecappContract.EventByUserEntry.COLUMN_KEY_USER, i.getEmail());
+                            valuesList.add(value);
+                        }
+                        ContentValues[] values = new ContentValues[valuesList.size()];
+                        valuesList.toArray(values);
+                        this.getContentResolver().bulkInsert(
+                                RecappContract.EventByUserEntry.CONTENT_URI,
+                                values
+                        );
+                        nextPage = collectionResponseEventByUser.getNextPageToken();
+                        collectionResponseEventByUser = Utility.getEventByUserApi().list().setCursor(nextPage).execute();
                     }
-                    ContentValues [] values = new ContentValues[valuesList.size()];
-                    valuesList.toArray(values);
-                    this.getContentResolver().bulkInsert(
-                            RecappContract.EventByUserEntry.CONTENT_URI,
-                            values
-                    );
-                    nextPage = collectionResponseEventByUser.getNextPageToken();
-                    collectionResponseEventByUser = Utility.getEventByUserApi().list().setCursor(nextPage).execute();
                 }
+                query = query.substring(0, query.length() - 1);
+                query += ")";
+                String queryArgs[] = new String[ids.size()];
+                if (ids.isEmpty()) {
+                    query = null;
+                    queryArgs = null;
+                }
+                this.getContentResolver().delete(
+                        RecappContract.EventByUserEntry.CONTENT_URI,
+                        query,
+                        queryArgs
+                );
             }
-            query = query.substring(0,query.length()-1);
-            query += ")";
-            String queryArgs [] = new String[ids.size()];
-            if(ids.isEmpty()){
-                query = null;
-                queryArgs = null;
-            }
-            this.getContentResolver().delete(
-                    RecappContract.EventByUserEntry.CONTENT_URI,
-                    query,
-                    queryArgs
-            );
         }catch (IOException e){
 
         }
@@ -387,93 +391,95 @@ public class GcmIntentService extends IntentService {
             List<String> ids = new ArrayList<>();
             String query = RecappContract.EventEntry._ID + " NOT IN ( ";
             String nextPage = "";
-            while (!collectionResponseEvent.getNextPageToken().equals(nextPage)){
-                List<ContentValues> valuesList = new ArrayList<>();
-                eventList = collectionResponseEvent.getItems();
-                if(eventList!=null) {
-                    for (Event i : eventList) {
-                        ids.add(i.getId()+"");
-                        query+="?,";
-                        ContentValues value = new ContentValues();
-                        value.put(RecappContract.EventEntry._ID, i.getId());
-                        value.put(RecappContract.EventEntry.COLUMN_ADDRESS, i.getAddress());
-                        value.put(RecappContract.EventEntry.COLUMN_CREATOR, i.getCreator());
-                        value.put(RecappContract.EventEntry.COLUMN_DATE, i.getStartDate());
-                        value.put(RecappContract.EventEntry.COLUMN_DESCRIPTION, i.getDescription());
-                        value.put(RecappContract.EventEntry.COLUMN_IMAGE, Utility.decodeImage(i.getImage()));
-                        value.put(RecappContract.EventEntry.COLUMN_LAT, i.getLat());
-                        value.put(RecappContract.EventEntry.COLUMN_LOG, i.getLng());
-                        value.put(RecappContract.EventEntry.COLUMN_NAME, i.getName());
-                        valuesList.add(value);
-                    }
-                    nextPage = collectionResponseEvent.getNextPageToken();
-                    ContentValues values[] = new ContentValues[valuesList.size()];
-                    valuesList.toArray(values);
-                    this.getContentResolver().bulkInsert(
-                            RecappContract.EventEntry.CONTENT_URI,
-                            values
-                    );
-                    collectionResponseEvent = Utility.getEventApi().list().setCursor(nextPage).execute();
-                }
-
-            }
-            query = query.substring(0,query.length()-1);
-            query += ")";
-            String [] queryArgs = new String[ids.size()];
-            ids.toArray(queryArgs);
-            switch (type){
-                case "addEvent":
-                    //We should make the notification to the events
-                    //NotificationCompat.InboxStyle inboxStyle = new NotificationCompat
-                    Intent newIntent = new Intent(this,Recapp.class);
-                    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, newIntent, 0);
-                    Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                    Notification notification = new Notification.Builder(this)
-                            .setContentTitle("There are new events")
-                            .setContentText("which are waiting for you")
-                            .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentIntent(pendingIntent)
-                            .setLargeIcon(BitmapFactory.decodeResource(this.getResources(),R.mipmap.ic_launcher))
-                            .setAutoCancel(true)
-                            .setVibrate(new long[]{1000, 1000, 1000, 1000})
-                            .setLights(Color.RED, 3000, 3000)
-                            .setSound(alarmSound)
-                            .build();
-                    NotificationManager manager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-                    manager.notify(-1,notification);
-                    break;
-                case "deleteEvent":
-                    List<Long> idsUser = new ArrayList<>();
-                    if(ids.isEmpty()){
-                        query = null;
-                        queryArgs = null;
-                    }
-                    Cursor cursor  = this.getContentResolver().query(
-                            RecappContract.EventByUserEntry.CONTENT_URI,
-                            new String[]{RecappContract.EventEntry._ID},
-                            query,
-                            queryArgs,
-                            null
-                    );
-                    while (cursor.moveToNext()){
-                        idsUser.add(cursor.getLong(0));
-                    }
-                    if(!idsUser.isEmpty()){
-                        for (Long i:idsUser){
-                            Utility.getEventByUserApi().removeUsers(i);
+            if(collectionResponseEvent.getNextPageToken()!=null) {
+                while (!collectionResponseEvent.getNextPageToken().equals(nextPage)) {
+                    List<ContentValues> valuesList = new ArrayList<>();
+                    eventList = collectionResponseEvent.getItems();
+                    if (eventList != null) {
+                        for (Event i : eventList) {
+                            ids.add(i.getId() + "");
+                            query += "?,";
+                            ContentValues value = new ContentValues();
+                            value.put(RecappContract.EventEntry._ID, i.getId());
+                            value.put(RecappContract.EventEntry.COLUMN_ADDRESS, i.getAddress());
+                            value.put(RecappContract.EventEntry.COLUMN_CREATOR, i.getCreator());
+                            value.put(RecappContract.EventEntry.COLUMN_DATE, i.getStartDate());
+                            value.put(RecappContract.EventEntry.COLUMN_DESCRIPTION, i.getDescription());
+                            value.put(RecappContract.EventEntry.COLUMN_IMAGE, Utility.decodeImage(i.getImage()));
+                            value.put(RecappContract.EventEntry.COLUMN_LAT, i.getLat());
+                            value.put(RecappContract.EventEntry.COLUMN_LOG, i.getLng());
+                            value.put(RecappContract.EventEntry.COLUMN_NAME, i.getName());
+                            valuesList.add(value);
                         }
+                        nextPage = collectionResponseEvent.getNextPageToken();
+                        ContentValues values[] = new ContentValues[valuesList.size()];
+                        valuesList.toArray(values);
+                        this.getContentResolver().bulkInsert(
+                                RecappContract.EventEntry.CONTENT_URI,
+                                values
+                        );
+                        collectionResponseEvent = Utility.getEventApi().list().setCursor(nextPage).execute();
                     }
-                    break;
+
+                }
+                query = query.substring(0, query.length() - 1);
+                query += ")";
+                String[] queryArgs = new String[ids.size()];
+                ids.toArray(queryArgs);
+                switch (type) {
+                    case "addEvent":
+                        //We should make the notification to the events
+                        //NotificationCompat.InboxStyle inboxStyle = new NotificationCompat
+                        Intent newIntent = new Intent(this, Recapp.class);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, newIntent, 0);
+                        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                        Notification notification = new Notification.Builder(this)
+                                .setContentTitle("There are new events")
+                                .setContentText("which are waiting for you")
+                                .setSmallIcon(R.mipmap.ic_launcher)
+                                .setContentIntent(pendingIntent)
+                                .setLargeIcon(BitmapFactory.decodeResource(this.getResources(), R.mipmap.ic_launcher))
+                                .setAutoCancel(true)
+                                .setVibrate(new long[]{1000, 1000, 1000, 1000})
+                                .setLights(Color.RED, 3000, 3000)
+                                .setSound(alarmSound)
+                                .build();
+                        NotificationManager manager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+                        manager.notify(-1, notification);
+                        break;
+                    case "deleteEvent":
+                        List<Long> idsUser = new ArrayList<>();
+                        if (ids.isEmpty()) {
+                            query = null;
+                            queryArgs = null;
+                        }
+                        Cursor cursor = this.getContentResolver().query(
+                                RecappContract.EventByUserEntry.CONTENT_URI,
+                                new String[]{RecappContract.EventEntry._ID},
+                                query,
+                                queryArgs,
+                                null
+                        );
+                        while (cursor.moveToNext()) {
+                            idsUser.add(cursor.getLong(0));
+                        }
+                        if (!idsUser.isEmpty()) {
+                            for (Long i : idsUser) {
+                                Utility.getEventByUserApi().removeUsers(i);
+                            }
+                        }
+                        break;
+                }
+                if (ids.isEmpty()) {
+                    query = null;
+                    queryArgs = null;
+                }
+                this.getContentResolver().delete(
+                        RecappContract.EventEntry.CONTENT_URI,
+                        query,
+                        queryArgs
+                );
             }
-            if(ids.isEmpty()){
-                query = null;
-                queryArgs = null;
-            }
-            this.getContentResolver().delete(
-                    RecappContract.EventEntry.CONTENT_URI,
-                    query,
-                    queryArgs
-            );
         }catch (IOException e){
 
         }
@@ -485,44 +491,46 @@ public class GcmIntentService extends IntentService {
             List<String> ids = new ArrayList<>();
             String query = RecappContract.PlaceImageEntry._ID + " NOT IN ( ";
             String nextPage = "";
-            while (!collectionResponsePlaceImage.getNextPageToken().equals(nextPage)){
-                placeImageList = collectionResponsePlaceImage.getItems();
-                if(placeImageList!=null){
-                    List<ContentValues> valuesList = new ArrayList<>();
-                    for(PlaceImage i:placeImageList){
-                        ids.add(i.getId() + "");
-                        query+="?,";
-                        ContentValues value = new ContentValues();
-                        value.put(RecappContract.PlaceImageEntry._ID,i.getId());
-                        value.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,i.getWorth());
-                        value.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,i.getPlaceId());
-                        value.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE,Utility.decodeImage(i.getImage()));
-                        valuesList.add(value);
+            if(collectionResponsePlaceImage.getNextPageToken()!=null) {
+                while (!collectionResponsePlaceImage.getNextPageToken().equals(nextPage)) {
+                    placeImageList = collectionResponsePlaceImage.getItems();
+                    if (placeImageList != null) {
+                        List<ContentValues> valuesList = new ArrayList<>();
+                        for (PlaceImage i : placeImageList) {
+                            ids.add(i.getId() + "");
+                            query += "?,";
+                            ContentValues value = new ContentValues();
+                            value.put(RecappContract.PlaceImageEntry._ID, i.getId());
+                            value.put(RecappContract.PlaceImageEntry.COLUMN_WORTH, i.getWorth());
+                            value.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, i.getPlaceId());
+                            value.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, Utility.decodeImage(i.getImage()));
+                            valuesList.add(value);
+                        }
+                        ContentValues values[] = new ContentValues[valuesList.size()];
+                        valuesList.toArray(values);
+                        this.getContentResolver().bulkInsert(
+                                RecappContract.PlaceImageEntry.CONTENT_URI,
+                                values
+                        );
+                        nextPage = collectionResponsePlaceImage.getNextPageToken();
+                        collectionResponsePlaceImage = Utility.getPlaceImageApi().list().setCursor(nextPage).execute();
                     }
-                    ContentValues values [] = new ContentValues[valuesList.size()];
-                    valuesList.toArray(values);
-                    this.getContentResolver().bulkInsert(
-                            RecappContract.PlaceImageEntry.CONTENT_URI,
-                            values
-                    );
-                    nextPage = collectionResponsePlaceImage.getNextPageToken();
-                    collectionResponsePlaceImage = Utility.getPlaceImageApi().list().setCursor(nextPage).execute();
                 }
-            }
-            query = query.substring(0,query.length()-1);
-            query += ")";
-            String queryArgs[] = new String[ids.size()];
-            ids.toArray(queryArgs);
-            if(ids.isEmpty()){
-                query = null;
-                queryArgs = null;
-            }
+                query = query.substring(0, query.length() - 1);
+                query += ")";
+                String queryArgs[] = new String[ids.size()];
+                ids.toArray(queryArgs);
+                if (ids.isEmpty()) {
+                    query = null;
+                    queryArgs = null;
+                }
 
-            this.getContentResolver().delete(
-                    RecappContract.PlaceImageEntry.CONTENT_URI,
-                    query,
-                    queryArgs
-            );
+                this.getContentResolver().delete(
+                        RecappContract.PlaceImageEntry.CONTENT_URI,
+                        query,
+                        queryArgs
+                );
+            }
         }catch (IOException e){
 
         }
@@ -535,46 +543,48 @@ public class GcmIntentService extends IntentService {
             String nextPage = "";
             List<String> ids = new ArrayList<>();
             String query = RecappContract.ReminderEntry._ID + " NOT IN ( ";
-            while (!collectionResponseReminderAll.getNextPageToken().equals(nextPage)){
-                reminderListAll = collectionResponseReminderAll.getItems();
-                if(reminderListAll!=null){
-                    List<ContentValues> valuesList = new ArrayList<>();
-                    for(Reminder i: reminderListAll){
-                        ids.add(i.getId()+"");
-                        query+="?,";
-                        ContentValues value = new ContentValues();
-                        value.put(RecappContract.ReminderEntry._ID,i.getId());
-                        value.put(RecappContract.ReminderEntry.COLUMN_NOTIFICATION, i.getNotification());
-                        value.put(RecappContract.ReminderEntry.COLUMN_NAME,i.getName());
-                        value.put(RecappContract.ReminderEntry.COLUMN_END_DATE,i.getEndDate());
-                        value.put(RecappContract.ReminderEntry.COLUMN_DESCRIPTION,i.getDescription());
-                        value.put(RecappContract.ReminderEntry.COLUMN_PLACE_KEY,i.getPlaceId());
-                        value.put(RecappContract.ReminderEntry.COLUMN_USER_KEY,i.getUserId());
-                        valuesList.add(value);
+            if(collectionResponseReminderAll.getNextPageToken()!=null) {
+                while (!collectionResponseReminderAll.getNextPageToken().equals(nextPage)) {
+                    reminderListAll = collectionResponseReminderAll.getItems();
+                    if (reminderListAll != null) {
+                        List<ContentValues> valuesList = new ArrayList<>();
+                        for (Reminder i : reminderListAll) {
+                            ids.add(i.getId() + "");
+                            query += "?,";
+                            ContentValues value = new ContentValues();
+                            value.put(RecappContract.ReminderEntry._ID, i.getId());
+                            value.put(RecappContract.ReminderEntry.COLUMN_NOTIFICATION, i.getNotification());
+                            value.put(RecappContract.ReminderEntry.COLUMN_NAME, i.getName());
+                            value.put(RecappContract.ReminderEntry.COLUMN_END_DATE, i.getEndDate());
+                            value.put(RecappContract.ReminderEntry.COLUMN_DESCRIPTION, i.getDescription());
+                            value.put(RecappContract.ReminderEntry.COLUMN_PLACE_KEY, i.getPlaceId());
+                            value.put(RecappContract.ReminderEntry.COLUMN_USER_KEY, i.getUserId());
+                            valuesList.add(value);
+                        }
+                        ContentValues[] values = new ContentValues[valuesList.size()];
+                        valuesList.toArray(values);
+                        this.getContentResolver().bulkInsert(
+                                RecappContract.ReminderEntry.CONTENT_URI,
+                                values
+                        );
+                        nextPage = collectionResponseReminderAll.getNextPageToken();
+                        collectionResponseReminderAll = Utility.getReminderApi().list().setCursor(nextPage).execute();
                     }
-                    ContentValues [] values = new ContentValues[valuesList.size()];
-                    valuesList.toArray(values);
-                    this.getContentResolver().bulkInsert(
-                            RecappContract.ReminderEntry.CONTENT_URI,
-                            values
-                    );
-                    nextPage = collectionResponseReminderAll.getNextPageToken();
-                    collectionResponseReminderAll = Utility.getReminderApi().list().setCursor(nextPage).execute();
                 }
+                query = query.substring(0, query.length() - 1);
+                query += ")";
+                String queryArgs[] = new String[ids.size()];
+                ids.toArray(queryArgs);
+                if (ids.isEmpty()) {
+                    query = null;
+                    queryArgs = null;
+                }
+                this.getContentResolver().delete(
+                        RecappContract.ReminderEntry.CONTENT_URI,
+                        query,
+                        queryArgs
+                );
             }
-            query = query.substring(0,query.length()-1);
-            query +=")";
-            String queryArgs[] = new String[ids.size()];
-            ids.toArray(queryArgs);
-            if(ids.isEmpty()){
-                query = null;
-                queryArgs = null;
-            }
-            this.getContentResolver().delete(
-                    RecappContract.ReminderEntry.CONTENT_URI,
-                    query,
-                    queryArgs
-            );
         }catch (IOException e){}
     }
 
@@ -780,42 +790,45 @@ public class GcmIntentService extends IntentService {
             String nextPage = "";
             List<String> ids = new ArrayList<>();
             String query = RecappContract.UserByPlaceEntry._ID + " NOT IN ( ";
-            while (!collectionResponseUserByPlace.getNextPageToken().equals(nextPage)){
-                userByPlaceListAll = collectionResponseUserByPlace.getItems();
-                if(userByPlaceListAll!=null){
-                    List<ContentValues> valuesList = new ArrayList<>();
-                    for (UserByPlace i:userByPlaceListAll){
-                        ids.add(i.getId()+"");
-                        query+="?,";
-                        ContentValues value = new ContentValues();
-                        value.put(RecappContract.UserByPlaceEntry._ID,i.getId());
-                        value.put(RecappContract.UserByPlaceEntry.COLUMN_USER_KEY,i.getUserId());
-                        value.put(RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY,i.getPlaceId());
-                        valuesList.add(value);
+            if(collectionResponseUserByPlace.getNextPageToken()!=null) {
+                while (!collectionResponseUserByPlace.getNextPageToken().equals(nextPage)) {
+                    userByPlaceListAll = collectionResponseUserByPlace.getItems();
+                    if (userByPlaceListAll != null) {
+                        List<ContentValues> valuesList = new ArrayList<>();
+                        for (UserByPlace i : userByPlaceListAll) {
+                            ids.add(i.getId() + "");
+                            query += "?,";
+                            ContentValues value = new ContentValues();
+                            value.put(RecappContract.UserByPlaceEntry._ID, i.getId());
+                            value.put(RecappContract.UserByPlaceEntry.COLUMN_USER_KEY, i.getUserId());
+                            value.put(RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY, i.getPlaceId());
+                            valuesList.add(value);
+                        }
+                        ContentValues values[] = new ContentValues[valuesList.size()];
+                        valuesList.toArray(values);
+                        this.getContentResolver().bulkInsert(
+                                RecappContract.UserByPlaceEntry.CONTENT_URI,
+                                values
+                        );
+                        nextPage = collectionResponseUserByPlace.getNextPageToken();
+                        collectionResponseUserByPlace = Utility.getUserByPlaceApi().list().setCursor(nextPage).execute();
                     }
-                    ContentValues values[] = new ContentValues[valuesList.size()];
-                    valuesList.toArray(values);
-                    this.getContentResolver().bulkInsert(
-                            RecappContract.UserByPlaceEntry.CONTENT_URI,
-                            values
-                    );
-                    nextPage = collectionResponseUserByPlace.getNextPageToken();
-                    collectionResponseUserByPlace = Utility.getUserByPlaceApi().list().setCursor(nextPage).execute();
                 }
+
+                query = query.substring(0, query.length() - 1);
+                query += ")";
+                String queryArgs[] = new String[ids.size()];
+                ids.toArray(queryArgs);
+                if (ids.isEmpty()) {
+                    query = null;
+                    queryArgs = null;
+                }
+                this.getContentResolver().delete(
+                        RecappContract.UserByPlaceEntry.CONTENT_URI,
+                        query,
+                        queryArgs
+                );
             }
-            query = query.substring(0,query.length()-1);
-            query+=")";
-            String queryArgs [] = new String[ids.size()];
-            ids.toArray(queryArgs);
-            if(ids.isEmpty()){
-                query=null;
-                queryArgs = null;
-            }
-            this.getContentResolver().delete(
-                    RecappContract.UserByPlaceEntry.CONTENT_URI,
-                    query,
-                    queryArgs
-            );
         }catch (IOException e){}
     }
 }

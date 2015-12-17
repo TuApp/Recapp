@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center"
             app:adSize="BANNER"
-            app:adUnitId="@string/banner_ad_unit_id"/>
+            app:adUnitId="@string/banner_ad_unit_id_navigation"/>
 
     </android.support.design.widget.CoordinatorLayout>
 

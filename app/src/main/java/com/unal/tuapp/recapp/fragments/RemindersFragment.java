@@ -49,10 +49,10 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
         if(extras!=null){
             user = extras.getParcelable("user");
         }
-        com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder reminder = new com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder();
+        /*com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder reminder = new com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder();
         reminder.setUserId(user.getId());
         Pair<Context,Pair<com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder,String>> pair = new Pair<>(getContext(),new Pair<>(reminder,"getReminderUser"));
-        new ReminderEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
+        new ReminderEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);*/
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
         final List<Reminder> reminders = new ArrayList<>();

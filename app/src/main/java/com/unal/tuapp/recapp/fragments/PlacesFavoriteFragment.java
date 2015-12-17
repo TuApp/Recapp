@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
@@ -42,15 +43,16 @@ public class PlacesFavoriteFragment extends Fragment implements LoaderManager.Lo
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        root = inflater.inflate(R.layout.fragment_places,container,false);
+        root = inflater.inflate(R.layout.fragment_places_favorite,container,false);
+
         Bundle extras = getActivity().getIntent().getExtras();
         if(extras!=null){
             user = extras.getParcelable("user");
         }
-        UserByPlace userByPlaceBackend = new UserByPlace();
+        /*UserByPlace userByPlaceBackend = new UserByPlace();
         userByPlaceBackend.setUserId(user.getId());
         Pair<Context,Pair<UserByPlace,String>> pairUserByPlace = new Pair<>(getContext(),new Pair<>(userByPlaceBackend,"getUserByPlaceUser"));
-        new UserByPlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairUserByPlace);
+        new UserByPlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairUserByPlace);*/
         recyclerView = (RecyclerView) root.findViewById(R.id.places_recycle_view);
 
         final List<Place> places = new ArrayList<>();

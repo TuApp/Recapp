@@ -146,14 +146,14 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         super.onCreate(savedInstanceState);
         root = getLayoutInflater().inflate(R.layout.activity_navigation_drawer, null);
         setContentView(root);
-        Pair<Pair<Context,String>,Pair<com.unal.tuapp.recapp.backend.model.userApi.model.User,String>> pair = new Pair<>(new Pair<>(getApplicationContext(),"nothing"),new Pair<>(new com.unal.tuapp.recapp.backend.model.userApi.model.User(),"allUser"));
-        new UserEndPoint().execute(pair);
+        /*Pair<Pair<Context,String>,Pair<com.unal.tuapp.recapp.backend.model.userApi.model.User,String>> pair = new Pair<>(new Pair<>(getApplicationContext(),"nothing"),new Pair<>(new com.unal.tuapp.recapp.backend.model.userApi.model.User(),"allUser"));
+        new UserEndPoint().execute(pair);*/
         mAdView = (AdView) root.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
                 .build();
         mAdView.loadAd(adRequest);
         mInterstitialAd = new InterstitialAd(NavigationDrawer.this);
-        mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id));
+        mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id_tutorial));
         mInterstitialAd.loadAd(adRequest);
 
         eventCreate = (FloatingActionButton) root.findViewById(R.id.event_create);
@@ -164,6 +164,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         savedInstance = false;
         if(savedInstanceState!=null){
             savedInstance = true;
+        }
+        if(getIntent().hasExtra("email")) {
+            emailUser = getIntent().getExtras().getString("email");
         }
         email = (TextView) findViewById(R.id.user_email);
         name = (TextView) findViewById(R.id.user_name);
@@ -188,13 +191,6 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         currentPerson.getName().getGivenName(), currentPerson.getName().getFamilyName());
                 }catch (Exception e){}
                 new LoadProfileImage(root, imageView).execute(personPhotoUrl, account.getAccountName(mGooglePlus.mGoogleApiClient));
-            }else {
-                emailUser = getIntent().getExtras().getString("email");
-                try {
-                    Utility.addUser(this, emailUser, "", "");
-                }catch (Exception e){}
-                email.setText(emailUser);
-
             }
 
             if(getSupportLoaderManager().getLoader(USER)==null) {
@@ -253,6 +249,11 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                     getSupportLoaderManager().initLoader(PLACE, null, NavigationDrawer.this);
                 } else {
                     getSupportLoaderManager().restartLoader(PLACE, null, NavigationDrawer.this);
+                }
+                if (getSupportLoaderManager().getLoader(TUTORIAL) == null) {
+                    getSupportLoaderManager().initLoader(TUTORIAL, null, NavigationDrawer.this);
+                } else {
+                    getSupportLoaderManager().restartLoader(TUTORIAL, null, NavigationDrawer.this);
                 }
             }
         });
@@ -393,6 +394,11 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                     } else {
                         getSupportLoaderManager().restartLoader(PLACE, null, NavigationDrawer.this);
                     }
+                    if (getSupportLoaderManager().getLoader(TUTORIAL) == null) {
+                        getSupportLoaderManager().initLoader(TUTORIAL, null, NavigationDrawer.this);
+                    } else {
+                        getSupportLoaderManager().restartLoader(TUTORIAL, null, NavigationDrawer.this);
+                    }
 
                 }
 
@@ -402,7 +408,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         });
         deepLink = PlusShare.getDeepLinkId(getIntent());
         navDrawer.getMenu().findItem(R.id.home).setChecked(true);
-        new NewsAsync().execute("https://ajax.googleapis.com/ajax/services/search/news?v=1.0&q=reciclaje&rsz=8");
+        if(Utility.isNetworkAvailable(this)) {
+            new NewsAsync().execute("https://ajax.googleapis.com/ajax/services/search/news?v=2.0&q=reciclaje&rsz=8");
+        }
 
         //handleIntent(getIntent());
     }
@@ -798,6 +806,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                     if(!user.getLastName().equals("") && !user.getName().equals("")){
                         name.setText(user.getName()+" "+user.getLastName());
                     }
+                    if(!user.getEmail().equals("")){
+                        email.setText(user.getEmail());
+                    }
                     if (user.getProfileImage()!=null){
                         imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
                                 user.getProfileImage().length));
@@ -831,16 +842,21 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 break;
             case TUTORIAL:
                 if(filtersConstraint.isEmpty()) {
+                    //Log.e("algo","algo");
                     tutorials = Tutorial.allTutorials(data);
                     tutorialsFragment.setDataTutorials(tutorials, data);
-                    addPreviewsToTutorial(tutorials);
+                    if(Utility.isNetworkAvailable(this)) {
+                        addPreviewsToTutorial(tutorials);
+                    }
                 }
                 break;
             case TUTORIAL_FILTER:
                 if(!filtersConstraint.isEmpty()){
                     tutorials = Tutorial.allTutorials(data);
                     tutorialsFragment.setDataTutorials(tutorials, data);
-                    addPreviewsToTutorial(tutorials);
+                    if(Utility.isNetworkAvailable(this)) {
+                        addPreviewsToTutorial(tutorials);
+                    }
                 }
 
                 break;
@@ -1034,7 +1050,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             Tutorial tutorial = (Tutorial) objects[0];
             String thumbnailURL = (String) objects[1];
             tutorial.setPreviewURL(thumbnailURL);
-            new PreviewYouTube().execute(tutorial);
+            if(Utility.isNetworkAvailable(getApplicationContext())) {
+                new PreviewYouTube().execute(tutorial);
+            }
         }
 
         @Override
@@ -1115,8 +1133,8 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
 
                 for(int i=0; i<results.length(); i++){
                     News mNews = new News();
-                    mNews.setDescription(results.getJSONObject(i).getString("content"));
-                    mNews.setTitle(results.getJSONObject(i).getString("titleNoFormatting"));
+                    mNews.setDescription(android.text.Html.fromHtml(results.getJSONObject(i).getString("content")).toString());
+                    mNews.setTitle(android.text.Html.fromHtml(results.getJSONObject(i).getString("titleNoFormatting")).toString());
                     mNews.setEditor(results.getJSONObject(i).getString("publisher"));
                     mNews.setDate(results.getJSONObject(i).getString("publishedDate"));
                     mNews.setUrl(results.getJSONObject(i).getString("unescapedUrl"));
@@ -1155,7 +1173,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     }
 
     public void callNewsRefresh(String url){
-        new NewsAsync(true).execute(url);
+        if(Utility.isNetworkAvailable(this)) {
+            new NewsAsync(true).execute(url);
+        }
 
     }
 

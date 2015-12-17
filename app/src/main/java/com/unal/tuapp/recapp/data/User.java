@@ -90,8 +90,14 @@ public class User implements Parcelable {
         parcel.writeString(lastName);
         parcel.writeDouble(lat);
         parcel.writeDouble(log);
-        parcel.writeInt(profileImage.length);
-        parcel.writeByteArray(profileImage);
+        if(profileImage==null){
+            parcel.writeInt(0);
+        }else{
+            parcel.writeInt(1);
+            parcel.writeInt(profileImage.length);
+            parcel.writeByteArray(profileImage);
+        }
+
     }
 
     private User(Parcel parcel) {
@@ -101,9 +107,12 @@ public class User implements Parcelable {
         lastName = parcel.readString();
         lat = parcel.readDouble();
         log = parcel.readDouble();
-        int size = parcel.readInt();
-        profileImage = new byte[size];
-        parcel.readByteArray(profileImage);
+        int isImage = parcel.readInt();
+        if(isImage==1) {
+            int size = parcel.readInt();
+            profileImage = new byte[size];
+            parcel.readByteArray(profileImage);
+        }
 
     }
 

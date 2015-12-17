@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.unal.tuapp.recapp.fragments.MyPointsFragment;
@@ -66,6 +67,7 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
     private  de.hdodenhof.circleimageview.CircleImageView imageView;
     private PendingIntent pendingIntent;
     private String point;
+    private String emailUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,22 +98,44 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
         googlePlus = GooglePlus.getInstance(this, null, null);
         if (googlePlus.mGoogleApiClient.isConnected()) {
             //Account account = Plus.AccountApi;
-            name.setText(user.getName() + " " + user.getLastName());
+            if(user!=null) {
+                name.setText(user.getName() + " " + user.getLastName());
 
-            email.setText(user.getEmail());
+                email.setText(user.getEmail());
 
 
-            if (user.getProfileImage() != null) {
-                imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
-                        user.getProfileImage().length));
-            } else if (Utility.isNetworkAvailable(this)) {
+                if (user.getProfileImage() != null) {
+                    imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
+                            user.getProfileImage().length));
+                }
+                else if (Utility.isNetworkAvailable(this)) {
+                    Person currentPerson = Plus.PeopleApi.getCurrentPerson(googlePlus.mGoogleApiClient);
+                    String personPhotoUrl = currentPerson.getImage().getUrl();
+                    //We try to request a image with major size, the new image will be of 600*600 pixels
+                    //The user doesn't have a image so we try to download one and put it to the user
+                    personPhotoUrl = personPhotoUrl.substring(0, personPhotoUrl.length() - 2) + googlePlus.PROFILE_PIC_SIZE;
+                    new LoadProfileImage(root, imageView).execute(personPhotoUrl, user.getEmail());
+                }
+            }else if(Utility.isNetworkAvailable(this)){
                 Person currentPerson = Plus.PeopleApi.getCurrentPerson(googlePlus.mGoogleApiClient);
+                Account account = Plus.AccountApi;
                 String personPhotoUrl = currentPerson.getImage().getUrl();
                 //We try to request a image with major size, the new image will be of 600*600 pixels
-                //The user doesn't have a image so we try to download one and put it to the user
-                personPhotoUrl = personPhotoUrl.substring(0, personPhotoUrl.length() - 2) + googlePlus.PROFILE_PIC_SIZE;
-                new LoadProfileImage(root, imageView).execute(personPhotoUrl, user.getEmail());
+                personPhotoUrl = personPhotoUrl.substring(0,personPhotoUrl.length()-2) + googlePlus.PROFILE_PIC_SIZE;
+
+
+                name.setText(currentPerson.getDisplayName());
+
+                emailUser = account.getAccountName(googlePlus.mGoogleApiClient);
+                email.setText(emailUser);
+
+                try{
+                    Utility.addUser(this,emailUser,
+                            currentPerson.getName().getGivenName(), currentPerson.getName().getFamilyName());
+                }catch (Exception e){}
+                new LoadProfileImage(root, imageView).execute(personPhotoUrl, account.getAccountName(googlePlus.mGoogleApiClient));
             }
+
 
         }
         toolbar = (Toolbar) root.findViewById(R.id.toolbar);

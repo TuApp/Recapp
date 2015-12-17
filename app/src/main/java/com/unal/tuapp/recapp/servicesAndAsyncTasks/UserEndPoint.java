@@ -102,6 +102,7 @@ public class UserEndPoint extends AsyncTask<Pair<Pair<Context,String>, Pair<User
                         values.put(RecappContract.UserEntry.COLUMN_USER_NAME,temp.getName());
                         values.put(RecappContract.UserEntry.COLUMN_USER_LASTNAME,temp.getLastname());
                         values.put(RecappContract.UserEntry._ID, temp.getId());
+                        values.put(RecappContract.UserEntry.COLUMN_USER_IMAGE,Utility.decodeImage(temp.getProfileImage()));
                         try {
                             pairs[0].first.first.getContentResolver().insert(
                                     RecappContract.UserEntry.CONTENT_URI,

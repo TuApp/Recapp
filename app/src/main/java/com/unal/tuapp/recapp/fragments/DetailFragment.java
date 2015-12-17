@@ -52,6 +52,7 @@ import com.unal.tuapp.recapp.data.Comment;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
+import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.CommentEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserByPlaceEndPoint;
@@ -152,14 +153,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     if(cursor.moveToFirst()){
                         userByPlaceBackend.setId(cursor.getLong(0));
                     }
-                    Pair<Context,Pair<UserByPlace,String>> pairUserByPlace = new Pair<>(getContext(),new Pair<>(userByPlaceBackend,"deleteUserByPlace"));
-                    new UserByPlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairUserByPlace);
-
                     getActivity().getContentResolver().delete(
                             RecappContract.UserByPlaceEntry.CONTENT_URI,
                             selection,
                             new String[]{"" + user.getId(), "" + id}
                     );
+                    Pair<Context,Pair<UserByPlace,String>> pairUserByPlace = new Pair<>(getContext(),new Pair<>(userByPlaceBackend,"deleteUserByPlace"));
+                    new UserByPlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairUserByPlace);
+
+
                 }
                 //favorite.invalidate();
             }
@@ -404,11 +406,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         RecappContract.PlaceEntry._ID + " = ? ",
                         new String[]{"" + this.id}
                 );
-                com.unal.tuapp.recapp.backend.model.placeApi.model.Place place = new com.unal.tuapp.recapp.backend.model.placeApi.model.Place();
-                place.setId(id);
-                place.setRating((float) rating);
-                Pair<Context,Pair<com.unal.tuapp.recapp.backend.model.placeApi.model.Place,String>> pairPlace = new Pair<>(getContext(),new Pair<>(place,"updatePlaceRating"));
-                new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairPlace);
+                if(Utility.isNetworkAvailable(getContext())) {
+                    com.unal.tuapp.recapp.backend.model.placeApi.model.Place place = new com.unal.tuapp.recapp.backend.model.placeApi.model.Place();
+                    place.setId(id);
+                    place.setRating((float) rating);
+                    Pair<Context, Pair<com.unal.tuapp.recapp.backend.model.placeApi.model.Place, String>> pairPlace = new Pair<>(getContext(), new Pair<>(place, "updatePlaceRating"));
+                    new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairPlace);
+                }
 
                 ratingCursor = data;
                 break;
@@ -476,15 +480,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
     public void sharePlace(){
 
+        if(!place.getWeb().startsWith("http://") || !place.getWeb().startsWith("https://")){
+            place.setWeb("http://"+place.getWeb());
+        }
         ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
                 .putString("og:type", "unalrecycle:recycle")
                 .putString("og:title", "Name: " + place.getName())
                 .putString("og:description","Description: " + place.getDescription())
                 .putString("og:url", place.getWeb())
                 .putString("place:location:latitude",""+place.getLat())
-                .putString("place:location:longitude",""+place.getLog())
+                .putString("place:location:longitude", "" + place.getLog())
                 .putString("unalrecyce:hastag","#recycle")
-                .putString("og:image","https://scontent-mia1-1.xx.fbcdn.net/hphotos-xtp1/v/t34.0-12/11922061_10206791589044848_1016804803_n.jpg?oh=e3900090e3ada42e02a62eadff90c700&oe=55FA5CE6")
+                .putString("og:image","https://scontent-mia1-1.xx.fbcdn.net/hphotos-xtf1/v/t1.0-9/12347998_10207330643760879_1614176967930939591_n.jpg?oh=498fbe834b4a7de3adf9d7d5f2cffc3f&oe=571C63E5" )
                 .build();
 
         ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
@@ -509,12 +516,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
                 @Override
                 public void onCancel() {
+                    Log.e("algo","algo");
 
                 }
 
                 @Override
                 public void onError(FacebookException e) {
-
+                    Log.e("algo","algo");
                 }
             });
         }

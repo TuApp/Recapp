@@ -51,7 +51,7 @@ public class NewsFragment extends Fragment{
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                ((NavigationDrawer)getActivity()).callNewsRefresh("https://ajax.googleapis.com/ajax/services/search/news?v=1.0&q=reciclaje&rsz=8&start="+recycleNewsAdapter.getItemCount());
+                ((NavigationDrawer)getActivity()).callNewsRefresh("https://ajax.googleapis.com/ajax/services/search/news?v=2.0&q=reciclaje&rsz=8&start="+recycleNewsAdapter.getItemCount()+1);
 
             }
         });

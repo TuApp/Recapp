@@ -78,13 +78,14 @@ public class RecycleTutorialAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         Tutorial tutorial = tutorials.get(position);
         tutorialsViewHolder.mTittle.setText(tutorial.getTittle());
         tutorialsViewHolder.mDescription.setText(tutorial.getDescription());
+        tutorialsViewHolder.mLink.setVisibility(View.GONE);
         //String link = tutorial.getLink();
 
         if(tutorial.getPreview() != null){
             tutorialsViewHolder.mIcon.setImageBitmap(tutorial.getPreview());
         }else{
             tutorialsViewHolder.mIcon.setImageResource(R.drawable.youtube);
-            tutorialsViewHolder.mLink.setVisibility(View.GONE);
+
         }
     }
 

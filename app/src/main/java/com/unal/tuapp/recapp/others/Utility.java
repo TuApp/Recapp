@@ -91,8 +91,7 @@ public class Utility {
     public static void addUser(Context context,String email,String name,String lastname) throws ExecutionException, InterruptedException {
         Cursor userCursor = context.getContentResolver().query(
                 RecappContract.UserEntry.buildUserEmail(email),
-                new String[]{RecappContract.UserEntry._ID,
-                        RecappContract.UserEntry.COLUMN_USER_IMAGE},
+                null,
                 null,
                 null,
                 null
@@ -121,8 +120,11 @@ public class Utility {
 
         }else{//There is a user but we should update the values
             User user = new User();
+            user.setId(userCursor.getLong(userCursor.getColumnIndexOrThrow(RecappContract.UserEntry._ID)));
             user.setEmail(email);
             user.setProfileImage(encodeImage(userCursor.getBlob(userCursor.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_IMAGE))));
+            user.setName(userCursor.getString(userCursor.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_NAME)));
+            user.setLastname(userCursor.getString(userCursor.getColumnIndexOrThrow(RecappContract.UserEntry.COLUMN_USER_LASTNAME)));
             ContentValues values = new ContentValues();
             if(!name.equals("")) {
                 user.setName(name);
@@ -137,7 +139,6 @@ public class Utility {
                         RecappContract.UserEntry.COLUMN_EMAIL + "= ?",
                         new String[]{email});
             }
-            user.setId(userCursor.getLong(userCursor.getColumnIndexOrThrow(RecappContract.UserEntry._ID)));
             Pair<Pair<Context,String>,Pair<User,String>> pair = new Pair<>(new Pair<>(context,email),new Pair<>(user,"updateUser"));
 
             new UserEndPoint().execute(pair);

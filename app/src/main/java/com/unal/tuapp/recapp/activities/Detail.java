@@ -34,6 +34,7 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.unal.tuapp.recapp.others.GooglePlus;
@@ -60,6 +61,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
     private DetailFragment detailFragment;
     private InterstitialAd mInterstitialAd;
     private CollapsingToolbarLayout collapsingToolbarLayout;
+    private String emailUser;
 
 
     @Override
@@ -68,7 +70,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
         root = getLayoutInflater().inflate(R.layout.activity_detail, null);
         setContentView(root);
         mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id));
+        mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id_gallery));
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {
@@ -88,29 +90,45 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
         }
         getSupportLoaderManager().initLoader(PLACE,null,this);
         mGooglePlus = GooglePlus.getInstance(this, null, null);
-
+        TextView name = (TextView) findViewById(R.id.user_name);
+        TextView email = (TextView) findViewById(R.id.user_email);
+        de.hdodenhof.circleimageview.CircleImageView imageView;
+        imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
         if(mGooglePlus.mGoogleApiClient.isConnected()){
-
             //Account account = Plus.AccountApi;
-
-
-            TextView name = (TextView) findViewById(R.id.user_name);
-            name.setText(user.getName()+" "+user.getLastName());
-
-            TextView email = (TextView) findViewById(R.id.user_email);
-            email.setText(user.getEmail());
-            de.hdodenhof.circleimageview.CircleImageView imageView;
-            imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
-            if(user.getProfileImage()!=null) {
-                imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
-                        user.getProfileImage().length));
+            if(user!=null){
+                name.setText(user.getName()+" "+user.getLastName());
+                email.setText(user.getEmail());
+                if(user.getProfileImage()!=null) {
+                    imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
+                            user.getProfileImage().length));
+                }
+                else if(Utility.isNetworkAvailable(this)){
+                    Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGooglePlus.mGoogleApiClient);
+                    String personPhotoUrl = currentPerson.getImage().getUrl();
+                    //We try to request a image with major size, the new image will be of 600*600 pixels
+                    //The user doesn't have a image so we try to download one and put it to the user
+                    personPhotoUrl = personPhotoUrl.substring(0,personPhotoUrl.length()-2) + mGooglePlus.PROFILE_PIC_SIZE;
+                    new LoadProfileImage(root,imageView).execute(personPhotoUrl,user.getEmail());
+                }
             }else if(Utility.isNetworkAvailable(this)){
                 Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGooglePlus.mGoogleApiClient);
+                Account account = Plus.AccountApi;
                 String personPhotoUrl = currentPerson.getImage().getUrl();
                 //We try to request a image with major size, the new image will be of 600*600 pixels
-                //The user doesn't have a image so we try to download one and put it to the user
                 personPhotoUrl = personPhotoUrl.substring(0,personPhotoUrl.length()-2) + mGooglePlus.PROFILE_PIC_SIZE;
-                new LoadProfileImage(root,imageView).execute(personPhotoUrl,user.getEmail());
+
+
+                name.setText(currentPerson.getDisplayName());
+
+                emailUser = account.getAccountName(mGooglePlus.mGoogleApiClient);
+                email.setText(emailUser);
+
+                try{
+                    Utility.addUser(this,emailUser,
+                            currentPerson.getName().getGivenName(), currentPerson.getName().getFamilyName());
+                }catch (Exception e){}
+                new LoadProfileImage(root, imageView).execute(personPhotoUrl, account.getAccountName(mGooglePlus.mGoogleApiClient));
             }
 
 
@@ -327,6 +345,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
             Bitmap image  = BitmapFactory.decodeByteArray(
                     data.getBlob(0), 0, data.getBlob(0).length);
             //Bitmap scaledImage = Bitmap.createScaledBitmap(image,100,100,true);
+
             Palette.from(image).generate(new Palette.PaletteAsyncListener() {
                 @Override
                 public void onGenerated(Palette palette) {
@@ -338,6 +357,7 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
                     collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(getResources().getColor(R.color.my_primary)));
                 }
             });
+
             detail.setImageBitmap(image);
         }
 

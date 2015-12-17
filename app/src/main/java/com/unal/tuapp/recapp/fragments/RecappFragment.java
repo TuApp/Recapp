@@ -20,12 +20,14 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
 import com.unal.tuapp.recapp.activities.Company;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.others.GooglePlus;
 import com.unal.tuapp.recapp.activities.NavigationDrawer;
 import com.unal.tuapp.recapp.R;
+import com.unal.tuapp.recapp.others.Utility;
 
 
 /**
@@ -175,10 +177,15 @@ public class RecappFragment extends Fragment implements GoogleApiClient.Connecti
         mSignInProgress = mGooglePlus.STATE_DEFAULT;
         //Toast.makeText(getActivity(),"User connected",Toast.LENGTH_SHORT).show();
         if(mGooglePlus.mGoogleApiClient.isConnected()) {
-            String email = Plus.AccountApi.getAccountName(mGooglePlus.mGoogleApiClient);
-            Intent intent = new Intent(getActivity(), NavigationDrawer.class);
-            intent.putExtra("email", email);
-            startActivity(intent);
+            if(Utility.isNetworkAvailable(getContext())) {
+                Account account = Plus.AccountApi;
+
+                Intent intent = new Intent(getActivity(), NavigationDrawer.class);
+                intent.putExtra("email",account.getAccountName(mGooglePlus.mGoogleApiClient));
+                startActivity(intent);
+            }else{
+                mGooglePlus.mGoogleApiClient.disconnect();
+            }
         }
 
     }

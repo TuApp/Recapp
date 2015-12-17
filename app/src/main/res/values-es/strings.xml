@@ -46,13 +46,15 @@
     <string name="accept">Aceptar</string>
     <string name="cancel">Cancelar</string>
     <string name="facebook_app_id">1674043846146726</string>
+    <string name="banner_ad_unit_id_navigation">ca-app-pub-7106306232801377/4724119447</string>
+    <string name="banner_ad_unit_id_user_detail">ca-app-pub-7106306232801377/6061251846</string>
+    <string name="interstitial_ad_unit_id_gallery">ca-app-pub-7106306232801377/6200852645</string>
+    <string name="interstitial_ad_unit_id_tutorial">ca-app-pub-7106306232801377/9154319048</string>
     <string name="title_activity_gallery">Galería</string>
     <string name="going">Vas a ir?</string>
     <string name="choose">Escoger o tomar foto</string>
     <string name="going_to">Voy a ir</string>
     <string name="my_events">Mis eventos</string>
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
     <string name="company_loging">Inicio para compañias</string>
     <string name="login">Iniciar</string>
     <string name="email">Correo</string>

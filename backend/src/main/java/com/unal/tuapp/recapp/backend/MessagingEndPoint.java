@@ -46,7 +46,11 @@ public class MessagingEndPoint {
             message = message.substring(0, 1000) + "[...]";
         }
         Sender sender = new Sender(API_KEY);
-        Message msg = new Message.Builder().addData("message", message).build();
+        Message msg = new Message.Builder().addData("message", message)
+                .delayWhileIdle(true)
+                .timeToLive(2419200)
+                .collapseKey(System.currentTimeMillis()+"")
+                .build();
         List<Registration> records = ofy().load().type(Registration.class).list();
         for (Registration record : records) {
             Result result = sender.send(msg, record.getRegId(), 15);

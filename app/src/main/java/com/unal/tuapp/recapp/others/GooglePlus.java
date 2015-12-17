@@ -1,8 +1,10 @@
 package com.unal.tuapp.recapp.others;
 
 import android.content.Context;
+import android.os.Bundle;
 
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 
@@ -51,6 +53,27 @@ public class GooglePlus {
         if (instance == null) {
             synchronized (GooglePlus.class) {
                 if (instance == null) {
+                    if(connection==null){
+                        connection = new GoogleApiClient.ConnectionCallbacks() {
+                            @Override
+                            public void onConnected(Bundle bundle) {
+
+                            }
+
+                            @Override
+                            public void onConnectionSuspended(int i) {
+
+                            }
+                        };
+                    }
+                    if(onConnection==null){
+                        onConnection = new GoogleApiClient.OnConnectionFailedListener() {
+                            @Override
+                            public void onConnectionFailed(ConnectionResult connectionResult) {
+
+                            }
+                        };
+                    }
                     instance = new GooglePlus(context, connection, onConnection);
                 }
             }

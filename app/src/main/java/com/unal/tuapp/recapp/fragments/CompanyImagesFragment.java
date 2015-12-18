@@ -52,7 +52,8 @@ public class CompanyImagesFragment extends Fragment implements LoaderManager.Loa
             placeId = getActivity().getIntent().getExtras().getLong("id");
         }
         companyImages = (RecyclerView) root.findViewById(R.id.company_recycler_images);
-        companyImages.setLayoutManager(new LinearLayoutManager(getActivity()));
+        RecyclerView.LayoutManager layoutManager = Utility.getLayoutManager(getActivity(),getResources().getConfiguration().screenWidthDp);
+        companyImages.setLayoutManager(layoutManager);
         companyImagesAdapter = new RecycleImagesCompanyAdapter(new ArrayList<PlaceImages>());
         companyImages.setAdapter(companyImagesAdapter);
         ItemTouchHelper swipeToDismiss = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(

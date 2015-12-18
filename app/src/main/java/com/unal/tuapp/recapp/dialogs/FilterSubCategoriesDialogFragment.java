@@ -55,7 +55,7 @@ public class FilterSubCategoriesDialogFragment extends DialogFragment implements
         View view = inflater.inflate(R.layout.subcategories_filter, container);
         getDialog().setTitle(R.string.sub_category);
         getDialog().setCancelable(true);
-        RecyclerView.LayoutManager linearLayoutManager = Utility.getLayoutManager(getActivity(), getResources().getConfiguration().orientation, 1);
+        RecyclerView.LayoutManager linearLayoutManager = Utility.getLayoutManager(getActivity(), getResources().getConfiguration().screenWidthDp);
         recyclerView = (RecyclerView) view.findViewById(R.id.subcategories_recycler);
         recyclerView.setLayoutManager(linearLayoutManager);
         List<SubCategory> subCategories = new ArrayList<>();

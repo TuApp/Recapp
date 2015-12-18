@@ -55,7 +55,7 @@ public class NewsFragment extends Fragment{
 
             }
         });
-        RecyclerView.LayoutManager layoutManager = Utility.getLayoutManager(getActivity(), getResources().getConfiguration().orientation, 3);
+        RecyclerView.LayoutManager layoutManager = Utility.getLayoutManager(getActivity(), getResources().getConfiguration().screenWidthDp);
         recyclerNews.setLayoutManager(layoutManager);
         recycleNewsAdapter.setOnNewsListener(new RecycleNewsAdapter.OnNewsListener() {
             @Override

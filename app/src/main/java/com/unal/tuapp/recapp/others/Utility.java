@@ -568,11 +568,16 @@ public class Utility {
         return Base64.decodeBase64(image);
     }
 
-    public static RecyclerView.LayoutManager getLayoutManager(FragmentActivity fragmentActivity, int orientation, int columns){
-        if(orientation == Configuration.ORIENTATION_PORTRAIT)
+    public static RecyclerView.LayoutManager getLayoutManager(FragmentActivity fragmentActivity,int width){
+        if(width >= 720 && width<900) {
+            return new GridLayoutManager(fragmentActivity, 2);
+        }else if(width>900){
+            return new GridLayoutManager(fragmentActivity,3);
+        }
+        else {
             return new LinearLayoutManager(fragmentActivity);
-        else
-            return new GridLayoutManager(fragmentActivity, columns);
+        }
+
     }
 
 }

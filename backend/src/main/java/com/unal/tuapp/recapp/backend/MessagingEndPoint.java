@@ -49,7 +49,7 @@ public class MessagingEndPoint {
         Message msg = new Message.Builder().addData("message", message)
                 .delayWhileIdle(true)
                 .timeToLive(2419200)
-                .collapseKey(System.currentTimeMillis()+"")
+                .collapseKey(message)
                 .build();
         List<Registration> records = ofy().load().type(Registration.class).list();
         for (Registration record : records) {

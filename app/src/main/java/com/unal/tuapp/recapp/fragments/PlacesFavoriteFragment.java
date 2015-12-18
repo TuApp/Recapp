@@ -22,6 +22,7 @@ import com.unal.tuapp.recapp.backend.model.userByPlaceApi.model.UserByPlace;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
+import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserByPlaceEndPoint;
 
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class PlacesFavoriteFragment extends Fragment implements LoaderManager.Lo
         recyclerView = (RecyclerView) root.findViewById(R.id.places_recycle_view);
 
         final List<Place> places = new ArrayList<>();
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        RecyclerView.LayoutManager linearLayoutManager = Utility.getLayoutManager(getActivity(),getResources().getConfiguration().screenWidthDp);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclePlaceAdapter = new RecyclePlaceAdapter(places);
         recyclePlaceAdapter.setOnItemClickListener(new RecyclePlaceAdapter.OnItemClickListener() {

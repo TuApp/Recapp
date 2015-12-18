@@ -18,6 +18,7 @@ import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.adapters.RecycleEventsAdapter;
 import com.unal.tuapp.recapp.data.Event;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.others.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,8 @@ public class CompanyEventsFragment extends Fragment implements LoaderManager.Loa
             email = getActivity().getIntent().getExtras().getString("email");
         }
         companyEventes = (RecyclerView) root.findViewById(R.id.company_recycler_events);
-        companyEventes.setLayoutManager(new LinearLayoutManager(getActivity()));
+        RecyclerView.LayoutManager layoutManager = Utility.getLayoutManager(getActivity(),getResources().getConfiguration().screenWidthDp);
+        companyEventes.setLayoutManager(layoutManager);
         companyEventsAdapter = new RecycleEventsAdapter(new ArrayList<Event>());
         companyEventsAdapter.setOnEventListener(new RecycleEventsAdapter.OnEventListener() {
             @Override

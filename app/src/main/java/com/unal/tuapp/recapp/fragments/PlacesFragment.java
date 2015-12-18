@@ -73,7 +73,7 @@ public class PlacesFragment extends Fragment {
         //recyclerView.setHasFixedSize(true);
         filters = new ArrayList<>();
         List<Place> places = new ArrayList<>();
-        RecyclerView.LayoutManager layoutManager = Utility.getLayoutManager(getActivity(), getResources().getConfiguration().orientation, 3);
+        RecyclerView.LayoutManager layoutManager = Utility.getLayoutManager(getActivity(), getResources().getConfiguration().screenWidthDp);
         recyclerView.setLayoutManager(layoutManager);
         recyclePlaceAdapter = new RecyclePlaceAdapter(places);
         recyclePlaceAdapter.setOnItemClickListener(new RecyclePlaceAdapter.OnItemClickListener() {

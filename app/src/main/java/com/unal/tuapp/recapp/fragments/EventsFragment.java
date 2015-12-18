@@ -18,6 +18,7 @@ import com.unal.tuapp.recapp.adapters.RecycleEventsAdapter;
 import com.unal.tuapp.recapp.adapters.RecycleEventsGoingAdapter;
 import com.unal.tuapp.recapp.backend.model.eventByUserApi.model.EventByUser;
 import com.unal.tuapp.recapp.data.Event;
+import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.EventByUserEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.EventEndPoint;
 
@@ -69,7 +70,7 @@ public class EventsFragment extends Fragment {
         });
 
 
-        LinearLayoutManager eventManager = new LinearLayoutManager(getActivity());
+        RecyclerView.LayoutManager eventManager = Utility.getLayoutManager(getActivity(),getResources().getConfiguration().screenWidthDp);
         LinearLayoutManager eventGoingManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false);
 
         events.setLayoutManager(eventManager);

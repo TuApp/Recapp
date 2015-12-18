@@ -42,7 +42,7 @@ public class TutorialFragment  extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tutorial, container,false);
-        RecyclerView.LayoutManager layoutManager = Utility.getLayoutManager(getActivity(), getResources().getConfiguration().orientation, 3);
+        RecyclerView.LayoutManager layoutManager = Utility.getLayoutManager(getActivity(), getResources().getConfiguration().screenWidthDp);
         recyclerView = (RecyclerView) view.findViewById(R.id.tutorial_recycler);
         mySwipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.tutorial_refresh);
         mySwipeRefresh.setColorSchemeResources(

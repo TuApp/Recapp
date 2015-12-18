@@ -17,6 +17,7 @@ import com.unal.tuapp.recapp.adapters.RecycleEventsAdapter;
 import com.unal.tuapp.recapp.data.Event;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
+import com.unal.tuapp.recapp.others.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class MyEventsFragment extends Fragment implements LoaderManager.LoaderCa
         myEvents = (RecyclerView) root.findViewById(R.id.user_myEvents);
         List<Event> events = new ArrayList<>();
         myEventsAdapter = new RecycleEventsAdapter(events);
-        LinearLayoutManager eventManager = new LinearLayoutManager(getActivity());
+        RecyclerView.LayoutManager eventManager = Utility.getLayoutManager(getActivity(),getResources().getConfiguration().screenWidthDp);
         myEventsAdapter.setOnEventListener(new RecycleEventsAdapter.OnEventListener() {
             @Override
             public void onAction(long id) {

@@ -82,7 +82,9 @@ public class RecycleEventsGoingAdapter extends RecyclerView.Adapter<RecyclerView
         viewHolder.name.setText(event.getName());
         viewHolder.description.setText(event.getDescription());
         viewHolder.address.setText(event.getAddress());
-        viewHolder.image.setImageBitmap(BitmapFactory.decodeByteArray(event.getImage(), 0, event.getImage().length));
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 3;
+        viewHolder.image.setImageBitmap(BitmapFactory.decodeByteArray(event.getImage(), 0, event.getImage().length,options));
         viewHolder.date.setText(Utility.getDate(event.getDate()));
     }
     public void swapData(List<Event> events){

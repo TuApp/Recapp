@@ -89,6 +89,8 @@ public class CommentEndpoint {
         return ofy().load().entity(comment).now();
     }
 
+
+
     /**
      * Updates an existing {@code Comment}.
      *
@@ -130,7 +132,7 @@ public class CommentEndpoint {
         checkExists(id);
         ofy().delete().type(Comment.class).id(id).now();
         try {
-            new MessagingEndPoint().sendMessage("comment");
+            new MessagingEndPoint().sendMessage("deleteComment");
         } catch (IOException e) {
             e.printStackTrace();
         }

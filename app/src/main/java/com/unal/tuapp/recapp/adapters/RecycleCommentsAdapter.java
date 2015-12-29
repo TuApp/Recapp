@@ -1,6 +1,9 @@
 package com.unal.tuapp.recapp.adapters;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -24,9 +27,11 @@ import java.util.List;
 public class RecycleCommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Comment> comments;
     private Cursor commentCursor=null;
+    private Context context;
 
-    public RecycleCommentsAdapter(List<Comment> comments) {
+    public RecycleCommentsAdapter(List<Comment> comments,Context context) {
         this.comments = comments;
+        this.context = context;
     }
 
     public static class CommentsViewHolder extends RecyclerView.ViewHolder{
@@ -64,11 +69,14 @@ public class RecycleCommentsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         Comment comment = comments.get(position);
         commentsViewHolder.comment.setText(comment.getComment());
         // We need to change it with the image which is stored in the database
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 3;
         if(comment.getImageProfile()!=null){
             commentsViewHolder.imageView.setImageBitmap(
-                    BitmapFactory.decodeByteArray(comment.getImageProfile(),0,comment.getImageProfile().length));
+                    BitmapFactory.decodeByteArray(comment.getImageProfile(),0,comment.getImageProfile().length,options));
         }else {
-            commentsViewHolder.imageView.setImageResource(R.drawable.background_material);
+            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.image_available,options);
+            commentsViewHolder.imageView.setImageBitmap(bitmap);
         }
         //We need to change the value, dynamically
         commentsViewHolder.ratingBar.setRating((float)comment.getRating());

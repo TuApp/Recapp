@@ -119,8 +119,10 @@ public class RecycleRemindersAdapter extends RecyclerView.Adapter<RecyclerView.V
         remindersViewHolder.nameReminder.setText(reminder.getName());
         remindersViewHolder.descriptionReminder.setText(reminder.getDescription());
         remindersViewHolder.dateReminder.setText("" + Utility.getDate(reminder.getEndDate()));
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 3;
         remindersViewHolder.imagePlace.setImageBitmap(BitmapFactory.decodeByteArray(
-                reminder.getPlace().getImageFavorite(), 0, reminder.getPlace().getImageFavorite().length
+                reminder.getPlace().getImageFavorite(), 0, reminder.getPlace().getImageFavorite().length,options
         ));
         remindersViewHolder.namePlace.setText(reminder.getPlace().getName());
         remindersViewHolder.addressPlace.setText(reminder.getPlace().getAddress());

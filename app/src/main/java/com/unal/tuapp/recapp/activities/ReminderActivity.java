@@ -15,6 +15,7 @@ import android.util.Pair;
 import android.view.View;
 
 import com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder;
+import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.MyAlarmReceiver;
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.dialogs.ReminderDialog;
@@ -103,16 +104,15 @@ public class ReminderActivity extends AppCompatActivity implements ReminderDialo
             }
             valuesReminder.put(RecappContract.ReminderEntry.COLUMN_USER_KEY,reminder.getUserId());
             valuesReminder.put(RecappContract.ReminderEntry.COLUMN_PLACE_KEY, reminder.getPlaceId());
-            valuesReminder.put(RecappContract.ReminderEntry._ID,reminder.getId());
+            valuesReminder.put(RecappContract.ReminderEntry._ID, reminder.getId());
             getContentResolver().insert(
                     RecappContract.ReminderEntry.CONTENT_URI,
                     valuesReminder
             );
-            Pair<Context,Pair<Reminder,String>> pair = new Pair<>(getApplicationContext(),new Pair<>(reminder,"addReminder"));
-            new ReminderEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
-
-
-
+            if(Utility.isNetworkAvailable(ReminderActivity.this)) {
+                Pair<Context, Pair<Reminder, String>> pair = new Pair<>(getApplicationContext(), new Pair<>(reminder, "addReminder"));
+                new ReminderEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
+            }
         }
         Intent intent = new Intent(ReminderActivity.this, Detail.class);
         intent.putExtra("id", id);

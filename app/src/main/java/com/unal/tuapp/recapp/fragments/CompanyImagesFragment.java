@@ -62,7 +62,7 @@ public class CompanyImagesFragment extends Fragment implements LoaderManager.Loa
 
             @Override
             public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-                if (companyImagesAdapter.getCompanyImages().size()==1) return 0;
+                if (companyImagesAdapter.getCompanyImages().size()==1 || !Utility.isNetworkAvailable(getContext())) return 0;
                 return super.getSwipeDirs(recyclerView, viewHolder);
             }
             @Override

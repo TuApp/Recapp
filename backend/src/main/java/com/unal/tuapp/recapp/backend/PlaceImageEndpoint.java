@@ -129,7 +129,7 @@ public class PlaceImageEndpoint {
         checkExists(id);
         ofy().delete().type(PlaceImage.class).id(id).now();
         try {
-            new MessagingEndPoint().sendMessage("imagePlace");
+            new MessagingEndPoint().sendMessage("DeleteImagePlace");
         } catch (IOException e) {
             e.printStackTrace();
         }

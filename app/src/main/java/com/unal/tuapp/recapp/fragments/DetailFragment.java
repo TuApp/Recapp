@@ -1,5 +1,6 @@
 package com.unal.tuapp.recapp.fragments;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -134,32 +135,42 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                             RecappContract.UserByPlaceEntry.CONTENT_URI,
                             userByPlace
                     );
-                    Pair<Context,Pair<UserByPlace,String>> pairUserByPlace = new Pair<>(getContext(),new Pair<>(userByPlaceBackend,"addUserByPlace"));
-                    new UserByPlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairUserByPlace);
+                    if(Utility.isNetworkAvailable(getContext())) {
+                        Pair<Context, Pair<UserByPlace, String>> pairUserByPlace = new Pair<>(getContext(), new Pair<>(userByPlaceBackend, "addUserByPlace"));
+                        new UserByPlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairUserByPlace);
+                    }
 
                 } else {
                     //favorite.setImageResource(R.drawable.ic_favorites);
-                    UserByPlace userByPlaceBackend = new UserByPlace();
-                    String selection = RecappContract.UserByPlaceEntry.COLUMN_USER_KEY+" = ? AND " +
-                            RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY+" = ? ";
+                    if(Utility.isNetworkAvailable(getContext())) {
+                        UserByPlace userByPlaceBackend = new UserByPlace();
+                        String selection = RecappContract.UserByPlaceEntry.COLUMN_USER_KEY + " = ? AND " +
+                                RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY + " = ? ";
 
-                    Cursor cursor = getActivity().getContentResolver().query(
-                            RecappContract.UserByPlaceEntry.CONTENT_URI,
-                            new String[]{RecappContract.UserByPlaceEntry._ID},
-                            selection,
-                            new String[]{"" + user.getId(), "" + id},
-                            null
-                    );
-                    if(cursor.moveToFirst()){
-                        userByPlaceBackend.setId(cursor.getLong(0));
+                        Cursor cursor = getActivity().getContentResolver().query(
+                                RecappContract.UserByPlaceEntry.CONTENT_URI,
+                                new String[]{RecappContract.UserByPlaceEntry._ID},
+                                selection,
+                                new String[]{"" + user.getId(), "" + id},
+                                null
+                        );
+                        if (cursor.moveToFirst()) {
+                            userByPlaceBackend.setId(cursor.getLong(0));
+                        }
+                        getActivity().getContentResolver().delete(
+                                RecappContract.UserByPlaceEntry.CONTENT_URI,
+                                selection,
+                                new String[]{"" + user.getId(), "" + id}
+                        );
+                        Pair<Context, Pair<UserByPlace, String>> pairUserByPlace = new Pair<>(getContext(), new Pair<>(userByPlaceBackend, "deleteUserByPlace"));
+                        new UserByPlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairUserByPlace);
+                    }else{
+                        new AlertDialog.Builder(getContext())
+                                .setCancelable(true)
+                                .setTitle(getResources().getString(R.string.internet))
+                                .setMessage(getResources().getString(R.string.need_internet))
+                                .show();
                     }
-                    getActivity().getContentResolver().delete(
-                            RecappContract.UserByPlaceEntry.CONTENT_URI,
-                            selection,
-                            new String[]{"" + user.getId(), "" + id}
-                    );
-                    Pair<Context,Pair<UserByPlace,String>> pairUserByPlace = new Pair<>(getContext(),new Pair<>(userByPlaceBackend,"deleteUserByPlace"));
-                    new UserByPlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairUserByPlace);
 
 
                 }
@@ -169,7 +180,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
 
         commentText = (EditText) root.findViewById(R.id.comment_text);
-
         commentRating = (RatingBar) root.findViewById(R.id.comment_rating);
         commentButton = (Button) root.findViewById(R.id.comment_button);
 
@@ -233,11 +243,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         comment.setLayoutManager(linearLayout);
-        commentsAdapter = new RecycleCommentsAdapter(comments);
+        commentsAdapter = new RecycleCommentsAdapter(comments,getContext());
         comment.setAdapter(commentsAdapter);
-        /*Pair<Pair<Context,Pair<Long,Long>>,Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment,String>> pair =
-                new Pair<>(new Pair<>(getContext(),new Pair<>(user.getId(),id)),new Pair<>(new com.unal.tuapp.recapp.backend.model.commentApi.model.Comment(),"commentPlace"));
-        new CommentEndPoint().execute(pair);*/
+
         commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -261,9 +269,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                             RecappContract.CommentEntry.CONTENT_URI,
                             values
                     );
-                    Pair<Pair<Context,Pair<Long,Long>>,Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment,String>> pair =
-                            new Pair<>(new Pair<>(getContext(),new Pair<>(user.getId(),id)),new Pair<>(commentApi,"addComment"));
-                    new CommentEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
+                    if(Utility.isNetworkAvailable(getContext())) {
+                        Pair<Pair<Context, Pair<Long, Long>>, Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment, String>> pair =
+                                new Pair<>(new Pair<>(getContext(), new Pair<>(user.getId(), id)), new Pair<>(commentApi, "addComment"));
+                        new CommentEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
+                    }
 
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
                             Context.INPUT_METHOD_SERVICE);
@@ -383,8 +393,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     card_title.setText(place.getName());
                     card_description.setText(place.getDescription());
                     card_address.setText(place.getAddress());
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inSampleSize = 3;
                     card_image.setImageBitmap(BitmapFactory.decodeByteArray(
-                            place.getImageFavorite(), 0, place.getImageFavorite().length
+                            place.getImageFavorite(), 0, place.getImageFavorite().length,options
                     ));
 
                     placeCursor = data;
@@ -463,12 +475,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             @Override
             public void onCancel() {
-                Log.e("algo", "cancel");
             }
 
             @Override
             public void onError(FacebookException e) {
-                Log.e("algo", e.toString());
             }
         });
     }

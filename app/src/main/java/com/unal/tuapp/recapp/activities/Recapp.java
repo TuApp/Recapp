@@ -1,7 +1,10 @@
 package com.unal.tuapp.recapp.activities;
 
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -47,11 +50,18 @@ import com.unal.tuapp.recapp.servicesAndAsyncTasks.TutorialEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserByPlaceEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserEndPoint;
 
+import java.util.Random;
+
 
 public class Recapp extends AppCompatActivity {
     private View root;
     public static ViewPager carrousel;
     private ScreenSlidePagerAdapter screenSlidePagerAdapter;
+    public static final String AUTHORITY = "com.unal.tuapp.recapp.app";
+    public static final String ACCOUNT_TYPE = "example.com";
+    public static final String ACCOUNT = "dummyaccount";
+
+    public static Account mAccount;
 
     public static ProgressDialog init;
     public static int initValue = 1;
@@ -64,8 +74,22 @@ public class Recapp extends AppCompatActivity {
         setContentView(root);
         setUpViewPager();
         addData();
+        mAccount = createSyncAccount(this);
 
+    }
 
+    public static Account createSyncAccount(Context context){
+        Account newAccount = new Account(ACCOUNT,ACCOUNT_TYPE);
+        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
+        if(accountManager.addAccountExplicitly(newAccount,null,null)){
+            ContentResolver.setIsSyncable(newAccount, AUTHORITY, 1);
+            ContentResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
+            Random random = new Random();
+            ContentResolver.addPeriodicSync(newAccount,AUTHORITY,Bundle.EMPTY,26*60*60+60*random.nextInt(6));
+            return newAccount;
+
+        }
+        return accountManager.getAccountsByType(ACCOUNT_TYPE)[0];
     }
 
 

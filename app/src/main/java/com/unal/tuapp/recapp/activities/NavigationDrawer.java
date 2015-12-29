@@ -108,8 +108,6 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private final String TAG = NavigationDrawer.class.getSimpleName();
     private final String FILE = "filters.txt";
     private static final int USER = 10;
-    private static final int CATEGORY = 199;
-    private static final int SUB_CATEGORY = 299;
     private static final int PLACE = 345;
     private static final int PLACE_FILTER = 467;
     private static final int EVENT = 579;
@@ -123,7 +121,6 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private TutorialFragment tutorialsFragment;
     private NewsFragment newsFragment;
 
-    private String [] subCategory;
     private List<String> filtersConstraint;
     private String[] selectionArgs=null;
     private String selectionPlaces =null;
@@ -138,6 +135,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     private FloatingActionButton eventCreate;
     private AdView mAdView;
     private InterstitialAd mInterstitialAd;
+    private InterstitialAd mInterstitialAdNews;
     private List<News> news;
 
 
@@ -156,6 +154,12 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id_tutorial));
         mInterstitialAd.loadAd(adRequest);
 
+        AdRequest adRequestNews = new AdRequest.Builder()
+                .build();
+        mInterstitialAdNews = new InterstitialAd(NavigationDrawer.this);
+        mInterstitialAdNews.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id_news));
+        mInterstitialAdNews.loadAd(adRequestNews);
+
         eventCreate = (FloatingActionButton) root.findViewById(R.id.event_create);
         query = "";
         totalFilter = 0;
@@ -172,6 +176,32 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         name = (TextView) findViewById(R.id.user_name);
 
         imageView = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile);
+        if(getSupportLoaderManager().getLoader(USER)==null) {
+            getSupportLoaderManager().initLoader(USER, null, this);
+        }else{
+            getSupportLoaderManager().restartLoader(USER, null, this);
+        }
+
+        if(getSupportLoaderManager().getLoader(PLACE)==null){
+            getSupportLoaderManager().initLoader(PLACE,null,this);
+        }else{
+            getSupportLoaderManager().restartLoader(PLACE,null,this);
+        }
+        if(getSupportLoaderManager().getLoader(EVENT)==null){
+            getSupportLoaderManager().initLoader(EVENT,null,this);
+        }else{
+            getSupportLoaderManager().restartLoader(EVENT,null,this);
+        }
+        if(getSupportLoaderManager().getLoader(EVENT_GOING)==null){
+            getSupportLoaderManager().initLoader(EVENT_GOING,null,this);
+        }else{
+            getSupportLoaderManager().restartLoader(EVENT_GOING,null,this);
+        }
+        if(getSupportLoaderManager().getLoader(TUTORIAL) == null) {
+            getSupportLoaderManager().initLoader(TUTORIAL,null,this);
+        }else{
+            getSupportLoaderManager().restartLoader(TUTORIAL,null,this);
+        }
         if(mGooglePlus.mGoogleApiClient.isConnected()){
             if(Utility.isNetworkAvailable(this)) {
                 Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGooglePlus.mGoogleApiClient);
@@ -193,36 +223,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 new LoadProfileImage(root, imageView).execute(personPhotoUrl, account.getAccountName(mGooglePlus.mGoogleApiClient));
             }
 
-            if(getSupportLoaderManager().getLoader(USER)==null) {
-                getSupportLoaderManager().initLoader(USER, null, this);
-            }else{
-                getSupportLoaderManager().restartLoader(USER, null, this);
-            }
-            if(getSupportLoaderManager().getLoader(CATEGORY)==null){
-                getSupportLoaderManager().initLoader(CATEGORY,null,this);
-            }else{
-                getSupportLoaderManager().restartLoader(CATEGORY,null,this);
-            }
-            if(getSupportLoaderManager().getLoader(PLACE)==null){
-                getSupportLoaderManager().initLoader(PLACE,null,this);
-            }else{
-                getSupportLoaderManager().restartLoader(PLACE,null,this);
-            }
-            if(getSupportLoaderManager().getLoader(EVENT)==null){
-                getSupportLoaderManager().initLoader(EVENT,null,this);
-            }else{
-                getSupportLoaderManager().restartLoader(EVENT,null,this);
-            }
-            if(getSupportLoaderManager().getLoader(EVENT_GOING)==null){
-                getSupportLoaderManager().initLoader(EVENT_GOING,null,this);
-            }else{
-                getSupportLoaderManager().restartLoader(EVENT_GOING,null,this);
-            }
-            if(getSupportLoaderManager().getLoader(TUTORIAL)==null){
-                getSupportLoaderManager().initLoader(TUTORIAL,null,this);
-            }else{
-                getSupportLoaderManager().restartLoader(TUTORIAL,null,this);
-            }
+
 
             resetLoaderFilter();
 
@@ -541,26 +542,43 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         tutorialsFragment = new TutorialFragment();
         tutorialsFragment.setOnTutorialListener(new TutorialFragment.onTutorialListener() {
             @Override
-            public void onTutorial(View view, long position, String link) {
-                final String linkTutorial = link;
+            public void onTutorial(View view, long position, final String link) {
                 mInterstitialAd.setAdListener(new AdListener() {
                     @Override
                     public void onAdClosed() {
                         super.onAdClosed();
-
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(linkTutorial)));
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
                     }
                 });
 
                 if (mInterstitialAd.isLoaded()) {
                     mInterstitialAd.show();
                 } else {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(linkTutorial)));
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
                 }
 
             }
         });
         newsFragment = new NewsFragment();
+        newsFragment.setOnNewsListener(new NewsFragment.OnNewsListener() {
+            @Override
+            public void onNews(final String link) {
+                mInterstitialAdNews.setAdListener(new AdListener() {
+                    @Override
+                    public void onAdClosed() {
+                        super.onAdClosed();
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
+
+                    }
+                });
+                if(mInterstitialAdNews.isLoaded()){
+                    mInterstitialAdNews.show();
+                }else{
+
+                    startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(link)));
+                }
+            }
+        });
         viewPagerAdapter.addFragment(placesFragment, getResources().getString(R.string.places));
         viewPagerAdapter.addFragment(mapFragment, getResources().getString(R.string.map));
         viewPagerAdapter.addFragment(eventsFragment, getResources().getString(R.string.events));
@@ -810,8 +828,10 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         email.setText(user.getEmail());
                     }
                     if (user.getProfileImage()!=null){
+                        final BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inSampleSize = 3;
                         imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
-                                user.getProfileImage().length));
+                                user.getProfileImage().length,options));
                     }
 
                     deepLinkIntent(deepLink);
@@ -872,17 +892,7 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
         eventsFragment.closeData();
         tutorialsFragment.closeData();
     }
-    public String buildSelection(String [] category){
-        String where = null;
-        if(category!=null && category.length>0){
-            where = RecappContract.CategoryEntry.TABLE_NAME+"."+ RecappContract.CategoryEntry.COLUMN_NAME + " IN ( ? ";
-            for (int i =1; i<category.length; i++){
-                where+=",? ";
-            }
-            where += " )";
-        }
-        return where;
-    }
+
     public String buildSelectionPlaceFilters(String[] filters){
         String where = null;
         if(filters!=null && filters.length>0){
@@ -1144,7 +1154,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         URL urlImage = new URL(images.getString("url"));
                         urlConnectionImage = (HttpURLConnection) urlImage.openConnection();
                         urlConnectionImage.connect();
-                        Bitmap bitmap = BitmapFactory.decodeStream(urlConnectionImage.getInputStream());
+                        final BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inSampleSize = 4;
+                        Bitmap bitmap = BitmapFactory.decodeStream(urlConnectionImage.getInputStream(),null,options);
                         mNews.setImage(bitmap);
                     }
                     news.add(mNews);

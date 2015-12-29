@@ -1,8 +1,10 @@
 package com.unal.tuapp.recapp.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -31,6 +33,7 @@ import com.unal.tuapp.recapp.backend.model.placeApi.model.Place;
 import com.unal.tuapp.recapp.data.Comment;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.User;
+import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.CommentEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceEndPoint;
 
@@ -106,24 +109,25 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
         mySwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                com.unal.tuapp.recapp.backend.model.commentApi.model.Comment comment = new com.unal.tuapp.recapp.backend.model.commentApi.model.Comment();
-                Pair<Pair<Context, Pair<Long, Long>>, Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment, String>> pairComment = new Pair<>(new Pair<>(getContext(), new Pair<>(-1L, -1L)),
-                        new Pair<>(comment, "getComments"));
-                new CommentEndPoint(true).execute(pairComment);
+                if(Utility.isNetworkAvailable(getContext())) {
+                    com.unal.tuapp.recapp.backend.model.commentApi.model.Comment comment = new com.unal.tuapp.recapp.backend.model.commentApi.model.Comment();
+                    Pair<Pair<Context, Pair<Long, Long>>, Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment, String>> pairComment = new Pair<>(new Pair<>(getContext(), new Pair<>(-1L, -1L)),
+                            new Pair<>(comment, "getComments"));
+                    new CommentEndPoint(true).execute(pairComment);
+                }else{
+                    mySwipeRefresh.setRefreshing(false);
+                }
             }
         });
         Bundle extras = getActivity().getIntent().getExtras();
         if(extras!=null){
             user = extras.getParcelable("user");
         }
-        /*Pair<Pair<Context,Pair<Long,Long>>,Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment,String>> pair =
-                new Pair<>(new Pair<>(getContext(),new Pair<>(user.getId(),-1L)),new Pair<>(new com.unal.tuapp.recapp.backend.model.commentApi.model.Comment(),"commentUser"));
-        new CommentEndPoint().execute(pair);*/
         recyclerView = (RecyclerView) root.findViewById(R.id.user_comments);
         List<Comment> comments = new ArrayList<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-        recycleCommentsAdapter = new RecycleCommentsUserAdapter(comments);
+        recycleCommentsAdapter = new RecycleCommentsUserAdapter(comments,getContext());
         recycleCommentsAdapter.setOnItemClickListener(new RecycleCommentsUserAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, long id,long idPlace) {
@@ -132,11 +136,7 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
                 idPlaceComment = idPlace;
                 if(actionMode==null){
                     actionMode = ((AppCompatActivity)getActivity()).startSupportActionMode(mActionModeCallback);
-                }/*else{
-                    actionMode.finish();
-                    actionMode = ((AppCompatActivity)getActivity()).startSupportActionMode(mActionModeCallback);
-
-                }*/
+                }
                 recycleCommentsAdapter.notifyDataSetChanged();
             }
         });
@@ -197,41 +197,55 @@ public class CommentsFragment extends Fragment  implements LoaderManager.LoaderC
     }
 
     public void deleteComment(){
-        getActivity().getContentResolver().delete(
-                RecappContract.CommentEntry.CONTENT_URI,
-                RecappContract.CommentEntry._ID + " = ?",
-                new String[]{"" + idComment}
-        );
-        com.unal.tuapp.recapp.backend.model.commentApi.model.Comment commentApi = new com.unal.tuapp.recapp.backend.model.commentApi.model.Comment();
-        commentApi.setId(idComment);
-        Pair<Pair<Context,Pair<Long,Long>>,Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment,String>> pair =
-                new Pair<>(new Pair<>(getContext(),new Pair<>(-1L,-1L)),new Pair<>(commentApi,"deleteComment"));
-        new CommentEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
-        Cursor cursorRating = getActivity().getContentResolver().query(
-                RecappContract.CommentEntry.buildCommentPlaceUri(idPlaceComment),
-                new String[]{"AVG(" + RecappContract.CommentEntry.TABLE_NAME + "."
-                        + RecappContract.CommentEntry.COLUMN_RATING + ")"},
-                RecappContract.PlaceEntry.TABLE_NAME + "." + RecappContract.PlaceEntry._ID,
-                null,
-                null
-        );
-        double newRating = 0;
-        if(cursorRating.moveToFirst()) {
-            newRating = cursorRating.getDouble(0);
+        if(Utility.isNetworkAvailable(getContext())) {
+            getActivity().getContentResolver().delete(
+                    RecappContract.CommentEntry.CONTENT_URI,
+                    RecappContract.CommentEntry._ID + " = ?",
+                    new String[]{"" + idComment}
+            );
+            com.unal.tuapp.recapp.backend.model.commentApi.model.Comment commentApi = new com.unal.tuapp.recapp.backend.model.commentApi.model.Comment();
+            commentApi.setId(idComment);
+            Pair<Pair<Context, Pair<Long, Long>>, Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment, String>> pair =
+                    new Pair<>(new Pair<>(getContext(), new Pair<>(-1L, -1L)), new Pair<>(commentApi, "deleteComment"));
+            new CommentEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
+            Cursor cursorRating = getActivity().getContentResolver().query(
+                    RecappContract.CommentEntry.buildCommentPlaceUri(idPlaceComment),
+                    new String[]{"AVG(" + RecappContract.CommentEntry.TABLE_NAME + "."
+                            + RecappContract.CommentEntry.COLUMN_RATING + ")"},
+                    RecappContract.PlaceEntry.TABLE_NAME + "." + RecappContract.PlaceEntry._ID,
+                    null,
+                    null
+            );
+            double newRating = 0;
+            if (cursorRating.moveToFirst()) {
+                newRating = cursorRating.getDouble(0);
+            }
+            Place place = new Place();
+            place.setRating((float) newRating);
+            place.setId(idPlaceComment);
+            Pair<Context, Pair<Place, String>> pairPlace = new Pair<>(getContext(), new Pair<>(place, "updatePlaceRating"));
+            new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairPlace);
+            ContentValues values = new ContentValues();
+            values.put(RecappContract.PlaceEntry.COLUMN_RATING, newRating);
+            getActivity().getContentResolver().update(
+                    RecappContract.PlaceEntry.CONTENT_URI,
+                    values,
+                    RecappContract.PlaceEntry._ID + " = ?",
+                    new String[]{"" + idPlaceComment}
+            );
+        }else{
+            new AlertDialog.Builder(getContext())
+                    .setCancelable(false)
+                    .setTitle(getResources().getString(R.string.internet))
+                    .setMessage(getResources().getString(R.string.need_internet))
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .show();
         }
-        Place place = new Place();
-        place.setRating((float)newRating);
-        place.setId(idPlaceComment);
-        Pair<Context,Pair<Place,String>> pairPlace = new Pair<>(getContext(),new Pair<>(place,"updatePlaceRating"));
-        new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairPlace);
-        ContentValues values = new ContentValues();
-        values.put(RecappContract.PlaceEntry.COLUMN_RATING, newRating);
-        getActivity().getContentResolver().update(
-                RecappContract.PlaceEntry.CONTENT_URI,
-                values,
-                RecappContract.PlaceEntry._ID + " = ?",
-                new String[]{"" + idPlaceComment}
-        );
 
         onCommentListener.onCommentDelete(true);
     }

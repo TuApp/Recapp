@@ -13,6 +13,7 @@ import com.unal.tuapp.recapp.backend.model.commentApi.model.CommentCollection;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.fragments.CommentsFragment;
 import com.unal.tuapp.recapp.fragments.CompanyCommentsFragment;
+import com.unal.tuapp.recapp.fragments.PlacesFragment;
 import com.unal.tuapp.recapp.others.Utility;
 
 import java.io.IOException;
@@ -63,6 +64,7 @@ public class CommentEndPoint extends AsyncTask<Pair<Pair<Context,Pair<Long,Long>
                                     value.put(RecappContract.CommentEntry._ID, i.getId());
                                     value.put(RecappContract.CommentEntry.COLUMN_PLACE_KEY, i.getPlaceId());
                                     value.put(RecappContract.CommentEntry.COLUMN_USER_KEY, i.getUserId());
+                                    value.put(RecappContract.COLUMN_IS_SEND,1);
                                     valuesList.add(value);
                                 }
                                 ContentValues values[] = new ContentValues[valuesList.size()];
@@ -121,6 +123,7 @@ public class CommentEndPoint extends AsyncTask<Pair<Pair<Context,Pair<Long,Long>
                             value.put(RecappContract.CommentEntry._ID, i.getId());
                             value.put(RecappContract.CommentEntry.COLUMN_PLACE_KEY, i.getPlaceId());
                             value.put(RecappContract.CommentEntry.COLUMN_USER_KEY, i.getUserId());
+                            value.put(RecappContract.COLUMN_IS_SEND,1);
                             contentValuesList.add(value);
                         }
                         ContentValues values[] = new ContentValues[contentValuesList.size()];
@@ -162,6 +165,7 @@ public class CommentEndPoint extends AsyncTask<Pair<Pair<Context,Pair<Long,Long>
                             value.put(RecappContract.CommentEntry._ID, i.getId());
                             value.put(RecappContract.CommentEntry.COLUMN_PLACE_KEY, i.getPlaceId());
                             value.put(RecappContract.CommentEntry.COLUMN_USER_KEY, i.getUserId());
+                            value.put(RecappContract.COLUMN_IS_SEND,1);
                             contentValuesListPlace.add(value);
                         }
                         ContentValues valuesPlace[] = new ContentValues[contentValuesListPlace.size()];
@@ -185,8 +189,13 @@ public class CommentEndPoint extends AsyncTask<Pair<Pair<Context,Pair<Long,Long>
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         if(swipe){
-            CommentsFragment.mySwipeRefresh.setRefreshing(false);
-            CompanyCommentsFragment.class.getSimpleName();
+
+            if(CommentsFragment.mySwipeRefresh !=null)
+                CommentsFragment.mySwipeRefresh.setRefreshing(false);
+            if( CompanyCommentsFragment.mySwipeRefresh !=null )
+                CompanyCommentsFragment.mySwipeRefresh.setRefreshing(false);
+            if(PlacesFragment.mySwipeRefresh!=null)
+                PlacesFragment.mySwipeRefresh.setRefreshing(false);
         }
     }
 

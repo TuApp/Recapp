@@ -71,7 +71,7 @@ public class UserEndpoint {
             httpMethod = ApiMethod.HttpMethod.GET
     )
     public User getEmail(@Named("email")String email) throws NotFoundException{
-        User user = ofy().load().type(User.class).filter("email",email).first().now();
+        User user = ofy().load().type(User.class).filter("email", email).first().now();
         if(user==null){
             throw new NotFoundException("Could not find User with email: "+email);
         }
@@ -100,6 +100,7 @@ public class UserEndpoint {
         }
         return ofy().load().entity(user).now();
     }
+
 
     /**
      * Updates an existing {@code User}.
@@ -142,7 +143,7 @@ public class UserEndpoint {
         checkExists(id);
         ofy().delete().type(User.class).id(id).now();
         try {
-            new MessagingEndPoint().sendMessage("user");
+            new MessagingEndPoint().sendMessage("deleteUser");
         } catch (IOException e) {
             e.printStackTrace();
         }

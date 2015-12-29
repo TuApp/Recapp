@@ -2,59 +2,69 @@
 <android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
+    android:layout_marginTop="@dimen/activity_vertical_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin">
 
-    <FrameLayout
-        android:layout_width="match_parent"
+    <RelativeLayout
         android:layout_height="match_parent"
-        android:layout_gravity="center">
-
-        <ImageView
-            android:id="@+id/card"
-            android:layout_width="220dp"
-            android:layout_height="150dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/card"
-            android:layout_gravity="center"/>
+        android:layout_width="match_parent">
 
         <android.support.v7.widget.CardView
-            android:id="@+id/card_points"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:visibility="gone">
+            android:layout_centerInParent="true">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center">
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_gravity="center">
 
-                <TextView
-                    android:id="@+id/points"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/points"
-                    android:textSize="50sp"
-                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/user_refresh"
+                    android:src="@drawable/ic_find_replace_black_48dp"
+                    android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
-                    android:visibility="gone"/>
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+
+                <ImageView
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:id="@+id/user_image"
+                    android:layout_centerHorizontal="true"
+
+                    android:layout_below="@+id/user_refresh"/>
 
                 <TextView
-                    android:id="@+id/my_points"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="50dp"
-                    android:layout_below="@+id/points"
-                    android:visibility="gone"
-                    android:layout_centerHorizontal="true"/>
+                    android:id="@id/user_name"
+                    android:textSize="22sp"
+                    android:layout_below="@+id/user_image"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"/>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/user_points"
+                    android:layout_below="@+id/user_name"
+                    android:textSize="20sp"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"/>
 
             </RelativeLayout>
 
         </android.support.v7.widget.CardView>
 
-    </FrameLayout>
-
+    </RelativeLayout>
 
 </android.support.v4.widget.NestedScrollView>

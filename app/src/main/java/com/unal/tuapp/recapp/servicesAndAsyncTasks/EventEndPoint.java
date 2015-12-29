@@ -57,6 +57,7 @@ public class EventEndPoint extends AsyncTask <Pair<Context,Pair<Event,String>>,V
                                     value.put(RecappContract.EventEntry.COLUMN_LAT, i.getLat());
                                     value.put(RecappContract.EventEntry.COLUMN_LOG, i.getLng());
                                     value.put(RecappContract.EventEntry.COLUMN_NAME, i.getName());
+                                    value.put(RecappContract.COLUMN_IS_SEND,1);
                                     valuesList.add(value);
                                 }
                                 nextPage = collectionResponseEvent.getNextPageToken();

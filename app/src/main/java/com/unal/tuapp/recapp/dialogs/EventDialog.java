@@ -355,7 +355,7 @@ public class  EventDialog extends DialogFragment implements LoaderManager.Loader
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==1 && resultCode==Activity.RESULT_OK){
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-            Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap,eventImage.getWidth()/2,eventImage.getHeight(),true);
+            Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap,eventImage.getWidth()/3,eventImage.getHeight()/3,true);
             image = bitmapScaled;
             eventImage.setImageBitmap(bitmapScaled);
             eventImage.invalidate();
@@ -364,7 +364,7 @@ public class  EventDialog extends DialogFragment implements LoaderManager.Loader
             try {
                 Bitmap bitmap = MediaStore.Images.Media
                         .getBitmap(getActivity().getContentResolver(), data.getData());
-                Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap,eventImage.getWidth()/2,eventImage.getHeight(),true);
+                Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap,eventImage.getWidth()/3,eventImage.getHeight()/3,true);
                 image = bitmapScaled;
                 eventImage.setImageBitmap(bitmapScaled);
             }catch (Exception e){
@@ -421,7 +421,9 @@ public class  EventDialog extends DialogFragment implements LoaderManager.Loader
                 String address = data.getString(data.getColumnIndexOrThrow(RecappContract.EventEntry.COLUMN_ADDRESS));
                 eventPlace.setText(address + "\nLat: " + lat + " Lng: " + lng);
                 byte [] image = data.getBlob(data.getColumnIndexOrThrow(RecappContract.EventEntry.COLUMN_IMAGE));
-                this.image = BitmapFactory.decodeByteArray(image,0,image.length);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 4;
+                this.image = BitmapFactory.decodeByteArray(image,0,image.length,options);
                 eventImage.setImageBitmap(this.image);
                 latLng = new LatLng(lat,lng);
                 isNewImage = true;

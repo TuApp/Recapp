@@ -1,6 +1,9 @@
 package com.unal.tuapp.recapp.adapters;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -26,11 +29,13 @@ public class RecycleCommentsUserAdapter extends RecyclerView.Adapter<RecyclerVie
     public static OnItemClickListener mItemClickListener;
     private static List<Comment> comments;
     private Cursor commentCursor=null;
-    private static int commentPositon;
+    private static int commentPosition;
+    private Context context;
 
 
-    public RecycleCommentsUserAdapter(List<Comment> comments) {
+    public RecycleCommentsUserAdapter(List<Comment> comments,Context context) {
         this.comments = comments;
+        this.context = context;
     }
 
 
@@ -60,7 +65,7 @@ public class RecycleCommentsUserAdapter extends RecyclerView.Adapter<RecyclerVie
         @Override
         public boolean onLongClick(View view) {
             if(mItemClickListener!=null){
-                commentPositon = getAdapterPosition();
+                commentPosition = getAdapterPosition();
                 long id = comments.get(getAdapterPosition()).getId();
                 long idPlace = comments.get(getAdapterPosition()).getIdPlace();
 
@@ -72,11 +77,11 @@ public class RecycleCommentsUserAdapter extends RecyclerView.Adapter<RecyclerVie
     }
 
     public int getCommentPositon() {
-        return commentPositon;
+        return commentPosition;
     }
 
     public void setCommentPositon(int commentPositon) {
-        RecycleCommentsUserAdapter.commentPositon = commentPositon;
+        RecycleCommentsUserAdapter.commentPosition = commentPositon;
     }
 
     @Override
@@ -99,13 +104,16 @@ public class RecycleCommentsUserAdapter extends RecyclerView.Adapter<RecyclerVie
         Comment comment = comments.get(position);
         commentsViewHolder.comment.setText(comment.getComment());
         // We need to change it with the image which is stored in the database
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 3;
         if(comment.getImageProfile()!=null){
             commentsViewHolder.imageView.setImageBitmap(
-                    BitmapFactory.decodeByteArray(comment.getImageProfile(),0,comment.getImageProfile().length));
+                    BitmapFactory.decodeByteArray(comment.getImageProfile(),0,comment.getImageProfile().length,options));
         }else {
-            commentsViewHolder.imageView.setImageResource(R.drawable.background_material);
+            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.image_available,options);
+            commentsViewHolder.imageView.setImageBitmap(bitmap);
         }
-        if(commentPositon==position){
+        if(commentPosition==position){
             commentsViewHolder.itemView.setBackgroundColor(GalleryFragment.SELECTED_BORDER);
         }else{
             commentsViewHolder.itemView.setBackgroundColor(Color.TRANSPARENT);

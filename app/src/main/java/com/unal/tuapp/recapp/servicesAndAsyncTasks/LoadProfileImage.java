@@ -65,6 +65,7 @@ public class LoadProfileImage extends AsyncTask<String, Void, Bitmap> {
                 try {
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     values.put(RecappContract.UserEntry.COLUMN_USER_IMAGE, stream.toByteArray());
+                    values.put(RecappContract.COLUMN_IS_SEND,0);
                     Cursor cursor = view.getContext().getContentResolver().query(
                             RecappContract.UserEntry.buildUserEmail(email),
                             null,

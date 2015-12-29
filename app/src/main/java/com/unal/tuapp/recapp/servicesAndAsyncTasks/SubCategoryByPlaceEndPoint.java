@@ -19,14 +19,10 @@ import java.util.List;
  * Created by andresgutierrez on 11/15/15.
  */
 public class SubCategoryByPlaceEndPoint extends AsyncTask<Pair<Context,Pair<SubCategoryByPlace,String>>,Void,Void> {
-    private boolean swipe;
 
     public SubCategoryByPlaceEndPoint() {
     }
 
-    public SubCategoryByPlaceEndPoint(boolean swipe) {
-        this.swipe = swipe;
-    }
 
     @Override
     protected Void doInBackground(Pair<Context, Pair<SubCategoryByPlace, String>>... pairs) {
@@ -48,6 +44,7 @@ public class SubCategoryByPlaceEndPoint extends AsyncTask<Pair<Context,Pair<SubC
                                    value.put(RecappContract.SubCategoryByPlaceEntry._ID, i.getId());
                                    value.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_PLACE_KEY, i.getPlaceId());
                                    value.put(RecappContract.SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY, i.getSubCategoryId());
+                                   value.put(RecappContract.COLUMN_IS_SEND,1);
                                    valuesList.add(value);
                                }
                                ContentValues values[] = new ContentValues[valuesList.size()];
@@ -75,9 +72,7 @@ public class SubCategoryByPlaceEndPoint extends AsyncTask<Pair<Context,Pair<SubC
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        if(swipe){
-            PlacesFragment.mySwipeRefresh.setRefreshing(false);
-        }
+
     }
 
     @Override

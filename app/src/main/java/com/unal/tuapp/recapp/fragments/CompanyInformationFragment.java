@@ -111,15 +111,18 @@ public class CompanyInformationFragment extends Fragment implements LoaderManage
                     values.put(RecappContract.PlaceEntry.COLUMN_LAT, place.getLat());
                     values.put(RecappContract.PlaceEntry.COLUMN_LOG, place.getLng());
                     values.put(RecappContract.PlaceEntry.COLUMN_IMAGE_FAVORITE, image);
+                    values.put(RecappContract.COLUMN_IS_SEND, 0);
                     getActivity().getContentResolver().update(
                             RecappContract.PlaceEntry.CONTENT_URI,
                             values,
                             RecappContract.PlaceEntry._ID + " = ?",
                             new String[]{"" + CompanyInformationFragment.this.id}
                     );
-                    Pair<Context,Pair<com.unal.tuapp.recapp.backend.model.placeApi.model.Place,String>> pair =
-                            new Pair<>(getContext(),new Pair<>(place,"updatePlace"));
-                    new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
+                    if(Utility.isNetworkAvailable(getContext())) {
+                        Pair<Context, Pair<com.unal.tuapp.recapp.backend.model.placeApi.model.Place, String>> pair =
+                                new Pair<>(getContext(), new Pair<>(place, "updatePlace"));
+                        new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
+                    }
                     Toast.makeText(getActivity(), "We update the data", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -133,12 +136,14 @@ public class CompanyInformationFragment extends Fragment implements LoaderManage
         companyImagesAdapater.setOnItemClickListener(new RecyclePlaceImagesAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, long position) {
-                companyImagesAdapater.setCurrentSelectedPositionImage((int)position);
-                place.setImageFavorite(companyImagesAdapater.getImage((int)position));
+                companyImagesAdapater.setCurrentSelectedPositionImage((int) position);
+                place.setImageFavorite(companyImagesAdapater.getImage((int) position));
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 3;
                 companyImage.setImageBitmap(
                         BitmapFactory.decodeByteArray(
                                 companyImagesAdapater.getImage((int)position),0,
-                                companyImagesAdapater.getImage((int)position).length
+                                companyImagesAdapater.getImage((int)position).length,options
                         )
                 );
                 companyImagesAdapater.notifyDataSetChanged();
@@ -161,9 +166,11 @@ public class CompanyInformationFragment extends Fragment implements LoaderManage
         companyDescription.setText(place.getDescription());
         companyAddress.setText(place.getAddress());
         companyWeb.setText(place.getWeb());
-        companyPosition.setText("Lat : "+place.getLat()+" Lng: "+place.getLog());
+        companyPosition.setText("Lat : " + place.getLat() + " Lng: " + place.getLog());
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4;
         companyImage.setImageBitmap(
-                BitmapFactory.decodeByteArray(place.getImageFavorite(),0,place.getImageFavorite().length)
+                BitmapFactory.decodeByteArray(place.getImageFavorite(),0,place.getImageFavorite().length,options)
         );
     }
 

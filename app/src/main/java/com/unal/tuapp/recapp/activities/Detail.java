@@ -100,8 +100,10 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
                 name.setText(user.getName()+" "+user.getLastName());
                 email.setText(user.getEmail());
                 if(user.getProfileImage()!=null) {
+                    final BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inSampleSize = 3;
                     imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
-                            user.getProfileImage().length));
+                            user.getProfileImage().length,options));
                 }
                 else if(Utility.isNetworkAvailable(this)){
                     Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGooglePlus.mGoogleApiClient);
@@ -342,8 +344,10 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         detail = (ImageView) findViewById(R.id.detail_image);
         if(data.moveToFirst()){
+            final BitmapFactory.Options options= new BitmapFactory.Options();
+            options.inSampleSize = 3;
             Bitmap image  = BitmapFactory.decodeByteArray(
-                    data.getBlob(0), 0, data.getBlob(0).length);
+                    data.getBlob(0), 0, data.getBlob(0).length,options);
             //Bitmap scaledImage = Bitmap.createScaledBitmap(image,100,100,true);
 
             Palette.from(image).generate(new Palette.PaletteAsyncListener() {

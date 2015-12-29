@@ -89,6 +89,8 @@ public class EventByUserEndpoint {
         return ofy().load().entity(eventByUser).now();
     }
 
+    
+
     /**
      * Updates an existing {@code EventByUser}.
      *
@@ -131,7 +133,7 @@ public class EventByUserEndpoint {
         ofy().delete().type(EventByUser.class).id(id).now();
         logger.info("Deleted EventByUser with ID: " + id);
         try {
-            new MessagingEndPoint().sendMessage("eventByUser");
+            new MessagingEndPoint().sendMessage("deleteEventByUser");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -152,7 +154,7 @@ public class EventByUserEndpoint {
         }
         ofy().delete().entities(eventByUserList);
         try {
-            new MessagingEndPoint().sendMessage("eventByUser");
+            new MessagingEndPoint().sendMessage("deleteEventByUser");
         }catch (IOException e){
 
         }

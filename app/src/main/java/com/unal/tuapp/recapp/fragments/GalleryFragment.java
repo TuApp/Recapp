@@ -160,7 +160,9 @@ public class GalleryFragment extends Fragment {
             imageView = (ImageView) itemView.findViewById(R.id.place_image);
             // Capture position and set to the ImageView
             byte[] image = placeImages.get(position);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(image,0,image.length);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 3;
+            Bitmap bitmap = BitmapFactory.decodeByteArray(image,0,image.length,options);
             imageView.setImageBitmap(bitmap);
 
             // Add viewpager_item.xml to ViewPager

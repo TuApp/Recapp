@@ -50,10 +50,6 @@ public class PlacesFavoriteFragment extends Fragment implements LoaderManager.Lo
         if(extras!=null){
             user = extras.getParcelable("user");
         }
-        /*UserByPlace userByPlaceBackend = new UserByPlace();
-        userByPlaceBackend.setUserId(user.getId());
-        Pair<Context,Pair<UserByPlace,String>> pairUserByPlace = new Pair<>(getContext(),new Pair<>(userByPlaceBackend,"getUserByPlaceUser"));
-        new UserByPlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairUserByPlace);*/
         recyclerView = (RecyclerView) root.findViewById(R.id.places_recycle_view);
 
         final List<Place> places = new ArrayList<>();

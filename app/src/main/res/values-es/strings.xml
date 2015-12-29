@@ -48,8 +48,10 @@
     <string name="facebook_app_id">1674043846146726</string>
     <string name="banner_ad_unit_id_navigation">ca-app-pub-7106306232801377/4724119447</string>
     <string name="banner_ad_unit_id_user_detail">ca-app-pub-7106306232801377/6061251846</string>
+    <string name="banner_ad_unit_id_company">ca-app-pub-7106306232801377/7697495042</string>
     <string name="interstitial_ad_unit_id_gallery">ca-app-pub-7106306232801377/6200852645</string>
     <string name="interstitial_ad_unit_id_tutorial">ca-app-pub-7106306232801377/9154319048</string>
+    <string name="interstitial_ad_unit_id_news">ca-app-pub-7106306232801377/9174228242</string>
     <string name="title_activity_gallery">Galería</string>
     <string name="going">Vas a ir?</string>
     <string name="choose">Escoger o tomar foto</string>
@@ -75,5 +77,8 @@
     <string name="first_general">Encuentra los mejores puntos y eventos de reciclaje</string>
     <string name="first_points">Encuentra los puntos más cercanos de reciclaje</string>
     <string name="first_events">Visita los sitios más importantes de reciclaje</string>
+    <string name="internet">Internet</string>
+    <string name="need_internet">Es necesario internet para hacer esta accion</string>
+    <string name="wrong_email">El correo no es valido</string>
 
 </resources>

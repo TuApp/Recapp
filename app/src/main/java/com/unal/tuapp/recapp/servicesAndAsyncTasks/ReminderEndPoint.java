@@ -48,6 +48,7 @@ public class ReminderEndPoint extends AsyncTask<Pair<Context,Pair<Reminder,Strin
                             value.put(RecappContract.ReminderEntry.COLUMN_END_DATE,i.getEndDate());
                             value.put(RecappContract.ReminderEntry.COLUMN_NAME,i.getName());
                             value.put(RecappContract.ReminderEntry.COLUMN_NOTIFICATION,i.getNotification());
+                            value.put(RecappContract.COLUMN_IS_SEND,1);
                             valuesList.add(value);
                         }
                         if(!valuesList.isEmpty()){
@@ -87,6 +88,7 @@ public class ReminderEndPoint extends AsyncTask<Pair<Context,Pair<Reminder,Strin
                                     value.put(RecappContract.ReminderEntry.COLUMN_DESCRIPTION, i.getDescription());
                                     value.put(RecappContract.ReminderEntry.COLUMN_PLACE_KEY, i.getPlaceId());
                                     value.put(RecappContract.ReminderEntry.COLUMN_USER_KEY, i.getUserId());
+                                    value.put(RecappContract.COLUMN_IS_SEND,1);
                                     valuesList.add(value);
                                 }
                                 ContentValues[] values = new ContentValues[valuesList.size()];

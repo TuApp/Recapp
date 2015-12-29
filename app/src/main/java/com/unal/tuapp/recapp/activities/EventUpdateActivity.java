@@ -1,7 +1,9 @@
 package com.unal.tuapp.recapp.activities;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -68,7 +70,7 @@ public class EventUpdateActivity extends AppCompatActivity {
                     event.setCreator(email);
                     event.setAddress((String) objects[3]);
                     event.setLat((Float) objects[4]);
-                    event.setLng((Float)objects[5]);
+                    event.setLng((Float) objects[5]);
                     ContentValues values = new ContentValues();
                     values.put(RecappContract.EventEntry.COLUMN_NAME,event.getName());
                     values.put(RecappContract.EventEntry.COLUMN_DESCRIPTION,event.getDescription());
@@ -77,6 +79,7 @@ public class EventUpdateActivity extends AppCompatActivity {
                     values.put(RecappContract.EventEntry.COLUMN_ADDRESS,event.getAddress());
                     values.put(RecappContract.EventEntry.COLUMN_LAT, event.getLat());
                     values.put(RecappContract.EventEntry.COLUMN_LOG,event.getLng());
+                    values.put(RecappContract.COLUMN_IS_SEND,0);
                     Bitmap image = (Bitmap)objects[6];
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     image.compress(Bitmap.CompressFormat.PNG, 100, stream);
@@ -89,46 +92,74 @@ public class EventUpdateActivity extends AppCompatActivity {
                             RecappContract.EventEntry._ID + " = ?",
                             new String[]{"" + eventId}
                     );
-                    Pair<Context,Pair<Event,String>> pairUpdateEvent = new Pair<>(getApplicationContext(),new Pair<>(
-                            event,"updateEvent"
-                    ));
-                    new EventEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairUpdateEvent);
+                    if(Utility.isNetworkAvailable(EventUpdateActivity.this)) {
+                        Pair<Context, Pair<Event, String>> pairUpdateEvent = new Pair<>(getApplicationContext(), new Pair<>(
+                                event, "updateEvent"
+                        ));
+                        new EventEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairUpdateEvent);
+                    }
                 }else if(action.equals("delete")){
+                    if(Utility.isNetworkAvailable(EventUpdateActivity.this)) {
+                        getContentResolver().delete(
+                                RecappContract.EventByUserEntry.CONTENT_URI,
+                                RecappContract.EventByUserEntry.COLUMN_KEY_EVENT + " = ?",
+                                new String[]{"" + eventId}
+                        );
+                        EventByUser eventByUser = new EventByUser();
+                        eventByUser.setEventId(eventId);
+                        Pair<Context, Pair<EventByUser, String>> pairEventByUser = new Pair<>(getApplicationContext(), new Pair<>(eventByUser,
+                                "deleteEventByUserEvent"));
+                        new EventByUserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEventByUser);
+                        getContentResolver().delete(
+                                RecappContract.EventEntry.CONTENT_URI,
+                                RecappContract.EventEntry._ID + " = ?",
+                                new String[]{"" + eventId}
+                        );
+                        Event event = new Event();
+                        event.setId(eventId);
+                        Pair<Context, Pair<Event, String>> pairEvent = new Pair<>(getApplicationContext(), new Pair<>(
+                                event, "deleteEvent"
+                        ));
+                        new EventEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEvent);
+                        if(user!=null) {
+                            Intent intent = new Intent(EventUpdateActivity.this, UserDetail.class);
+                            intent.putExtra("user", user);
+                            intent.putExtra("type", "event");
+                            startActivity(intent);
+                        }else{
+                            Intent intent = new Intent(EventUpdateActivity.this, Company.class);
+                            intent.putExtra("email", email);
+                            intent.putExtra("id",id);
+                            intent.putExtra("type", "event");
+                            startActivity(intent);
+                        }
+                    }else{
+                        new AlertDialog.Builder(EventUpdateActivity.this)
+                                .setCancelable(false)
+                                .setTitle(getResources().getString(R.string.internet))
+                                .setMessage(getResources().getString(R.string.need_internet))
+                                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                        if(user!=null) {
+                                            Intent intent = new Intent(EventUpdateActivity.this, UserDetail.class);
+                                            intent.putExtra("user", user);
+                                            intent.putExtra("type", "event");
+                                            startActivity(intent);
+                                        }else{
+                                            Intent intent = new Intent(EventUpdateActivity.this, Company.class);
+                                            intent.putExtra("email", email);
+                                            intent.putExtra("id",id);
+                                            intent.putExtra("type", "event");
+                                            startActivity(intent);
+                                        }
+                                    }
+                                })
+                                .show();
+                    }
+                }
 
-                    getContentResolver().delete(
-                            RecappContract.EventByUserEntry.CONTENT_URI,
-                            RecappContract.EventByUserEntry.COLUMN_KEY_EVENT + " = ?",
-                            new String[]{"" + eventId}
-                    );
-                    EventByUser eventByUser = new EventByUser();
-                    eventByUser.setEventId(eventId);
-                    Pair<Context,Pair<EventByUser,String>> pairEvnetByUser = new Pair<>(getApplicationContext(), new Pair<>(eventByUser,
-                            "deleteEventByUserEvent"));
-                    new EventByUserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEvnetByUser);
-                    getContentResolver().delete(
-                            RecappContract.EventEntry.CONTENT_URI,
-                            RecappContract.EventEntry._ID + " = ?",
-                            new String[]{"" + eventId}
-                    );
-                    Event event = new Event();
-                    event.setId(eventId);
-                    Pair<Context,Pair<Event,String>> pairEvent = new Pair<>(getApplicationContext(), new Pair<>(
-                            event,"deleteEvent"
-                    ));
-                    new EventEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairEvent);
-                }
-                if(user!=null) {
-                    Intent intent = new Intent(EventUpdateActivity.this, UserDetail.class);
-                    intent.putExtra("user", user);
-                    intent.putExtra("type", "event");
-                    startActivity(intent);
-                }else{
-                    Intent intent = new Intent(EventUpdateActivity.this, Company.class);
-                    intent.putExtra("email", email);
-                    intent.putExtra("id",id);
-                    intent.putExtra("type", "event");
-                    startActivity(intent);
-                }
             }
         });
         getSupportFragmentManager().beginTransaction().
@@ -136,8 +167,5 @@ public class EventUpdateActivity extends AppCompatActivity {
                 .commit();
 
     }
-
-
-
 
 }

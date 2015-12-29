@@ -28,6 +28,7 @@ public class RecappContract {
     public static final String PATH_USERBYPLACE = "userByPlace";
     public static final String PATH_EVENT = "event";
     public static final String PATH_EVENTBYUSER = "eventByUser";
+    public static final String COLUMN_IS_SEND = "send";
 
     public static class UserEntry implements BaseColumns {
         public static final String TABLE_NAME = "User";
@@ -36,6 +37,7 @@ public class RecappContract {
         public static final String COLUMN_USER_NAME = "user_name";
         public static final String COLUMN_USER_LASTNAME = "user_lastname";
         public static final String COLUMN_USER_IMAGE = "user_image";
+
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_USER).build();
 

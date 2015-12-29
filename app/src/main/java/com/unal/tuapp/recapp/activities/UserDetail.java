@@ -58,25 +58,22 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
     private  Fragment fragmentComment;
     private  Fragment fragmentReminder;
     private  Fragment fragmentEvents;
-    private  Fragment fragmentPoints;
+    private  static Fragment fragmentPoints;
     private  String newType;
     private  AdView mAdView;
     private  String TAG = UserDetail.class.getSimpleName();
     private  TextView name;
     private  TextView email;
     private  de.hdodenhof.circleimageview.CircleImageView imageView;
-    private PendingIntent pendingIntent;
-    private String point;
-    private String emailUser;
+    private  PendingIntent pendingIntent;
+    private  String point;
+    private  String emailUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         root = getLayoutInflater().inflate(R.layout.activity_user_detail,null);
         setContentView(root);
-        pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-
-
         mAdView = (AdView) root.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
                 .build();
@@ -105,8 +102,10 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
 
 
                 if (user.getProfileImage() != null) {
+                    final BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inSampleSize = 3;
                     imageView.setImageBitmap(BitmapFactory.decodeByteArray(user.getProfileImage(), 0,
-                            user.getProfileImage().length));
+                            user.getProfileImage().length,options));
                 }
                 else if (Utility.isNetworkAvailable(this)) {
                     Person currentPerson = Plus.PeopleApi.getCurrentPerson(googlePlus.mGoogleApiClient);
@@ -357,52 +356,6 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
     }
 
 
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        nfcAdapter.disableForegroundDispatch(this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
-    }
-
-    @Override
-    public void onNewIntent(Intent intent) {
-        //super.onNewIntent(intent);
-        if(getIntent().getExtras()!=null){
-            intent.putExtra("user",getIntent().getExtras().getParcelable("user"));
-            intent.putExtra("type", getIntent().getExtras().getString("type"));
-            setIntent(intent);
-        }
-        resolveIntent(intent);
-    }
-
-    public void  connectMifare(final MifareClassic mifare) {
-        if(user!=null) {
-            Utility.connectMifare(mifare, this, user);
-
-        }
-    }
-
-    private void resolveIntent(Intent intent) {
-        Log.i(TAG, "resolving intent");
-        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-
-        if (tag != null) {
-            Log.i(TAG, "found a tag");
-            MifareClassic mifare = MifareClassic.get(tag);
-
-            connectMifare(mifare);
-
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -454,7 +407,7 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
     }
 
     @Override
-    public void sendData(com.unal.tuapp.recapp.backend.model.userApi.model.User user) {
+    public void sendData(Long user) {
         ((MyPointsFragment) fragmentPoints).showPoint(user);
     }
 }

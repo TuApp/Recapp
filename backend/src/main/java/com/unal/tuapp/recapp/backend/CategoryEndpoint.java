@@ -78,6 +78,7 @@ public class CategoryEndpoint {
         //
         // If your client provides the ID then you should probably use PUT instead.
         ofy().save().entity(category).now();
+
         logger.info("Created Category with ID: " + category.getId());
         try {
             new MessagingEndPoint().sendMessage("category");
@@ -86,6 +87,8 @@ public class CategoryEndpoint {
         }
         return ofy().load().entity(category).now();
     }
+
+
 
     /**
      * Updates an existing {@code Category}.
@@ -128,7 +131,7 @@ public class CategoryEndpoint {
         checkExists(id);
         ofy().delete().type(Category.class).id(id).now();
         try {
-            new MessagingEndPoint().sendMessage("category");
+            new MessagingEndPoint().sendMessage("deleteCategory");
         } catch (IOException e) {
             e.printStackTrace();
         }

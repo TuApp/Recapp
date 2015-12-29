@@ -86,7 +86,6 @@ public class FilterCategoriesDialogFragment extends DialogFragment implements Lo
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         List<Category> categories = Category.allCategories(data);
-        Log.e("algo",""+categories.size());
         adapter.swapData(categories);
         adapter.notifyDataSetChanged();
     }

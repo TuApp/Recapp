@@ -89,6 +89,8 @@ public class PlaceEndpoint {
         return ofy().load().entity(place).now();
     }
 
+
+
     /**
      * Updates an existing {@code Place}.
      *
@@ -130,7 +132,7 @@ public class PlaceEndpoint {
         checkExists(id);
         ofy().delete().type(Place.class).id(id).now();
         try {
-            new MessagingEndPoint().sendMessage("place");
+            new MessagingEndPoint().sendMessage("deletePlace");
         } catch (IOException e) {
             e.printStackTrace();
         }

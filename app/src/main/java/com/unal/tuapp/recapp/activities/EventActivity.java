@@ -89,8 +89,10 @@ public class EventActivity extends AppCompatActivity {
                             RecappContract.EventEntry.CONTENT_URI,
                             values
                     );
-                    Pair<Context, Pair<Event, String>> pairEvent = new Pair<>(getApplicationContext(), new Pair<>(event, "addEvent"));
-                    new EventEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEvent);
+                    if(Utility.isNetworkAvailable(EventActivity.this)) {
+                        Pair<Context, Pair<Event, String>> pairEvent = new Pair<>(getApplicationContext(), new Pair<>(event, "addEvent"));
+                        new EventEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEvent);
+                    }
                     if (user != null) {
                             //The user who creates the event also should attend to it
                         EventByUser eventByUser = new EventByUser();
@@ -105,9 +107,11 @@ public class EventActivity extends AppCompatActivity {
                                 RecappContract.EventByUserEntry.CONTENT_URI,
                                 values1
                         );
-                        Pair<Context, Pair<EventByUser, String>> pairEventByUser = new Pair<>(getApplicationContext(),
-                                new Pair<>(eventByUser, "addEventByUser"));
-                        new EventByUserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEventByUser);
+                        if(Utility.isNetworkAvailable(EventActivity.this)) {
+                            Pair<Context, Pair<EventByUser, String>> pairEventByUser = new Pair<>(getApplicationContext(),
+                                    new Pair<>(eventByUser, "addEventByUser"));
+                            new EventByUserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEventByUser);
+                        }
                     }
                 }
                 if (user != null) {

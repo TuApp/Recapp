@@ -43,6 +43,7 @@ public class UserByPlaceEndPoint extends AsyncTask<Pair<Context,Pair<UserByPlace
                             value.put(RecappContract.UserByPlaceEntry._ID,i.getId());
                             value.put(RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY,i.getPlaceId());
                             value.put(RecappContract.UserByPlaceEntry.COLUMN_USER_KEY,i.getUserId());
+                            value.put(RecappContract.COLUMN_IS_SEND,1);
                             valuesList.add(value);
                         }
                         if(!valuesList.isEmpty()){
@@ -78,6 +79,7 @@ public class UserByPlaceEndPoint extends AsyncTask<Pair<Context,Pair<UserByPlace
                                     value.put(RecappContract.UserByPlaceEntry._ID, i.getId());
                                     value.put(RecappContract.UserByPlaceEntry.COLUMN_USER_KEY, i.getUserId());
                                     value.put(RecappContract.UserByPlaceEntry.COLUMN_PLACE_KEY, i.getId());
+                                    value.put(RecappContract.COLUMN_IS_SEND,1);
                                     valuesList.add(value);
                                 }
                                 ContentValues values[] = new ContentValues[valuesList.size()];

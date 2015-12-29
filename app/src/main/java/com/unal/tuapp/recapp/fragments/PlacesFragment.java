@@ -19,10 +19,12 @@ import android.view.ViewGroup;
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.adapters.RecyclePlaceAdapter;
 import com.unal.tuapp.recapp.backend.model.categoryApi.model.Category;
+import com.unal.tuapp.recapp.backend.model.commentApi.model.Comment;
 import com.unal.tuapp.recapp.backend.model.subCategoryByPlaceApi.model.SubCategoryByPlace;
 import com.unal.tuapp.recapp.data.Place;
 import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.CategoryEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.CommentEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.SubCategoryByPlaceEndPoint;
 
@@ -56,13 +58,20 @@ public class PlacesFragment extends Fragment {
         mySwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                if(Utility.isNetworkAvailable(getContext())) {
+                    com.unal.tuapp.recapp.backend.model.placeApi.model.Place place = new com.unal.tuapp.recapp.backend.model.placeApi.model.Place();
+                    Pair<Context, Pair<com.unal.tuapp.recapp.backend.model.placeApi.model.Place, String>> pair = new Pair<>(getContext(), new Pair<>(place, "getPlaces"));
+                    new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
 
-                com.unal.tuapp.recapp.backend.model.placeApi.model.Place place = new com.unal.tuapp.recapp.backend.model.placeApi.model.Place();
-                Pair<Context, Pair<com.unal.tuapp.recapp.backend.model.placeApi.model.Place, String>> pair = new Pair<>(getContext(), new Pair<>(place, "getPlaces"));
-                new PlaceEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
-                SubCategoryByPlace subCategoryByPlace = new SubCategoryByPlace();
-                Pair<Context, Pair<SubCategoryByPlace, String>> pairSubCategoryByPlace = new Pair<>(getContext(), new Pair<>(subCategoryByPlace, "getSubCategoryByPlace"));
-                new SubCategoryByPlaceEndPoint(true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairSubCategoryByPlace);
+                    Comment comment = new Comment();
+                    Pair<Pair<Context,Pair<Long,Long>>,Pair<Comment,String>> pairComment = new Pair<>(
+                            new Pair<>(getContext(),new Pair<>(-1L,-1L)),new Pair<>(comment,"getComments")
+                    );
+                    new CommentEndPoint(true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairComment);
+                }else{
+                    mySwipeRefresh.setRefreshing(false);
+                }
+
 
 
             }

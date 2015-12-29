@@ -37,6 +37,7 @@ public class CategoryEndPoint extends AsyncTask<Pair<Context,Pair<Category,Strin
                                     value.put(RecappContract.CategoryEntry._ID, i.getId());
                                     value.put(RecappContract.CategoryEntry.COLUMN_NAME, i.getName());
                                     value.put(RecappContract.CategoryEntry.COLUMN_IMAGE, Utility.decodeImage(i.getImage()));
+                                    value.put(RecappContract.COLUMN_IS_SEND,1);
                                     valuesList.add(value);
                                 }
                                 ContentValues values[] = new ContentValues[valuesList.size()];

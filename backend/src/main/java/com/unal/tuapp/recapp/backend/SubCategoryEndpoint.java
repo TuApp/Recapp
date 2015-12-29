@@ -88,6 +88,8 @@ public class SubCategoryEndpoint {
         return ofy().load().entity(subCategory).now();
     }
 
+
+
     /**
      * Updates an existing {@code SubCategory}.
      *
@@ -130,7 +132,7 @@ public class SubCategoryEndpoint {
         ofy().delete().type(SubCategory.class).id(id).now();
         logger.info("Deleted SubCategory with ID: " + id);
         try {
-            new MessagingEndPoint().sendMessage("subCategory");
+            new MessagingEndPoint().sendMessage("deleteSubCategory");
         } catch (IOException e) {
             e.printStackTrace();
         }

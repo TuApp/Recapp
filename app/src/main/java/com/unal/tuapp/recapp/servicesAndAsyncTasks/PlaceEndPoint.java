@@ -67,6 +67,7 @@ public class PlaceEndPoint extends AsyncTask<Pair<Context,Pair<Place,String>>,Vo
                                     value.put(RecappContract.PlaceEntry.COLUMN_LOG, i.getLng());
                                     value.put(RecappContract.PlaceEntry.COLUMN_RATING, i.getRating());
                                     value.put(RecappContract.PlaceEntry.COLUMN_WEB, i.getWeb());
+                                    value.put(RecappContract.COLUMN_IS_SEND,1);
                                     valuesList.add(value);
                                 }
                                 ContentValues values[] = new ContentValues[valuesList.size()];

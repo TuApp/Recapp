@@ -88,6 +88,8 @@ public class ReminderEndpoint {
         return ofy().load().entity(reminder).now();
     }
 
+
+
     /**
      * Updates an existing {@code Reminder}.
      *
@@ -130,7 +132,7 @@ public class ReminderEndpoint {
         ofy().delete().type(Reminder.class).id(id).now();
         logger.info("Deleted Reminder with ID: " + id);
         try {
-            new MessagingEndPoint().sendMessage("reminder");
+            new MessagingEndPoint().sendMessage("deleteReminder");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -151,7 +153,7 @@ public class ReminderEndpoint {
 
         ofy().delete().type(Reminder.class).ids(reminderList).now();
         try {
-            new MessagingEndPoint().sendMessage("reminder");
+            new MessagingEndPoint().sendMessage("DeleteReminder");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -36,6 +36,11 @@ public class NewsFragment extends Fragment{
     private static RecycleNewsAdapter recycleNewsAdapter;
     private static List<News> news;
     public static SwipeRefreshLayout swipeRefreshLayout;
+    public static OnNewsListener mOnNewsListener;
+
+    public interface OnNewsListener{
+        public void onNews(String link);
+    }
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -51,8 +56,11 @@ public class NewsFragment extends Fragment{
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                ((NavigationDrawer)getActivity()).callNewsRefresh("https://ajax.googleapis.com/ajax/services/search/news?v=2.0&q=reciclaje&rsz=8&start="+recycleNewsAdapter.getItemCount()+1);
-
+                if(Utility.isNetworkAvailable(getContext())) {
+                    ((NavigationDrawer) getActivity()).callNewsRefresh("https://ajax.googleapis.com/ajax/services/search/news?v=2.0&q=reciclaje&rsz=8&start=" + recycleNewsAdapter.getItemCount() + 1);
+                }else{
+                    swipeRefreshLayout.setRefreshing(false);
+                }
             }
         });
         RecyclerView.LayoutManager layoutManager = Utility.getLayoutManager(getActivity(), getResources().getConfiguration().screenWidthDp);
@@ -60,9 +68,10 @@ public class NewsFragment extends Fragment{
         recycleNewsAdapter.setOnNewsListener(new RecycleNewsAdapter.OnNewsListener() {
             @Override
             public void onNews(String link) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(link));
-                startActivity(i);
+                if(mOnNewsListener!=null){
+                    mOnNewsListener.onNews(link);
+                }
+
             }
         });
         recycleNewsAdapter = new RecycleNewsAdapter(news);
@@ -75,5 +84,7 @@ public class NewsFragment extends Fragment{
         recycleNewsAdapter.swapData(news,swipe);
     }
 
-
+    public void setOnNewsListener(OnNewsListener mOnNewsListener) {
+        NewsFragment.mOnNewsListener = mOnNewsListener;
+    }
 }

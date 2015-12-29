@@ -1,7 +1,9 @@
 package com.unal.tuapp.recapp.fragments;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -24,6 +26,7 @@ import com.unal.tuapp.recapp.adapters.RecycleRemindersAdapter;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.data.Reminder;
 import com.unal.tuapp.recapp.data.User;
+import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.ReminderEndPoint;
 
 import java.util.ArrayList;
@@ -49,24 +52,12 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
         if(extras!=null){
             user = extras.getParcelable("user");
         }
-        /*com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder reminder = new com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder();
-        reminder.setUserId(user.getId());
-        Pair<Context,Pair<com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder,String>> pair = new Pair<>(getContext(),new Pair<>(reminder,"getReminderUser"));
-        new ReminderEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);*/
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
         final List<Reminder> reminders = new ArrayList<>();
         recycleRemindersAdapter = new RecycleRemindersAdapter(reminders);
-        /*recycleRemindersAdapter.setOnItemClickListener(new RecycleRemindersAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(long reminderId) {
-                getActivity().getContentResolver().delete(
-                        RecappContract.ReminderEntry.CONTENT_URI,
-                        RecappContract.ReminderEntry._ID + " = ?",
-                        new String[]{"" + reminderId}
-                );
-            }
-        });*/
+
         recyclerView.setAdapter(recycleRemindersAdapter);
         ItemTouchHelper swipeToDismiss = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
                 0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -74,7 +65,22 @@ public class RemindersFragment extends Fragment implements LoaderManager.LoaderC
 
             @Override
             public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-                if (!recycleRemindersAdapter.getPlaces().get(viewHolder.getAdapterPosition()).isSwipe()) return 0;
+                if (!recycleRemindersAdapter.getPlaces().get(viewHolder.getAdapterPosition()).isSwipe() ||
+                        !Utility.isNetworkAvailable(getContext())) {
+                    new AlertDialog.Builder(getContext())
+                            .setTitle(R.string.internet)
+                            .setMessage(R.string.need_internet)
+                            .setCancelable(false)
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                }
+                            })
+                            .show();
+                    return 0;
+
+                }
                 return super.getSwipeDirs(recyclerView, viewHolder);
             }
             @Override

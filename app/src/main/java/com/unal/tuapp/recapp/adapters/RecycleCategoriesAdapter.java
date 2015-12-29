@@ -76,14 +76,14 @@ public class RecycleCategoriesAdapter extends RecyclerView.Adapter<RecyclerView.
         CategoryViewHolder subcategoryViewHolder = (CategoryViewHolder) holder;
         Category category =categories.get(position);
         byte[] image = category.getImage();
-        subcategoryViewHolder.mCategoryImage.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-        int width =  subcategoryViewHolder.mCategoryImage.getMeasuredWidth();
-        int height =  subcategoryViewHolder.mCategoryImage.getMeasuredHeight();
-        Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
-        if(bitmap!=null) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 3;
+        Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length,options);
+        /*if(bitmap!=null) {
             Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap, width*4, height*4, true);
             subcategoryViewHolder.mCategoryImage.setImageBitmap(bitmapScaled);
-        }
+        }*/
+        subcategoryViewHolder.mCategoryImage.setImageBitmap(bitmap);
         subcategoryViewHolder.mCategoryText.setText(category.getName());
         subcategoryViewHolder.mCategoryId.setText(category.getId()+"");
 

@@ -35,6 +35,7 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 UserEntry.COLUMN_USER_NAME + " TEXT, " +
                 UserEntry.COLUMN_USER_LASTNAME + " TEXT, " +
                 UserEntry.COLUMN_USER_IMAGE + " BLOB ,"+
+                RecappContract.COLUMN_IS_SEND + " INTEGER DEFAULT 0 , "+
                 "UNIQUE( "+ UserEntry._ID+" ) ON CONFLICT REPLACE); " ;
         final String CREATE_PLACE_TABLE = "CREATE TABLE " + PlaceEntry.TABLE_NAME + " ( "+
                 PlaceEntry._ID + " INTEGER PRIMARY KEY , "+
@@ -48,6 +49,7 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 PlaceEntry.COLUMN_IMAGE_FAVORITE + " BLOB NOT NULL , " +
                 PlaceEntry.COLUMN_EMAIL + " TEXT UNIQUE NOT NULL , " +
                 PlaceEntry.COLUMN_PASSWORD+" TEXT NOT NULL, "+
+                RecappContract.COLUMN_IS_SEND + " INTEGER DEFAULT 0 , "+
                 "UNIQUE ( "+ PlaceEntry._ID+" ) ON CONFLICT REPLACE );";
 
         final String CREATE_REMINDER_TABLE = "CREATE TABLE "+ ReminderEntry.TABLE_NAME +" ( "+
@@ -58,6 +60,7 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 ReminderEntry.COLUMN_NOTIFICATION + " INTEGER NOT NULL, " +
                 ReminderEntry.COLUMN_USER_KEY + " INTEGER," +
                 ReminderEntry.COLUMN_PLACE_KEY + " INTEGER, "+
+                RecappContract.COLUMN_IS_SEND + " INTEGER DEFAULT 0 , "+
                 "UNIQUE ( " +ReminderEntry._ID+" ) ON CONFLICT REPLACE ,"+
                 "FOREIGN KEY ( " + ReminderEntry.COLUMN_USER_KEY +" ) REFERENCES " +
                 UserEntry.TABLE_NAME + " ( "+ UserEntry._ID +" ), " +
@@ -70,6 +73,7 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 CommentEntry.COLUMN_DATE + " INTEGER NOT NULL, " +
                 CommentEntry.COLUMN_USER_KEY + " INTEGER , "+
                 CommentEntry.COLUMN_PLACE_KEY + " INTEGER , " +
+                RecappContract.COLUMN_IS_SEND + " INTEGER DEFAULT 0 , "+
                 "UNIQUE ( "+ CommentEntry._ID +" ) ON CONFLICT REPLACE ,"+
                 "FOREIGN KEY ("  + CommentEntry.COLUMN_USER_KEY + ") REFERENCES " +
                 UserEntry.TABLE_NAME + " ("+ UserEntry._ID +"), " +
@@ -80,6 +84,7 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 PlaceImageEntry.COLUMN_IMAGE + " BLOB NOT NULL, " +
                 PlaceImageEntry.COLUMN_WORTH + " INTEGER NOT NULL DEFAULT 0, " +
                 PlaceImageEntry.COLUMN_PLACE_KEY + " INTEGER, "+
+                RecappContract.COLUMN_IS_SEND + " INTEGER DEFAULT 0 , "+
                 "UNIQUE ( "+PlaceImageEntry.COLUMN_PLACE_KEY+" , "+ PlaceImageEntry._ID+" ) ON CONFLICT REPLACE , "+
                 "FOREIGN KEY ( " + PlaceImageEntry.COLUMN_PLACE_KEY + " ) REFERENCES " +
                 PlaceEntry.TABLE_NAME + " ( " + PlaceEntry._ID + " ) );";
@@ -88,16 +93,19 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 TutorialEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                 TutorialEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL," +
                 TutorialEntry.COLUMN_LINK_VIDEO + " TEXT NOT NULL , " +
+                RecappContract.COLUMN_IS_SEND + " INTEGER DEFAULT 0 , "+
                 "UNIQUE ( "+ TutorialEntry._ID+" ) ON CONFLICT REPLACE );";
         final String CREATE_CATEGORY_TABLE = "CREATE TABLE " + CategoryEntry.TABLE_NAME + " ( " +
                 CategoryEntry._ID + "  INTEGER PRIMARY KEY , " +
                 CategoryEntry.COLUMN_NAME + " TEXT UNIQUE NOT NULL, "+
                 CategoryEntry.COLUMN_IMAGE + " BLOB NOT NULL ," +
+                RecappContract.COLUMN_IS_SEND + " INTEGER DEFAULT 0 ,"+
                 "UNIQUE ( "+ CategoryEntry._ID +" ) ON CONFLICT REPLACE );";
         final String CREATE_SUB_CATEGORY_TABLE = "CREATE TABLE " + SubCategoryEntry.TABLE_NAME + "(" +
                 SubCategoryEntry._ID + " INTEGER PRIMARY KEY , " +
                 SubCategoryEntry.COLUMN_NAME + " TEXT UNIQUE NOT NULL, " +
                 SubCategoryEntry.COLUMN_CATEGORY_KEY + " INTEGER, "+
+                RecappContract.COLUMN_IS_SEND + " INTEGER DEFAULT 0 , "+
                 "UNIQUE ( "+ SubCategoryEntry._ID +" ) ON CONFLICT REPLACE, "+
                 "FOREIGN KEY (" + SubCategoryEntry.COLUMN_CATEGORY_KEY +") REFERENCES " +
                 CategoryEntry.TABLE_NAME + "( "+CategoryEntry._ID+" ) );";
@@ -105,6 +113,7 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 SubCategoryByPlaceEntry._ID + " INTEGER PRIMARY KEY , "+
                 SubCategoryByPlaceEntry.COLUMN_PLACE_KEY+ " INTEGER NOT NULL,"+
                 SubCategoryByPlaceEntry.COLUMN_SUBCATEGORY_KEY+ " INTEGER NOT NULL, "+
+                RecappContract.COLUMN_IS_SEND + " INTEGER DEFAULT 0 , "+
                 "UNIQUE ( "+ SubCategoryByPlaceEntry._ID+" )  ON CONFLICT REPLACE ,"+
                 "FOREIGN KEY (" +SubCategoryByPlaceEntry.COLUMN_PLACE_KEY+") REFERENCES "+
                 PlaceEntry.TABLE_NAME+"(" +PlaceEntry._ID+") , "+
@@ -114,6 +123,7 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 SubCategoryByTutorialEntry._ID + " INTEGER PRIMARY KEY , "+
                 SubCategoryByTutorialEntry.COLUMN_TUTORIAL_KEY+" INTEGER NOT NULL,"+
                 SubCategoryByTutorialEntry.COLUMN_SUBCATEGORY_KEY+" INTEGER NOT NULL, "+
+                RecappContract.COLUMN_IS_SEND + " INTEGER DEFAULT 0 , "+
                 "UNIQUE ( "+ SubCategoryByTutorialEntry._ID+" ) ON CONFLICT REPLACE, "+
                 "FOREIGN KEY (" + SubCategoryByTutorialEntry.COLUMN_TUTORIAL_KEY+") REFERENCES "+
                 TutorialEntry.TABLE_NAME+"("+TutorialEntry._ID+"), "+
@@ -124,6 +134,7 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 UserByPlaceEntry._ID + " INTEGER PRIMARY KEY , " +
                 UserByPlaceEntry.COLUMN_USER_KEY +" INTEGER NOT NULL, " +
                 UserByPlaceEntry.COLUMN_PLACE_KEY + " INTEGER NOT NULL, " +
+                RecappContract.COLUMN_IS_SEND + " INTEGER DEFAULT 0 , "+
                 "UNIQUE ( "+UserByPlaceEntry._ID+ " ) ON CONFLICT REPLACE, "+
                 "FOREIGN KEY (" + UserByPlaceEntry.COLUMN_USER_KEY + ") REFERENCES " +
                 UserEntry.TABLE_NAME + "(" + UserEntry._ID+"), " +
@@ -139,12 +150,14 @@ public class RecappDBHelper extends SQLiteOpenHelper{
                 EventEntry.COLUMN_IMAGE + " BLOB , "+
                 EventEntry.COLUMN_LAT + " REAL NOT NULL, "+
                 EventEntry.COLUMN_LOG +" REAL NOT NULL , " +
+                RecappContract.COLUMN_IS_SEND + " INTEGER DEFAULT 0 , "+
                 "UNIQUE ( " + EventEntry._ID+" ) ON CONFLICT REPLACE );";
 
         final String CREATE_EVENT_BY_USER_TABLE = "CREATE TABLE " + EventByUserEntry.TABLE_NAME+ "(" +
                 EventByUserEntry._ID + " INTEGER PRIMARY KEY , "+
                 EventByUserEntry.COLUMN_KEY_EVENT +" INTEGER NOT NULL,  "+
                 EventByUserEntry.COLUMN_KEY_USER + " TEXT NOT NULL, "+
+                RecappContract.COLUMN_IS_SEND + " INTEGER DEFAULT 0 , "+
                 "UNIQUE ( "+EventByUserEntry._ID+" ) ON CONFLICT REPLACE, "+
                 "FOREIGN KEY ("+ EventByUserEntry.COLUMN_KEY_USER +") REFERENCES " +
                 UserEntry.TABLE_NAME +" ( "+ UserEntry.COLUMN_EMAIL +"), "+

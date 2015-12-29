@@ -82,13 +82,14 @@ public class EventEndpoint {
         ofy().save().entity(event).now();
         logger.info("Created Event with ID: " + event.getId());
         try {
-            new MessagingEndPoint().sendMessage("addEvent");
+            new MessagingEndPoint().sendMessage("event");
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return ofy().load().entity(event).now();
     }
+
 
     /**
      * Updates an existing {@code Event}.
@@ -109,7 +110,7 @@ public class EventEndpoint {
         ofy().save().entity(event).now();
         logger.info("Updated Event: " + event);
         try {
-            new MessagingEndPoint().sendMessage("addEvent");
+            new MessagingEndPoint().sendMessage("event");
         } catch (IOException e) {
             e.printStackTrace();
         }

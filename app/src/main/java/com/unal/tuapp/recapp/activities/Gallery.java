@@ -105,7 +105,7 @@ public class Gallery extends AppCompatActivity implements LoaderManager.LoaderCa
                 new String[]{RecappContract.PlaceImageEntry.COLUMN_IMAGE},
                 null,
                 null,
-                null
+                RecappContract.PlaceImageEntry.COLUMN_WORTH + " DESC "
         );
     }
 

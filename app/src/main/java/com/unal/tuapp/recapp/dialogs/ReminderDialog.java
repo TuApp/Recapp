@@ -254,7 +254,9 @@ public class ReminderDialog extends DialogFragment implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         data.moveToFirst();
-        placeImage.setImageBitmap(BitmapFactory.decodeByteArray(data.getBlob(3), 0, (data.getBlob(3)).length));
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4;
+        placeImage.setImageBitmap(BitmapFactory.decodeByteArray(data.getBlob(3), 0, (data.getBlob(3)).length,options));
         placeName.setText(data.getString(1));
         placeAddress.setText(data.getString(2));
         placeCursor = data;

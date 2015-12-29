@@ -89,6 +89,8 @@ public class TutorialEndpoint {
         return ofy().load().entity(tutorial).now();
     }
 
+
+
     /**
      * Updates an existing {@code Tutorial}.
      *
@@ -131,7 +133,7 @@ public class TutorialEndpoint {
         ofy().delete().type(Tutorial.class).id(id).now();
         logger.info("Deleted Tutorial with ID: " + id);
         try {
-            new MessagingEndPoint().sendMessage("tutorial");
+            new MessagingEndPoint().sendMessage("deleteTutorial");
         } catch (IOException e) {
             e.printStackTrace();
         }

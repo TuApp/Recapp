@@ -37,6 +37,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.backend.model.placeImageApi.model.PlaceImage;
 import com.unal.tuapp.recapp.backend.model.userApi.model.User;
@@ -84,13 +86,14 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
     private Fragment companyComments;
     private Fragment companyEventFragment;
     private Fragment companyImagesFragment;
-    private Fragment companyPointsFragment;
+    private static Fragment companyPointsFragment;
     private String menu;
     private boolean addImages;
     private String imagePath;
     private Bitmap image;
     private PendingIntent pendingIntent;
     private final String TAG = Company.class.getSimpleName();
+    private AdView mAdView;
 
 
     @Override
@@ -108,6 +111,11 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
             email = getIntent().getExtras().getString("email");
             placeId = getIntent().getExtras().getLong("id");
         }
+        mAdView = (AdView) root.findViewById(R.id.adView);
+        AdRequest adRequest =  new AdRequest.Builder()
+                .build();
+        mAdView.loadAd(adRequest);
+
         companyEvent = (FloatingActionButton) root.findViewById(R.id.company_create_event);
         companyEvent.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -444,49 +452,6 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
     }
 
 
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        nfcAdapter.disableForegroundDispatch(this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        if(getIntent().getExtras()!=null){
-            intent.putExtra("email",getIntent().getExtras().getString("email"));
-            intent.putExtra("id", getIntent().getExtras().getLong("id"));
-            setIntent(intent);
-        }
-        resolveIntent(intent);
-    }
-    public void  connectMifare(final MifareClassic mifare) {
-        Utility.readMifare(mifare, this,placeId);
-
-
-    }
-
-    private void resolveIntent(Intent intent) {
-        Log.i(TAG, "resolving intent");
-        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-
-        if (tag != null) {
-            Log.i(TAG, "found a tag");
-            MifareClassic mifare = MifareClassic.get(tag);
-
-            connectMifare(mifare);
-
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_recapp, menu);
@@ -532,8 +497,10 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
             place = places.get(0);
             place.setEmail(email);
             companyName.setText(place.getName());
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 3;
             companyImage.setImageBitmap(
-                    BitmapFactory.decodeByteArray(place.getImageFavorite(), 0, place.getImageFavorite().length)
+                    BitmapFactory.decodeByteArray(place.getImageFavorite(), 0, place.getImageFavorite().length,options)
             );
             ((CompanyMainFragment)companyHome).setPlace(place);
             ((CompanyInformationFragment)companyInformation).setPlace(place);
@@ -571,17 +538,19 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         super.onActivityResult(requestCode, resultCode, data);
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 3;
         if(requestCode==1 && resultCode== Activity.RESULT_OK){
-            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-            Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap,root.getWidth()/2,root.getHeight(),true);
-            image = bitmapScaled;
+
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+            image = bitmap;
 
         }
         if(requestCode==2 && resultCode==Activity.RESULT_OK){
             try {
                 Bitmap bitmap = MediaStore.Images.Media
                         .getBitmap(getContentResolver(), data.getData());
-                Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap,root.getWidth()/2,root.getHeight(),true);
+                Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap, root.getWidth() / 3, root.getHeight()/3, true);
                 image = bitmapScaled;
             }catch (Exception e){
 
@@ -599,14 +568,16 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
         values.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE,stream.toByteArray());
         values.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY,placeImage.getPlaceId());
         values.put(RecappContract.PlaceImageEntry._ID,placeImage.getId());
-        values.put(RecappContract.PlaceImageEntry.COLUMN_WORTH,placeImage.getWorth());
+        values.put(RecappContract.PlaceImageEntry.COLUMN_WORTH, placeImage.getWorth());
         getContentResolver().insert(
                 RecappContract.PlaceImageEntry.CONTENT_URI,
                 values
         );
-        Pair<Pair<Context,Long>,Pair<PlaceImage,String>> pair = new Pair<>(new Pair<>(getApplicationContext(),-1L),
-                new Pair<>(placeImage,"addImage"));
-        new PlaceImageEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
+        if(Utility.isNetworkAvailable(this)) {
+            Pair<Pair<Context, Long>, Pair<PlaceImage, String>> pair = new Pair<>(new Pair<>(getApplicationContext(), -1L),
+                    new Pair<>(placeImage, "addImage"));
+            new PlaceImageEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pair);
+        }
         companyImagesGallery.hide();
         companyImagesCamera.hide();
         companyImages.setImageResource(R.drawable.ic_add_white_24dp);
@@ -614,7 +585,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void sendData(User user) {
+    public void sendData(Long user) {
         ((CompanyPointsFragment) companyPointsFragment).showPoint(user);
     }
 

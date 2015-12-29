@@ -99,7 +99,9 @@ public class RecyclePlaceImagesAdapter extends RecyclerView.Adapter<RecyclerView
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i){
         PlaceImagesViewHolder placeImagesViewHolder = (PlaceImagesViewHolder) viewHolder;
         byte[] image = placeImages.get(i);
-        Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 3;
+        Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length,options);
         placeImagesViewHolder.placeImage.setImageBitmap(bitmap);
         placeImagesViewHolder.placeImage.setPadding(1, 1, 1, 1);
         int COLOR = GalleryFragment.NON_SELECTED_BORDER;

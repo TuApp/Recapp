@@ -39,6 +39,7 @@ public class SubCategoryEndPoint extends AsyncTask<Pair<Context,Pair<SubCategory
                                     value.put(RecappContract.SubCategoryEntry._ID, i.getId());
                                     value.put(RecappContract.SubCategoryEntry.COLUMN_NAME, i.getName());
                                     value.put(RecappContract.SubCategoryEntry.COLUMN_CATEGORY_KEY, i.getCategoryId());
+                                    value.put(RecappContract.COLUMN_IS_SEND,1);
                                     valuesList.add(value);
                                 }
                                 nextPage = collectionResponseSubCategory.getNextPageToken();
@@ -66,6 +67,7 @@ public class SubCategoryEndPoint extends AsyncTask<Pair<Context,Pair<SubCategory
                             value.put(RecappContract.SubCategoryEntry._ID,i.getId());
                             value.put(RecappContract.SubCategoryEntry.COLUMN_NAME,i.getName());
                             value.put(RecappContract.SubCategoryEntry.COLUMN_CATEGORY_KEY,i.getCategoryId());
+                            value.put(RecappContract.COLUMN_IS_SEND,1);
                             valuesList.add(value);
                         }
                         ContentValues values [] = new ContentValues[valuesList.size()];

@@ -42,6 +42,7 @@ public class PlaceImageEndPoint extends AsyncTask<Pair<Pair<Context,Long>,Pair<P
                                     value.put(RecappContract.PlaceImageEntry.COLUMN_WORTH, i.getWorth());
                                     value.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, i.getPlaceId());
                                     value.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, Utility.decodeImage(i.getImage()));
+                                    value.put(RecappContract.COLUMN_IS_SEND,1);
                                     valuesList.add(value);
                                 }
                                 ContentValues values[] = new ContentValues[valuesList.size()];
@@ -66,12 +67,13 @@ public class PlaceImageEndPoint extends AsyncTask<Pair<Pair<Context,Long>,Pair<P
                         String query = RecappContract.PlaceEntry._ID + " NOT IN ( ";
                         for (PlaceImage i : images.getItems()) {
                             query += " ?,";
-                            ids.add(""+i.getId());
+                            ids.add("" + i.getId());
                             ContentValues value = new ContentValues();
                             value.put(RecappContract.PlaceImageEntry.COLUMN_PLACE_KEY, id);
                             value.put(RecappContract.PlaceImageEntry.COLUMN_IMAGE, Utility.decodeImage(i.getImage()));
                             value.put(RecappContract.PlaceImageEntry.COLUMN_WORTH, i.getWorth());
                             value.put(RecappContract.PlaceImageEntry._ID, i.getId());
+                            value.put(RecappContract.COLUMN_IS_SEND,1);
                             valuesList.add(value);
                         }
                         if(!valuesList.isEmpty()) {
@@ -94,7 +96,6 @@ public class PlaceImageEndPoint extends AsyncTask<Pair<Pair<Context,Long>,Pair<P
                     }
                     break;
                 case "addImage":
-                    Log.e("algo","alog");
                     Utility.getPlaceImageApi().insert(pairs[0].second.first).execute();
                     break;
                 case "deleteImage":

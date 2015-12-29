@@ -1,7 +1,9 @@
 package com.unal.tuapp.recapp.activities;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
@@ -73,35 +75,54 @@ public class EventActivityGoing extends AppCompatActivity implements LoaderManag
             @Override
             public void onClick(View view) {
                 if(wasGoing && !mSwitch.isChecked()){
-                    //We should eliminate the user from the table because now he/she doesn't want to go to the event
-                    Cursor cursor = getContentResolver().query(
-                            RecappContract.EventByUserEntry.CONTENT_URI,
-                            new String[]{RecappContract.EventByUserEntry._ID},
-                            RecappContract.EventByUserEntry.COLUMN_KEY_USER +" = ? AND " + RecappContract.EventByUserEntry.COLUMN_KEY_EVENT+" = ?",
-                            new String[]{user.getEmail(),""+idEvent},
-                            null
-                    );
-                    if(cursor.moveToFirst()){
-                        EventByUser event = new EventByUser();
-                        event.setId(cursor.getLong(0));
-                        Pair<Context,Pair<EventByUser,String>> pairEventGoing = new Pair<>(getApplicationContext(),
-                                new Pair<>(event,"deleteEventByUser"));
-                        new EventByUserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairEventGoing);
+                    if(Utility.isNetworkAvailable(EventActivityGoing.this)) {
+                        //We should eliminate the user from the table because now he/she doesn't want to go to the event
+                        Cursor cursor = getContentResolver().query(
+                                RecappContract.EventByUserEntry.CONTENT_URI,
+                                new String[]{RecappContract.EventByUserEntry._ID},
+                                RecappContract.EventByUserEntry.COLUMN_KEY_USER + " = ? AND " + RecappContract.EventByUserEntry.COLUMN_KEY_EVENT + " = ?",
+                                new String[]{user.getEmail(), "" + idEvent},
+                                null
+                        );
+                        if (cursor.moveToFirst()) {
+                            EventByUser event = new EventByUser();
+                            event.setId(cursor.getLong(0));
+                            Pair<Context, Pair<EventByUser, String>> pairEventGoing = new Pair<>(getApplicationContext(),
+                                    new Pair<>(event, "deleteEventByUser"));
+                            new EventByUserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEventGoing);
+                        }
+                        getContentResolver().delete(
+                                RecappContract.EventByUserEntry.CONTENT_URI,
+                                RecappContract.EventByUserEntry.COLUMN_KEY_USER + " = ? AND " + RecappContract.EventByUserEntry.COLUMN_KEY_EVENT + " = ?",
+                                new String[]{user.getEmail(), "" + idEvent}
+                        );
+                    }else{
+                        new AlertDialog.Builder(EventActivityGoing.this)
+                                .setTitle(getResources().getString(R.string.internet))
+                                .setMessage(getResources().getString(R.string.need_internet))
+                                .setCancelable(false)
+                                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                        Intent intent = new Intent(EventActivityGoing.this,NavigationDrawer.class);
+                                        intent.putExtra("email", user.getEmail());
+                                        startActivity(intent);
+                                    }
+                                })
+                                .show();
                     }
-                    getContentResolver().delete(
-                            RecappContract.EventByUserEntry.CONTENT_URI,
-                            RecappContract.EventByUserEntry.COLUMN_KEY_USER +" = ? AND " + RecappContract.EventByUserEntry.COLUMN_KEY_EVENT+" = ?",
-                            new String[]{user.getEmail(),""+idEvent}
-                    );
                 }else if(!wasGoing && mSwitch.isChecked()){
                     //We should add the user to the table because now he/she want to go to the event
                     EventByUser event = new EventByUser();
                     event.setId(System.currentTimeMillis());
                     event.setEventId(idEvent);
                     event.setEmail(user.getEmail());
-                    Pair<Context,Pair<EventByUser,String>> pairEventGoing = new Pair<>(getApplicationContext(),
-                            new Pair<>(event,"addEventByUser"));
-                    new EventByUserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEventGoing);
+                    if(Utility.isNetworkAvailable(EventActivityGoing.this)) {
+                        Pair<Context, Pair<EventByUser, String>> pairEventGoing = new Pair<>(getApplicationContext(),
+                                new Pair<>(event, "addEventByUser"));
+                        new EventByUserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEventGoing);
+                    }
                     ContentValues values = new ContentValues();
                     values.put(RecappContract.EventByUserEntry.COLUMN_KEY_EVENT,event.getEventId());
                     values.put(RecappContract.EventByUserEntry.COLUMN_KEY_USER, event.getEmail());
@@ -110,10 +131,12 @@ public class EventActivityGoing extends AppCompatActivity implements LoaderManag
                             RecappContract.EventByUserEntry.CONTENT_URI,
                             values
                     );
+                    Intent intent = new Intent(EventActivityGoing.this,NavigationDrawer.class);
+                    intent.putExtra("email", user.getEmail());
+                    startActivity(intent);
 
                 }
-                Intent intent = new Intent(EventActivityGoing.this,NavigationDrawer.class);
-                startActivity(intent);
+
             }
         });
 
@@ -168,7 +191,9 @@ public class EventActivityGoing extends AppCompatActivity implements LoaderManag
                                 " Lng: " + data.getDouble(data.getColumnIndexOrThrow(RecappContract.EventEntry.COLUMN_LOG))
                 );
                 byte [] img = data.getBlob(data.getColumnIndexOrThrow(RecappContract.EventEntry.COLUMN_IMAGE));
-                image.setImageBitmap(BitmapFactory.decodeByteArray(img,0,img.length));
+                final BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 3;
+                image.setImageBitmap(BitmapFactory.decodeByteArray(img,0,img.length,options));
             }
         }
         if(loader.getId()== EVENT_BY_USER){

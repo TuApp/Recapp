@@ -1,6 +1,10 @@
 package com.unal.tuapp.recapp.adapters;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,13 +24,14 @@ import java.util.List;
  * Created by andresgutierrez on 7/22/15.
  */
 public class RecycleTutorialAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
+    private Context context;
     private static List<Tutorial> tutorials;
     private Cursor tutorialsCursor =null;
     public static OnItemClickListener mItemClickListener;
 
-    public RecycleTutorialAdapter(List<Tutorial> tutorials) {
+    public RecycleTutorialAdapter(List<Tutorial> tutorials,Context context) {
         this.tutorials = tutorials;
+        this.context = context;
     }
 
     public static class TutorialViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -84,7 +89,10 @@ public class RecycleTutorialAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         if(tutorial.getPreview() != null){
             tutorialsViewHolder.mIcon.setImageBitmap(tutorial.getPreview());
         }else{
-            tutorialsViewHolder.mIcon.setImageResource(R.drawable.youtube);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 3;
+            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.youtube,options);
+            tutorialsViewHolder.mIcon.setImageBitmap(bitmap);
 
         }
     }

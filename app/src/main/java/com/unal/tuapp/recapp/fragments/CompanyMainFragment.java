@@ -54,8 +54,10 @@ public class CompanyMainFragment extends Fragment {
         companyDescription.setText(place.getDescription());
         companyRating.setRating((float) place.getRating());
         companyName.setText(place.getName());
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 3;
         companyImage.setImageBitmap(
-                BitmapFactory.decodeByteArray(place.getImageFavorite(),0,place.getImageFavorite().length)
+                BitmapFactory.decodeByteArray(place.getImageFavorite(),0,place.getImageFavorite().length,options)
         );
     }
 

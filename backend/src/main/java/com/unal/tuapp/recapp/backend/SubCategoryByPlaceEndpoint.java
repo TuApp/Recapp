@@ -87,6 +87,8 @@ public class SubCategoryByPlaceEndpoint {
         return ofy().load().entity(subCategoryByPlace).now();
     }
 
+
+
     /**
      * Updates an existing {@code SubCategoryByPlace}.
      *
@@ -128,7 +130,7 @@ public class SubCategoryByPlaceEndpoint {
         checkExists(id);
         ofy().delete().type(SubCategoryByPlace.class).id(id).now();
         try {
-            new MessagingEndPoint().sendMessage("subCategoryByPlace");
+            new MessagingEndPoint().sendMessage("DeleteSubCategoryByPlace");
         } catch (IOException e) {
             e.printStackTrace();
         }

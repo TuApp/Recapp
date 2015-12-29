@@ -51,8 +51,10 @@ public class RecycleImagesCompanyAdapter extends RecyclerView.Adapter<RecyclerVi
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         CompanyImageViewHolder imageViewHolder = (CompanyImageViewHolder) holder;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 3;
         imageViewHolder.imageView.setImageBitmap(
-                BitmapFactory.decodeByteArray(images.get(position).getImage(),0,images.get(position).getImage().length)
+                BitmapFactory.decodeByteArray(images.get(position).getImage(),0,images.get(position).getImage().length,options)
         );
     }
     public void swapData(List<PlaceImages> images){

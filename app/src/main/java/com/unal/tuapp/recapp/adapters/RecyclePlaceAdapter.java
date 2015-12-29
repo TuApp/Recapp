@@ -131,20 +131,23 @@ public class RecyclePlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i){
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 3;
         switch (viewHolder.getItemViewType()){
             case FAVORITE:
                 PlaceViewHolderFavorite placeViewHolderFavorite = (PlaceViewHolderFavorite) viewHolder;
                 placeViewHolderFavorite.name.setText(places.get(i).getName());
                 placeViewHolderFavorite.imageView.setImageBitmap(BitmapFactory.decodeByteArray(
-                        places.get(i).getImageFavorite(),0,places.get(i).getImageFavorite().length
+                        places.get(i).getImageFavorite(),0,places.get(i).getImageFavorite().length,options
                 ));
                 placeViewHolderFavorite.address.setText(places.get(i).getAddress());
                 break;
             case NORMAL:
                 PlaceViewHolder placeViewHolder = (PlaceViewHolder) viewHolder;
                 placeViewHolder.name.setText(places.get(i).getName());
+
                 placeViewHolder.image.setImageBitmap(BitmapFactory.decodeByteArray(
-                        places.get(i).getImageFavorite(), 0, places.get(i).getImageFavorite().length
+                        places.get(i).getImageFavorite(), 0, places.get(i).getImageFavorite().length,options
                 ));
                 break;
         }

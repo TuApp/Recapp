@@ -29,22 +29,25 @@ import java.util.List;
 
 //This asynctask is for addUser and UpdateUser
 public class UserEndPoint extends AsyncTask<Pair<Pair<Context,String>, Pair<User,String>>,Void,String> {
-    private User userTemp;
+    private long userTemp;
     private Activity activity;
     private ProgressDialog progressDialog;
 
     public UserEndPoint(Activity activity) {
         this.activity = activity;
+        userTemp = -1;
         progressDialog = new ProgressDialog(activity);
     }
 
     public UserEndPoint() {
+        userTemp = -1;
     }
 
     @Override
     protected void onPreExecute() {
         if(activity!=null){
             progressDialog.setMessage("We are downloading the user's information");
+            progressDialog.setCancelable(false);
             progressDialog.show();
         }
     }
@@ -79,6 +82,7 @@ public class UserEndPoint extends AsyncTask<Pair<Pair<Context,String>, Pair<User
                                     value.put(RecappContract.UserEntry.COLUMN_USER_LASTNAME, i.getLastname());
                                     value.put(RecappContract.UserEntry.COLUMN_USER_NAME, i.getName());
                                     value.put(RecappContract.UserEntry.COLUMN_USER_IMAGE, Utility.decodeImage(i.getProfileImage()));
+                                    value.put(RecappContract.COLUMN_IS_SEND,1);
                                     valuesList.add(value);
                                 }
                                 ContentValues values[] = new ContentValues[valuesList.size()];
@@ -103,6 +107,7 @@ public class UserEndPoint extends AsyncTask<Pair<Pair<Context,String>, Pair<User
                         values.put(RecappContract.UserEntry.COLUMN_USER_LASTNAME,temp.getLastname());
                         values.put(RecappContract.UserEntry._ID, temp.getId());
                         values.put(RecappContract.UserEntry.COLUMN_USER_IMAGE,Utility.decodeImage(temp.getProfileImage()));
+                        values.put(RecappContract.COLUMN_IS_SEND,1);
                         try {
                             pairs[0].first.first.getContentResolver().insert(
                                     RecappContract.UserEntry.CONTENT_URI,
@@ -118,11 +123,9 @@ public class UserEndPoint extends AsyncTask<Pair<Pair<Context,String>, Pair<User
 
                     }
                     break;
-                case "getUserId":
-                    userTemp = Utility.getUserApi().get(pairs[0].second.first.getId()).execute();
-                    break;
                 case "getUserPoint":
-                    return Utility.getUserApi().get(pairs[0].second.first.getId()).execute().getPoints()+"";
+                    userTemp = Utility.getUserApi().get(pairs[0].second.first.getId()).execute().getPoints();
+                    break;
                 case "addPointsUser":
                     User newPoints = Utility.getUserApi().get(pairs[0].second.first.getId()).execute();
                     newPoints.setPoints(newPoints.getPoints() + pairs[0].second.first.getPoints());

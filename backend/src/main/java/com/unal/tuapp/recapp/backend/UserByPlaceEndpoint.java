@@ -88,6 +88,7 @@ public class UserByPlaceEndpoint {
         return ofy().load().entity(userByPlace).now();
     }
 
+
     /**
      * Updates an existing {@code UserByPlace}.
      *

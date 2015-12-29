@@ -56,6 +56,7 @@ public class EventByUserEndPoint extends AsyncTask<Pair<Context,Pair<EventByUser
                                     value.put(RecappContract.EventByUserEntry._ID, i.getId());
                                     value.put(RecappContract.EventByUserEntry.COLUMN_KEY_EVENT, i.getEventId());
                                     value.put(RecappContract.EventByUserEntry.COLUMN_KEY_USER, i.getEmail());
+                                    value.put(RecappContract.COLUMN_IS_SEND,1);
                                     valuesList.add(value);
                                 }
                                 ContentValues[] values = new ContentValues[valuesList.size()];
@@ -86,8 +87,10 @@ public class EventByUserEndPoint extends AsyncTask<Pair<Context,Pair<EventByUser
             EventsFragment.mySwipeRefresh.setRefreshing(false);
         }
         if(Recapp.initValue>0){
-            Recapp.init.hide();
-            Recapp.initValue = 0;
+            if(Recapp.init!=null) {
+                Recapp.init.hide();
+                Recapp.initValue = 0;
+            }
         }
         super.onPostExecute(aVoid);
     }

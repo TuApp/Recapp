@@ -82,7 +82,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     private BitmapDescriptor icon=null;
     private Cursor placeCursor;
     private ImageButton calculateDistance;
-    private ImageButton myPositon;
+    private ImageButton myPosition;
     private static ClusterManager<Place> placeClusterManager;
     private Cluster<Place> clickedCluster;
     private Place clickedPlace;
@@ -110,18 +110,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         try{
             view = inflater.inflate(R.layout.fragment_map,container,false);
             calculateDistance = (ImageButton) view.findViewById(R.id.the_way);
-            myPositon = (ImageButton) view.findViewById(R.id.my_position);
-            myPositon.setOnClickListener(new View.OnClickListener() {
+            myPosition = (ImageButton) view.findViewById(R.id.my_position);
+            myPosition.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(me!=null){
+                    if (me != null) {
                         LatLng myLocation = new LatLng(me.getPosition().latitude,
                                 me.getPosition().longitude);
                         CameraPosition cameraPosition = new CameraPosition.Builder()
                                 .target(myLocation)
                                 .zoom(16)
                                 .build();
-                        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),3000,null);
+                        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 3000, null);
                     }
                 }
             });

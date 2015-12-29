@@ -21,6 +21,7 @@ import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.adapters.RecycleCommentsUserAdapter;
 import com.unal.tuapp.recapp.data.Comment;
 import com.unal.tuapp.recapp.data.RecappContract;
+import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.CommentEndPoint;
 
 import java.util.ArrayList;
@@ -52,15 +53,19 @@ public class CompanyCommentsFragment  extends Fragment implements LoaderManager.
         mySwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                com.unal.tuapp.recapp.backend.model.commentApi.model.Comment comment = new com.unal.tuapp.recapp.backend.model.commentApi.model.Comment();
-                Pair<Pair<Context, Pair<Long, Long>>, Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment, String>> pairComment = new Pair<>(new Pair<>(getContext(), new Pair<>(-1L, -1L)),
-                        new Pair<>(comment, "getComments"));
-                new CommentEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairComment);
+                if(Utility.isNetworkAvailable(getContext())) {
+                    com.unal.tuapp.recapp.backend.model.commentApi.model.Comment comment = new com.unal.tuapp.recapp.backend.model.commentApi.model.Comment();
+                    Pair<Pair<Context, Pair<Long, Long>>, Pair<com.unal.tuapp.recapp.backend.model.commentApi.model.Comment, String>> pairComment = new Pair<>(new Pair<>(getContext(), new Pair<>(-1L, -1L)),
+                            new Pair<>(comment, "getComments"));
+                    new CommentEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairComment);
+                }else{
+                    mySwipeRefresh.setRefreshing(false);
+                }
             }
         });
         companyComments = (RecyclerView) root.findViewById(R.id.company_comments);
         companyComments.setLayoutManager(new LinearLayoutManager(getActivity()));
-        companyCommentsAdapter = new RecycleCommentsUserAdapter(new ArrayList<Comment>());
+        companyCommentsAdapter = new RecycleCommentsUserAdapter(new ArrayList<Comment>(),getContext());
         companyCommentsAdapter.setCommentPositon(-1);
         companyComments.setAdapter(companyCommentsAdapter);
         if(getLoaderManager().getLoader(PLACE_COMMENT)==null){

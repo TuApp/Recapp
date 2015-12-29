@@ -55,16 +55,13 @@ public class TutorialFragment  extends Fragment {
             public void onRefresh() {
                 com.unal.tuapp.recapp.backend.model.tutorialApi.model.Tutorial tutorial = new com.unal.tuapp.recapp.backend.model.tutorialApi.model.Tutorial();
                 Pair<Context, Pair<com.unal.tuapp.recapp.backend.model.tutorialApi.model.Tutorial, String>> pairTutorial = new Pair<>(getContext(), new Pair<>(tutorial, "getTutorials"));
-                new TutorialEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairTutorial);
+                new TutorialEndPoint(true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairTutorial);
 
-                SubCategoryByTutorial subCategoryByTutorial = new SubCategoryByTutorial();
-                Pair<Context, Pair<SubCategoryByTutorial, String>> pairSubCategoryByTutorial = new Pair<>(getContext(), new Pair<>(subCategoryByTutorial, "getSubCategoryByTutorial"));
-                new SubCategoryByTutorialEndPoint(true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairSubCategoryByTutorial);
             }
         });
         recyclerView.setLayoutManager(layoutManager);
         List<Tutorial> tutorials = new ArrayList<>();
-        adapter = new RecycleTutorialAdapter(tutorials);
+        adapter = new RecycleTutorialAdapter(tutorials,getContext());
         adapter.setOnItemClickListener(new RecycleTutorialAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, long position, String link) {

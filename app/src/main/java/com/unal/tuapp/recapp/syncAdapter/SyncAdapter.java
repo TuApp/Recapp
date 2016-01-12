@@ -35,6 +35,8 @@ import com.unal.tuapp.recapp.backend.model.placeImageApi.model.CollectionRespons
 import com.unal.tuapp.recapp.backend.model.placeImageApi.model.PlaceImage;
 import com.unal.tuapp.recapp.backend.model.reminderApi.model.CollectionResponseReminder;
 import com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder;
+import com.unal.tuapp.recapp.backend.model.statisticsApi.model.CollectionResponseStatistics;
+import com.unal.tuapp.recapp.backend.model.statisticsApi.model.Statistics;
 import com.unal.tuapp.recapp.backend.model.subCategoryApi.model.CollectionResponseSubCategory;
 import com.unal.tuapp.recapp.backend.model.subCategoryApi.model.SubCategory;
 import com.unal.tuapp.recapp.backend.model.subCategoryByPlaceApi.model.CollectionResponseSubCategoryByPlace;
@@ -150,6 +152,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     break;
                 case "deleteUser":
                     getUsers("deleteUser");
+                    break;
+                case "statistics":
+                    getStatistics("statistics");
+                    break;
+                case "deleteStatics":
+                    getStatistics("deleteStatistics");
+                    break;
 
             }
         }else{ //There is a network
@@ -166,6 +175,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             addSubCategoryByPlace();
             addSubCategoryByTutorial();
             addFavoritePlace();
+            addStatistics();
 
         }
     }
@@ -1264,7 +1274,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 }
                 switch (type){
                     case "subCategoryByTutorial":
-                        ContentValues values[] = new ContentValues[subCategoryByTutorialList.size()];
+                        ContentValues values[] = new ContentValues[valuesList.size()];
                         subCategoryByTutorialList.toArray(values);
                         mContentResolver.bulkInsert(
                                 RecappContract.SubCategoryByTutorialEntry.CONTENT_URI,
@@ -1364,5 +1374,91 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 );
             }
         }catch (IOException e){}
+    }
+
+    private void addStatistics(){
+        Cursor cursorStatistics = mContentResolver.query(
+                RecappContract.StatisticsEntry.CONTENT_URI,
+                null,
+                RecappContract.COLUMN_IS_SEND + " =? ",
+                new String[]{"0"},
+                null
+        );
+        while (cursorStatistics.moveToNext()){
+            Statistics statistics = new Statistics();
+            statistics.setId(cursorStatistics.getLong(cursorStatistics.getColumnIndexOrThrow(RecappContract.StatisticsEntry._ID)));
+            statistics.setUserId(cursorStatistics.getLong(cursorStatistics.getColumnIndexOrThrow(RecappContract.StatisticsEntry.COLUMN_KEY_USER)));
+            statistics.setDate(cursorStatistics.getLong(cursorStatistics.getColumnIndexOrThrow(RecappContract.StatisticsEntry.COLUMN_DATE)));
+            statistics.setPoints(cursorStatistics.getLong(cursorStatistics.getColumnIndexOrThrow(RecappContract.StatisticsEntry.COLUMN_POINT)));
+            try {
+                Utility.getStatisticsApi().insert(statistics).execute();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        cursorStatistics.close();
+    }
+
+    private void getStatistics(String type){
+        try {
+            CollectionResponseStatistics collectionResponseStatistics =
+                    Utility.getStatisticsApi().list().execute();
+            List<Statistics> statisticsList;
+            List<String> ids = new ArrayList<>();
+            String query = RecappContract.StatisticsEntry._ID + " NOT IN ( ";
+            List<ContentValues> valuesList = new ArrayList<>();
+
+            String nextPage = "";
+
+            if(collectionResponseStatistics.getNextPageToken()!=null) {
+                while (!collectionResponseStatistics.getNextPageToken().equals(nextPage)) {
+                    statisticsList = collectionResponseStatistics.getItems();
+                    if (statisticsList != null) {
+                        for (Statistics i : statisticsList) {
+                            ids.add(i.getId() + "");
+                            query += "?,";
+                            ContentValues values = new ContentValues();
+                            values.put(RecappContract.COLUMN_IS_SEND, 1);
+                            values.put(RecappContract.StatisticsEntry._ID, i.getId());
+                            values.put(RecappContract.StatisticsEntry.COLUMN_KEY_USER, i.getUserId());
+                            values.put(RecappContract.StatisticsEntry.COLUMN_DATE, i.getDate());
+                            values.put(RecappContract.StatisticsEntry.COLUMN_POINT, i.getPoints());
+                            valuesList.add(values);
+                        }
+                        nextPage = collectionResponseStatistics.getNextPageToken();
+                        collectionResponseStatistics = Utility.getStatisticsApi().list()
+                                .setCursor(nextPage).execute();
+
+                    }
+                    switch (type) {
+                        case "statistics":
+                            ContentValues values[] = new ContentValues[valuesList.size()];
+                            valuesList.toArray(values);
+                            mContentResolver.bulkInsert(
+                                    RecappContract.StatisticsEntry.CONTENT_URI,
+                                    values
+                            );
+                            break;
+                        case "deleteStatistics":
+                            query = query.substring(0, query.length() - 1);
+                            query += ")";
+                            String queryArgs[] = new String[ids.size()];
+                            ids.toArray(queryArgs);
+                            if (ids.isEmpty()) {
+                                query = null;
+                                queryArgs = null;
+                            }
+                            mContentResolver.delete(
+                                    RecappContract.StatisticsEntry.CONTENT_URI,
+                                    query,
+                                    queryArgs
+                            );
+                            break;
+                    }
+                }
+            }
+
+        }catch (IOException e){}
+
     }
 }

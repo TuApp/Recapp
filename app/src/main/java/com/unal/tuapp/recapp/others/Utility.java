@@ -35,6 +35,7 @@ import com.unal.tuapp.recapp.backend.model.placeApi.PlaceApi;
 import com.unal.tuapp.recapp.backend.model.placeImageApi.PlaceImageApi;
 import com.unal.tuapp.recapp.backend.model.registrationApi.RegistrationApi;
 import com.unal.tuapp.recapp.backend.model.reminderApi.ReminderApi;
+import com.unal.tuapp.recapp.backend.model.statisticsApi.StatisticsApi;
 import com.unal.tuapp.recapp.backend.model.subCategoryApi.SubCategoryApi;
 import com.unal.tuapp.recapp.backend.model.subCategoryByPlaceApi.SubCategoryByPlaceApi;
 import com.unal.tuapp.recapp.backend.model.subCategoryByTutorialApi.SubCategoryByTutorialApi;
@@ -49,6 +50,7 @@ import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserEndPoint;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
@@ -70,6 +72,7 @@ public class Utility {
     private static EventApi eventApi = null;
     private static EventByUserApi eventByUserApi = null;
     private static RegistrationApi registrationApi = null;
+    private static StatisticsApi statisticsApi =  null;
     private static String points = "";
     private static  ProgressDialog progressDialog;
     private static final String TAG = Utility.class.getSimpleName();
@@ -335,6 +338,20 @@ public class Utility {
         }
         return registrationApi;
     }
+    public static StatisticsApi getStatisticsApi(){
+        if(statisticsApi==null){
+            synchronized (Utility.class){
+                if(statisticsApi==null){
+                    StatisticsApi.Builder builder = new StatisticsApi.Builder(AndroidHttp.newCompatibleTransport(),
+                            new JacksonFactory(),null)
+                            .setRootUrl("https://tonal-vector-100303.appspot.com/_ah/api/");
+                    statisticsApi = builder.build();
+                }
+            }
+        }
+        return statisticsApi;
+    }
+
 
 
     public static String encodeImage(byte[] image){
@@ -354,6 +371,46 @@ public class Utility {
             return new LinearLayoutManager(fragmentActivity);
         }
 
+    }
+
+    public static Long[] getStatisticsWeek(){
+        Long time [] = new Long[2];
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_WEEK, calendar.getActualMinimum(Calendar.DAY_OF_WEEK));
+        calendar.set(Calendar.HOUR_OF_DAY,calendar.getActualMinimum(Calendar.HOUR_OF_DAY));
+        calendar.set(Calendar.MINUTE,calendar.getActualMinimum(Calendar.MINUTE));
+        time[0] = calendar.getTimeInMillis();
+        calendar.set(Calendar.DAY_OF_WEEK, calendar.getActualMaximum(Calendar.DAY_OF_WEEK));
+        calendar.set(Calendar.HOUR_OF_DAY,calendar.getActualMaximum(Calendar.HOUR_OF_DAY));
+        calendar.set(Calendar.MINUTE,calendar.getActualMaximum(Calendar.MINUTE));
+        time[1] = calendar.getTimeInMillis();
+        return time;
+    }
+    public static Long[] getStatisticsMonth(){
+        Long time [] = new Long[2];
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DATE,1);
+        calendar.set(Calendar.HOUR_OF_DAY,calendar.getActualMinimum(Calendar.HOUR_OF_DAY));
+        calendar.set(Calendar.MINUTE,calendar.getActualMinimum(Calendar.MINUTE));
+        time[0] = calendar.getTimeInMillis();
+        calendar.set(Calendar.DATE,calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        calendar.set(Calendar.HOUR_OF_DAY,calendar.getActualMaximum(Calendar.HOUR_OF_DAY));
+        calendar.set(Calendar.MINUTE,calendar.getActualMaximum(Calendar.MINUTE));
+        time[1] = calendar.getTimeInMillis();
+        return time;
+    }
+    public static Long[] getStatisticsYear(){
+        Long time [] = new Long[2];
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_YEAR,calendar.getActualMinimum(Calendar.DAY_OF_YEAR));
+        calendar.set(Calendar.HOUR_OF_DAY,calendar.getActualMinimum(Calendar.HOUR_OF_DAY));
+        calendar.set(Calendar.MINUTE,calendar.getActualMinimum(Calendar.MINUTE));
+        time[0] = calendar.getTimeInMillis();
+        calendar.set(Calendar.DAY_OF_YEAR,calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
+        calendar.set(Calendar.HOUR_OF_DAY,calendar.getActualMaximum(Calendar.HOUR_OF_DAY));
+        calendar.set(Calendar.MINUTE,calendar.getActualMaximum(Calendar.MINUTE));
+        time[1] = calendar.getTimeInMillis();
+        return time;
     }
 
 }

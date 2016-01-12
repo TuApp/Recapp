@@ -349,6 +349,12 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                         intentPoint.putExtra("type", "points");
                         startActivity(intentPoint);
                         break;
+                    case R.id.contest:
+                        Intent intentContest = new Intent(NavigationDrawer.this,UserDetail.class);
+                        intentContest.putExtra("user",user);
+                        intentContest.putExtra("type", "contest");
+                        startActivity(intentContest);
+                        break;
                     case R.id.sign_out:
                         if(mGooglePlus.mGoogleApiClient.isConnected()){
                             Plus.AccountApi.clearDefaultAccount(mGooglePlus.mGoogleApiClient);
@@ -488,9 +494,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
     }
 
     public void setUpToolbar(){
+        toolbar.setTitle(R.string.my_home);
         setSupportActionBar(toolbar);
-        //getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action);
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
     }
 
     public void setUpViewPager(){

@@ -70,6 +70,9 @@ public class RecappProvider extends ContentProvider {
     static final int EVENT_BY_USER_EVENT = 1310;
     static final int EVENT_BY_USER_USER = 1320;
     static final int EVENT_BY_USER_ID = 1330;
+    static final int STATISTICS = 1400;
+    static final int STATISTICS_BY_USER = 1410;
+    static final int STATISTICS_ID = 1420;
 
     private static final SQLiteQueryBuilder reminderByUser;
     private static final SQLiteQueryBuilder reminderByPlace;
@@ -87,6 +90,8 @@ public class RecappProvider extends ContentProvider {
     private static final SQLiteQueryBuilder userByPlacePlace;
     private static final SQLiteQueryBuilder eventByUserEvent;
     private static final SQLiteQueryBuilder eventByUserUser;
+    private static final SQLiteQueryBuilder statisticsByUser;
+
 
     static {
 
@@ -209,6 +214,14 @@ public class RecappProvider extends ContentProvider {
                         EventByUserEntry.TABLE_NAME+"."+ EventByUserEntry.COLUMN_KEY_USER+
                         " = "+ UserEntry.TABLE_NAME+"."+UserEntry._ID
         );
+        statisticsByUser =  new SQLiteQueryBuilder();
+        statisticsByUser.setTables(
+                UserEntry.TABLE_NAME + " INNER JOIN "+
+                        StatisticsEntry.TABLE_NAME + " ON "+
+                        UserEntry.TABLE_NAME+"."+UserEntry._ID +
+                        " = " +StatisticsEntry.TABLE_NAME+"."+StatisticsEntry.COLUMN_KEY_USER
+        );
+
 
     }
 
@@ -290,11 +303,16 @@ public class RecappProvider extends ContentProvider {
         matcher.addURI(authority,RecappContract.PATH_EVENT,EVENT);
         matcher.addURI(authority,RecappContract.PATH_EVENT+"/#",EVENT_ID);
 
-        //Mathcers for event by user
+        //Matchers for event by user
         matcher.addURI(authority,RecappContract.PATH_EVENTBYUSER,EVENT_BY_USER);
         matcher.addURI(authority,RecappContract.PATH_EVENTBYUSER+"/"+RecappContract.PATH_EVENT+"/#",EVENT_BY_USER_EVENT);
         matcher.addURI(authority,RecappContract.PATH_EVENTBYUSER+"/"+RecappContract.PATH_USER+"/*",EVENT_BY_USER_USER);
         matcher.addURI(authority,RecappContract.PATH_EVENTBYUSER+"/#",EVENT_BY_USER_ID);
+
+        //Matchers for statistics
+        matcher.addURI(authority,RecappContract.PATH_STATISTICS,STATISTICS);
+        matcher.addURI(authority,RecappContract.PATH_STATISTICS+"/"+RecappContract.PATH_USER,STATISTICS_BY_USER);
+        matcher.addURI(authority,RecappContract.PATH_STATISTICS+"/#",STATISTICS_ID);
 
         return matcher;
 
@@ -410,6 +428,12 @@ public class RecappProvider extends ContentProvider {
                 return EventByUserEntry.CONTENT_TYPE;
             case EVENT_BY_USER_ID:
                 return EventByUserEntry.CONTENT_ITEM_TYPE;
+            case STATISTICS:
+                return StatisticsEntry.CONTENT_TYPE;
+            case STATISTICS_BY_USER:
+                return StatisticsEntry.CONTENT_TYPE;
+            case STATISTICS_ID:
+                return StatisticsEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
@@ -1036,6 +1060,41 @@ public class RecappProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
+            case STATISTICS:
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        StatisticsEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        null
+                );
+                break;
+            case STATISTICS_BY_USER:
+                retCursor = statisticsByUser.query(
+                        recappDBHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        StatisticsEntry.COLUMN_KEY_USER,
+                        null,
+                        sortOrder
+
+                );
+                break;
+            case STATISTICS_ID:
+                long statisticsId = StatisticsEntry.getIdFromUri(uri);
+                retCursor = recappDBHelper.getReadableDatabase().query(
+                        StatisticsEntry.TABLE_NAME,
+                        projection,
+                        StatisticsEntry._ID + " =? ",
+                        new String[]{""+statisticsId},
+                        null,
+                        null,
+                        null
+                );
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
@@ -1051,7 +1110,7 @@ public class RecappProvider extends ContentProvider {
         long id;
         switch (uriMatcher.match(uri)){
             case USER:
-                id = db.insert(UserEntry.TABLE_NAME,null,values);
+                id = db.insertWithOnConflict(UserEntry.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_REPLACE);
                 if(id>0){
                     returnUri = UserEntry.buildUserUri(id);
                 }else{
@@ -1059,7 +1118,7 @@ public class RecappProvider extends ContentProvider {
                 }
                 break;
             case PLACE:
-                id = db.insert(PlaceEntry.TABLE_NAME,null,values);
+                id = db.insertWithOnConflict(PlaceEntry.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_REPLACE);
                 if(id>0){
                     returnUri = PlaceEntry.buildPlaceUri(id);
                 }else{
@@ -1067,7 +1126,7 @@ public class RecappProvider extends ContentProvider {
                 }
                 break;
             case REMINDER:
-                id = db.insert(ReminderEntry.TABLE_NAME,null,values);
+                id = db.insertWithOnConflict(ReminderEntry.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_REPLACE);
                 if(id>0){
                     returnUri = ReminderEntry.buildReminderUri(id);
                 }else{
@@ -1076,7 +1135,7 @@ public class RecappProvider extends ContentProvider {
                 break;
             case COMMENT:
 
-                id = db.insert(CommentEntry.TABLE_NAME,null,values);
+                id = db.insertWithOnConflict(CommentEntry.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_REPLACE);
                 if(id>0){
                     returnUri = CommentEntry.buildCommentUri(id);
                 }else{
@@ -1084,7 +1143,7 @@ public class RecappProvider extends ContentProvider {
                 }
                 break;
             case CATEGORY:
-                id = db.insert(CategoryEntry.TABLE_NAME,null,values);
+                id = db.insertWithOnConflict(CategoryEntry.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_REPLACE);
                 if(id>0){
                     returnUri = CategoryEntry.buildCategoryUri(id);
                 }else{
@@ -1092,7 +1151,7 @@ public class RecappProvider extends ContentProvider {
                 }
                 break;
             case TUTORIAL:
-                id = db.insert(TutorialEntry.TABLE_NAME,null,values);
+                id = db.insertWithOnConflict(TutorialEntry.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_REPLACE);
                 if(id>0){
                     returnUri = TutorialEntry.buildTutorialUri(id);
                 }else{
@@ -1100,7 +1159,7 @@ public class RecappProvider extends ContentProvider {
                 }
                 break;
             case PLACE_IMAGE:
-                id = db.insert(PlaceImageEntry.TABLE_NAME,null,values);
+                id = db.insertWithOnConflict(PlaceImageEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
                 if(id>0){
                     returnUri = PlaceImageEntry.buildPlaceImageUri(id);
                 }else{
@@ -1110,7 +1169,7 @@ public class RecappProvider extends ContentProvider {
 
             case SUB_CATEGORY:
 
-                id = db.insert(SubCategoryEntry.TABLE_NAME,null,values);
+                id = db.insertWithOnConflict(SubCategoryEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
                 if(id>0){
                     returnUri = SubCategoryEntry.buildSubCategoryUri(id);
                 }else{
@@ -1118,7 +1177,7 @@ public class RecappProvider extends ContentProvider {
                 }
                 break;
             case SUB_CATEGORY_BY_PLACE:
-                id = db.insert(SubCategoryByPlaceEntry.TABLE_NAME,null,values);
+                id = db.insertWithOnConflict(SubCategoryByPlaceEntry.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_REPLACE);
                 if(id>0){
                     returnUri = SubCategoryByPlaceEntry.buildSubCategoryByPlaceUri(id);
                 }else{
@@ -1126,7 +1185,7 @@ public class RecappProvider extends ContentProvider {
                 }
                 break;
             case SUB_CATEGORY_BY_TUTORIAL:
-                id = db.insert(SubCategoryByTutorialEntry.TABLE_NAME,null,values);
+                id = db.insertWithOnConflict(SubCategoryByTutorialEntry.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_REPLACE);
                 if(id>0){
                     returnUri = SubCategoryByTutorialEntry.buildSubCategoryByTutorialUri(id);
                 }else{
@@ -1134,7 +1193,7 @@ public class RecappProvider extends ContentProvider {
                 }
                 break;
             case USER_BY_PLACE:
-                id = db.insert(UserByPlaceEntry.TABLE_NAME,null,values);
+                id = db.insertWithOnConflict(UserByPlaceEntry.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_REPLACE);
                 if(id>0){
                     returnUri = UserByPlaceEntry.buildUserByPlaceUri(id);
                 }else{
@@ -1142,7 +1201,7 @@ public class RecappProvider extends ContentProvider {
                 }
                 break;
             case EVENT:
-                id = db.insert(EventEntry.TABLE_NAME,null,values);
+                id = db.insertWithOnConflict(EventEntry.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_REPLACE);
                 if(id>0){
                     returnUri = EventEntry.buildEventUri(id);
                 }else{
@@ -1150,9 +1209,17 @@ public class RecappProvider extends ContentProvider {
                 }
                 break;
             case EVENT_BY_USER:
-                id = db.insert(EventByUserEntry.TABLE_NAME,null,values);
+                id = db.insertWithOnConflict(EventByUserEntry.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_REPLACE);
                 if(id>0){
                     returnUri = EventByUserEntry.buildEventByUser(id);
+                }else{
+                    throw new android.database.SQLException("Failed to insert row into "+ uri);
+                }
+                break;
+            case STATISTICS:
+                id = db.insertWithOnConflict(StatisticsEntry.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_REPLACE);
+                if(id>0){
+                    returnUri = StatisticsEntry.buildStatistics(id);
                 }else{
                     throw new android.database.SQLException("Failed to insert row into "+ uri);
                 }
@@ -1211,6 +1278,9 @@ public class RecappProvider extends ContentProvider {
             case EVENT_BY_USER:
                 rowsDeleted = db.delete(EventByUserEntry.TABLE_NAME,selection,selectionArgs);
                 break;
+            case STATISTICS:
+                rowsDeleted = db.delete(StatisticsEntry.TABLE_NAME,selection,selectionArgs);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
@@ -1248,8 +1318,6 @@ public class RecappProvider extends ContentProvider {
             case PLACE_IMAGE:
                 rowUpdated = db.update(PlaceImageEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
-
-
             case SUB_CATEGORY:
                 rowUpdated = db.update(SubCategoryEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
@@ -1267,6 +1335,9 @@ public class RecappProvider extends ContentProvider {
                 break;
             case EVENT_BY_USER:
                 rowUpdated = db.update(EventByUserEntry.TABLE_NAME,values,selection,selectionArgs);
+                break;
+            case STATISTICS:
+                rowUpdated = db.update(StatisticsEntry.TABLE_NAME,values,selection,selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -1490,6 +1561,22 @@ public class RecappProvider extends ContentProvider {
                 try{
                     for(ContentValues value:values){
                         long id = db.insertWithOnConflict(EventByUserEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
+                        if(id!=-1){
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
+            case STATISTICS:
+                db.beginTransaction();
+                returnCount = 0;
+                try {
+                    for(ContentValues value:values){
+                        long id = db.insertWithOnConflict(StatisticsEntry.TABLE_NAME,null,value,SQLiteDatabase.CONFLICT_REPLACE);
                         if(id!=-1){
                             returnCount++;
                         }

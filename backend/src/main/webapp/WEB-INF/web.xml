@@ -27,7 +27,8 @@
                 com.unal.tuapp.recapp.backend.EventEndpoint,
                 com.unal.tuapp.recapp.backend.EventByUserEndpoint,
                 com.unal.tuapp.recapp.backend.ReminderEndpoint,
-                com.unal.tuapp.recapp.backend.RegistrationEndpoint</param-value>
+                com.unal.tuapp.recapp.backend.RegistrationEndpoint,
+                com.unal.tuapp.recapp.backend.StatisticsEndpoint</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>

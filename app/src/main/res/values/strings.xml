@@ -80,5 +80,14 @@
     <string name="internet">Internet</string>
     <string name="need_internet">You need internet to do this action</string>
     <string name="wrong_email">The email is not valid</string>
+    <string name="statistics_image">Image</string>
+    <string name="statistics_name">Name</string>
+    <string name="statistics_lastname">Last name</string>
+    <string name="statistics_email">Email</string>
+    <string name="statistics_points">Points</string>
+    <string name="week">Week</string>
+    <string name="month">Month</string>
+    <string name="year">Year</string>
+    <string name="contest">Contest</string>
 
 </resources>

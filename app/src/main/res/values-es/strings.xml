@@ -80,5 +80,15 @@
     <string name="internet">Internet</string>
     <string name="need_internet">Es necesario internet para hacer esta accion</string>
     <string name="wrong_email">El correo no es valido</string>
+    <string name="statistics_image">Image</string>
+    <string name="statistics_name">Nombre</string>
+    <string name="statistics_lastname">Apellido</string>
+    <string name="statistics_email">Correo</string>
+    <string name="statistics_points">Puntos</string>
+    <string name="week">Semana</string>
+    <string name="month">Mes</string>
+    <string name="year">Año</string>
+    <string name="contest">Torneo</string>
+
 
 </resources>

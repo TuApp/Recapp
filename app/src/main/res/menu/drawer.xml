@@ -30,7 +30,12 @@
         </item>
         <item android:id="@+id/points"
             android:title="@string/points"
-            android:icon="@drawable/ic_calendar">
+            android:icon="@drawable/points">
+
+        </item>
+        <item android:id="@+id/contest"
+            android:title="@string/contest"
+            android:icon="@drawable/competition">
 
         </item>
         <item android:id="@+id/account"

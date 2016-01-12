@@ -28,6 +28,7 @@ public class RecappContract {
     public static final String PATH_USERBYPLACE = "userByPlace";
     public static final String PATH_EVENT = "event";
     public static final String PATH_EVENTBYUSER = "eventByUser";
+    public static final String PATH_STATISTICS = "statitics";
     public static final String COLUMN_IS_SEND = "send";
 
     public static class UserEntry implements BaseColumns {
@@ -535,6 +536,31 @@ public class RecappContract {
         }
         public static final String getUserFromUri(Uri uri){
             return uri.getPathSegments().get(2);
+        }
+    }
+    public static class StatisticsEntry implements BaseColumns{
+        public static final String TABLE_NAME = "statistics";
+
+        public static final String COLUMN_KEY_USER = "user_key";
+        public static final String COLUMN_DATE = "date";
+        public static final String COLUMN_POINT = "point";
+
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_STATISTICS).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_STATISTICS;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" +PATH_STATISTICS;
+
+        public static final Uri buildStatistics(long id){
+            return ContentUris.withAppendedId(CONTENT_URI,id);
+        }
+        public static final Uri buildStatisticsByUser(){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(PATH_USER).build();
+        }
+        public static final long getIdFromUri(Uri uri){
+            return  Long.parseLong(uri.getPathSegments().get(1));
         }
     }
 

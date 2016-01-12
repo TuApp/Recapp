@@ -1,6 +1,7 @@
 package com.unal.tuapp.recapp.fragments;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -32,10 +33,12 @@ import android.widget.Toast;
 import com.unal.tuapp.recapp.R;
 import com.unal.tuapp.recapp.activities.Company;
 import com.unal.tuapp.recapp.backend.model.placeApi.model.Place;
+import com.unal.tuapp.recapp.backend.model.statisticsApi.model.Statistics;
 import com.unal.tuapp.recapp.backend.model.userApi.model.User;
 import com.unal.tuapp.recapp.data.RecappContract;
 import com.unal.tuapp.recapp.others.Utility;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.StatisticsEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.UserEndPoint;
 
 /**
@@ -100,7 +103,28 @@ public class CompanyPointsFragment extends Fragment implements LoaderManager.Loa
                     userBackend.setPoints(pointsAdded);
                     Pair<Pair<Context,String>,Pair<com.unal.tuapp.recapp.backend.model.userApi.model.User,String>> pairUser
                             = new Pair<>(new Pair<>(getContext(),""),new Pair<>(userBackend,"addPointsUser"));
-                    new UserEndPoint(getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairUser);
+                    new UserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairUser);
+                    Statistics statistics = new Statistics();
+                    statistics.setPoints(pointsAdded);
+                    statistics.setDate(System.currentTimeMillis());
+                    statistics.setUserId(user.getId());
+                    statistics.setId(System.currentTimeMillis());
+                    Pair<Context,Pair<Statistics,String>> pairStatistics = new Pair<>(getContext(),
+                            new Pair<>(statistics,"addStatistics"));
+                    new StatisticsEndPoint(getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairStatistics);
+
+                    ContentValues values = new ContentValues();
+                    values.put(RecappContract.StatisticsEntry._ID,statistics.getId());
+                    values.put(RecappContract.StatisticsEntry.COLUMN_POINT,statistics.getPoints());
+                    values.put(RecappContract.StatisticsEntry.COLUMN_DATE,statistics.getDate());
+                    values.put(RecappContract.COLUMN_IS_SEND,1);
+                    values.put(RecappContract.StatisticsEntry.COLUMN_KEY_USER,statistics.getUserId());
+
+                    getActivity().getContentResolver().insert(
+                            RecappContract.StatisticsEntry.CONTENT_URI,
+                            values
+
+                    );
                 }else{
                     new AlertDialog.Builder(getContext())
                             .setTitle(R.string.internet)

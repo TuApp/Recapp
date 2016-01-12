@@ -88,7 +88,11 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
             id = extras.getLong("id");
             user = extras.getParcelable("user");
         }
-        getSupportLoaderManager().initLoader(PLACE,null,this);
+        if(getSupportLoaderManager().initLoader(PLACE,null,this)==null) {
+            getSupportLoaderManager().initLoader(PLACE, null, this);
+        }else{
+            getSupportLoaderManager().restartLoader(PLACE, null, this);
+        }
         mGooglePlus = GooglePlus.getInstance(this, null, null);
         TextView name = (TextView) findViewById(R.id.user_name);
         TextView email = (TextView) findViewById(R.id.user_email);
@@ -213,6 +217,12 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
                         intentPoint.putExtra("user",user);
                         intentPoint.putExtra("type","points");
                         startActivity(intentPoint);
+                        break;
+                    case R.id.contest:
+                        Intent intentContest = new Intent(Detail.this,UserDetail.class);
+                        intentContest.putExtra("user",user);
+                        intentContest.putExtra("type", "contest");
+                        startActivity(intentContest);
                         break;
                     case R.id.sign_out:
                         if (mGooglePlus.mGoogleApiClient.isConnected()) {

@@ -34,6 +34,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.plus.Account;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.unal.tuapp.recapp.fragments.ContestFragment;
 import com.unal.tuapp.recapp.fragments.MyPointsFragment;
 import com.unal.tuapp.recapp.others.GooglePlus;
 import com.unal.tuapp.recapp.others.OnSendDataToActivity;
@@ -58,6 +59,7 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
     private  Fragment fragmentComment;
     private  Fragment fragmentReminder;
     private  Fragment fragmentEvents;
+    private  Fragment fragmentContest;
     private  static Fragment fragmentPoints;
     private  String newType;
     private  AdView mAdView;
@@ -161,6 +163,7 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
         fragmentReminder = new RemindersFragment();
         fragmentEvents = new MyEventsFragment();
         fragmentPoints = new MyPointsFragment();
+        fragmentContest = new ContestFragment();
         ((MyEventsFragment) fragmentEvents).setOnEventListener(new MyEventsFragment.OnEventListener() {
             @Override
             public void onAction(long id) {
@@ -180,7 +183,7 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                         intentHome.putExtra("email", user.getEmail());
                         startActivity(intentHome);
                     case R.id.favorites:
-                        getSupportActionBar().setTitle("My Favorites");
+                        getSupportActionBar().setTitle(R.string.my_favorites);
                         newType = "favorite";
                         if (fragmentPlace.isAdded()) {
                             fragmentTransaction.show(fragmentPlace);
@@ -192,10 +195,11 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                         fragmentTransaction.hide(fragmentReminder);
                         fragmentTransaction.hide(fragmentEvents);
                         fragmentTransaction.hide(fragmentPoints);
+                        fragmentTransaction.hide(fragmentContest);
                         fragmentTransaction.commit();
                         break;
                     case R.id.appointments:
-                        getSupportActionBar().setTitle("My Reminders");
+                        getSupportActionBar().setTitle(R.string.my_appointments);
                         newType = "reminder";
                         if (fragmentReminder.isAdded()) {
                             fragmentTransaction.show(fragmentReminder);
@@ -206,11 +210,11 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                         fragmentTransaction.hide(fragmentComment);
                         fragmentTransaction.hide(fragmentEvents);
                         fragmentTransaction.hide(fragmentPoints);
-
+                        fragmentTransaction.hide(fragmentContest);
                         fragmentTransaction.commit();
                         break;
                     case R.id.comments:
-                        getSupportActionBar().setTitle("My Comments");
+                        getSupportActionBar().setTitle(R.string.my_comments);
                         newType = "comment";
                         if (fragmentComment.isAdded()) {
                             fragmentTransaction.show(fragmentComment);
@@ -221,11 +225,12 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                         fragmentTransaction.hide(fragmentReminder);
                         fragmentTransaction.hide(fragmentEvents);
                         fragmentTransaction.hide(fragmentPoints);
+                        fragmentTransaction.hide(fragmentContest);
                         fragmentTransaction.commit();
 
                         break;
                     case R.id.events:
-                        getSupportActionBar().setTitle("My Events");
+                        getSupportActionBar().setTitle(R.string.my_events);
                         newType = "event";
                         if (fragmentEvents.isAdded()) {
                             fragmentTransaction.show(fragmentEvents);
@@ -236,6 +241,7 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                         fragmentTransaction.hide(fragmentReminder);
                         fragmentTransaction.hide(fragmentComment);
                         fragmentTransaction.hide(fragmentPoints);
+                        fragmentTransaction.hide(fragmentContest);
                         fragmentTransaction.commit();
                         break;
                     case R.id.sign_out:
@@ -258,7 +264,7 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                         }
                         break;
                     case R.id.points:
-                        getSupportActionBar().setTitle("My Points");
+                        getSupportActionBar().setTitle(R.string.points);
                         newType = "points";
                         if (fragmentPoints.isAdded()) {
                             fragmentTransaction.show(fragmentPoints);
@@ -267,8 +273,22 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                         fragmentTransaction.hide(fragmentPlace);
                         fragmentTransaction.hide(fragmentReminder);
                         fragmentTransaction.hide(fragmentEvents);
+                        fragmentTransaction.hide(fragmentContest);
                         fragmentTransaction.commit();
 
+                        break;
+                    case R.id.contest:
+                        getSupportActionBar().setTitle(R.string.contest);
+                        newType = "contest";
+                        if (fragmentContest.isAdded()) {
+                            fragmentTransaction.show(fragmentContest);
+                        }
+                        fragmentTransaction.hide(fragmentComment);
+                        fragmentTransaction.hide(fragmentPlace);
+                        fragmentTransaction.hide(fragmentReminder);
+                        fragmentTransaction.hide(fragmentEvents);
+                        fragmentTransaction.hide(fragmentPoints);
+                        fragmentTransaction.commit();
                         break;
 
                 }
@@ -279,12 +299,14 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
         });
         switch (newType) {
             case "favorite":
-                getSupportActionBar().setTitle("My Favorites");
+                getSupportActionBar().setTitle(R.string.my_favorites);
                 fragmentTransaction.replace(R.id.user_detail_container, fragmentPlace, "favorite");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentComment, "comment");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentReminder, "reminder");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentEvents, "event");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentPoints, "points");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentContest, "contest");
+                fragmentTransaction.hide(fragmentContest);
                 fragmentTransaction.hide(fragmentPoints);
                 fragmentTransaction.hide(fragmentComment);
                 fragmentTransaction.hide(fragmentReminder);
@@ -293,12 +315,14 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                 navigationView.getMenu().findItem(R.id.favorites).setChecked(true);
                 break;
             case "comment":
-                getSupportActionBar().setTitle("My Comments");
+                getSupportActionBar().setTitle(R.string.my_comments);
                 fragmentTransaction.replace(R.id.user_detail_container, fragmentComment, "comment");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentPlace, "favorite");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentReminder, "reminder");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentEvents, "event");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentPoints, "points");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentContest, "contest");
+                fragmentTransaction.hide(fragmentContest);
                 fragmentTransaction.hide(fragmentPoints);
                 fragmentTransaction.hide(fragmentPlace);
                 fragmentTransaction.hide(fragmentReminder);
@@ -308,12 +332,14 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                 break;
             case "reminder":
                 //We should delete all reminders which endDate < now
-                getSupportActionBar().setTitle("My Reminders");
+                getSupportActionBar().setTitle(R.string.my_appointments);
                 fragmentTransaction.replace(R.id.user_detail_container, fragmentReminder, "reminder");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentPlace, "favorite");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentComment, "comment");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentEvents, "event");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentPoints, "points");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentContest, "contest");
+                fragmentTransaction.hide(fragmentContest);
                 fragmentTransaction.hide(fragmentPoints);
                 fragmentTransaction.hide(fragmentPlace);
                 fragmentTransaction.hide(fragmentComment);
@@ -322,12 +348,14 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                 navigationView.getMenu().findItem(R.id.appointments).setChecked(true);
                 break;
             case "event":
-                getSupportActionBar().setTitle("My Events");
+                getSupportActionBar().setTitle(R.string.my_events);
                 fragmentTransaction.replace(R.id.user_detail_container, fragmentEvents, "event");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentPlace, "favorite");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentComment, "comment");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentReminder, "reminder");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentPoints, "points");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentContest, "contest");
+                fragmentTransaction.hide(fragmentContest);
                 fragmentTransaction.hide(fragmentPoints);
                 fragmentTransaction.hide(fragmentPlace);
                 fragmentTransaction.hide(fragmentComment);
@@ -336,12 +364,14 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                 navigationView.getMenu().findItem(R.id.events).setChecked(true);
                 break;
             case "points":
-                getSupportActionBar().setTitle("My Points");
+                getSupportActionBar().setTitle(R.string.points);
                 fragmentTransaction.replace(R.id.user_detail_container, fragmentPoints, "points");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentPlace, "favorite");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentComment, "comment");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentEvents, "event");
                 fragmentTransaction.add(R.id.user_detail_container, fragmentReminder, "reminder");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentContest, "contest");
+                fragmentTransaction.hide(fragmentContest);
                 fragmentTransaction.hide(fragmentPlace);
                 fragmentTransaction.hide(fragmentComment);
                 fragmentTransaction.hide(fragmentReminder);
@@ -349,6 +379,23 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                 fragmentTransaction.commit();
                 navigationView.getMenu().findItem(R.id.points).setChecked(true);
                 break;
+            case "contest":
+                getSupportActionBar().setTitle(R.string.contest);
+                fragmentTransaction.replace(R.id.user_detail_container, fragmentPoints, "points");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentPlace, "favorite");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentComment, "comment");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentEvents, "event");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentReminder, "reminder");
+                fragmentTransaction.add(R.id.user_detail_container, fragmentContest, "contest");
+                fragmentTransaction.hide(fragmentPoints);
+                fragmentTransaction.hide(fragmentPlace);
+                fragmentTransaction.hide(fragmentComment);
+                fragmentTransaction.hide(fragmentReminder);
+                fragmentTransaction.hide(fragmentEvents);
+                fragmentTransaction.commit();
+                navigationView.getMenu().findItem(R.id.contest).setChecked(true);
+                break;
+
         }
 
 

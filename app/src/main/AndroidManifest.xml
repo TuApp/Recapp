@@ -165,7 +165,6 @@
                 <category android:name="com.unal.tuapp.recapp" />
             </intent-filter>
         </receiver>
-        <service android:name=".servicesAndAsyncTasks.GcmIntentService" />
 
 
         <activity

@@ -54,13 +54,6 @@ public class MyPointsFragment extends Fragment {
                 userName.setText(user.getName()+ " " + user.getLastName());
             }
         }
-        if(Utility.isNetworkAvailable(getContext())){
-            com.unal.tuapp.recapp.backend.model.userApi.model.User userBackend = new com.unal.tuapp.recapp.backend.model.userApi.model.User();
-            userBackend.setId(user.getId());
-            Pair<Pair<Context,String>,Pair<com.unal.tuapp.recapp.backend.model.userApi.model.User,String>> pair
-                    = new Pair<>(new Pair<>(getContext(),""),new Pair<>(userBackend,"getUserPoint"));
-            new UserEndPoint(getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pair);
-        }
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

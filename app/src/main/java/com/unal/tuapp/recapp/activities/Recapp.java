@@ -26,6 +26,7 @@ import com.unal.tuapp.recapp.backend.model.eventByUserApi.model.EventByUser;
 import com.unal.tuapp.recapp.backend.model.placeApi.model.Place;
 import com.unal.tuapp.recapp.backend.model.placeImageApi.model.PlaceImage;
 import com.unal.tuapp.recapp.backend.model.reminderApi.model.Reminder;
+import com.unal.tuapp.recapp.backend.model.statisticsApi.model.Statistics;
 import com.unal.tuapp.recapp.backend.model.subCategoryApi.model.SubCategory;
 import com.unal.tuapp.recapp.backend.model.subCategoryByPlaceApi.model.SubCategoryByPlace;
 import com.unal.tuapp.recapp.backend.model.subCategoryByTutorialApi.model.SubCategoryByTutorial;
@@ -43,6 +44,7 @@ import com.unal.tuapp.recapp.servicesAndAsyncTasks.GcmRegistrationEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.PlaceImageEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.ReminderEndPoint;
+import com.unal.tuapp.recapp.servicesAndAsyncTasks.StatisticsEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.SubCategoryByPlaceEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.SubCategoryByTutorialEndPoint;
 import com.unal.tuapp.recapp.servicesAndAsyncTasks.SubCategoryEndPoint;
@@ -211,6 +213,11 @@ public class Recapp extends AppCompatActivity {
                 Pair<Context, Pair<EventByUser, String>> pairEventByUser = new Pair<>(getApplicationContext(), new Pair<>(eventByUser,
                         "getEventByUser"));
                 new EventByUserEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, pairEventByUser);
+
+                Statistics statistics = new Statistics();
+                Pair<Context,Pair<Statistics,String>> pairStatistics = new Pair<>(getApplicationContext(),
+                        new Pair<>(statistics,"getStatistics"));
+                new StatisticsEndPoint().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,pairStatistics);
 
                 //progressDialog.dismiss();
 

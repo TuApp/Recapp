@@ -11,6 +11,7 @@ import com.unal.tuapp.recapp.backend.model.Place;
 import com.unal.tuapp.recapp.backend.model.PlaceImage;
 import com.unal.tuapp.recapp.backend.model.Registration;
 import com.unal.tuapp.recapp.backend.model.Reminder;
+import com.unal.tuapp.recapp.backend.model.Statistics;
 import com.unal.tuapp.recapp.backend.model.SubCategory;
 import com.unal.tuapp.recapp.backend.model.SubCategoryByPlace;
 import com.unal.tuapp.recapp.backend.model.SubCategoryByTutorial;
@@ -37,7 +38,7 @@ public class OfyService {
         ObjectifyService.register(EventByUser.class);
         ObjectifyService.register(Reminder.class);
         ObjectifyService.register(Registration.class);
-
+        ObjectifyService.register(Statistics.class);
     }
 
     public static Objectify ofy() {

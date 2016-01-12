@@ -212,6 +212,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                     FragmentTransaction ft = fragmentManager.beginTransaction();
                     switch (menuItem.getItemId()) {
                         case R.id.home:
+                            getSupportActionBar().setTitle(R.string.my_home);
                             if (companyHome.isAdded()) {
                                 ft.show(companyHome);
 
@@ -231,6 +232,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             menu = "home";
                             break;
                         case R.id.information:
+                            getSupportActionBar().setTitle(R.string.my_information);
                             if (companyInformation.isAdded()) {
                                 ft.show(companyInformation);
                             }
@@ -251,6 +253,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             menu = "information";
                             break;
                         case R.id.comments:
+                            getSupportActionBar().setTitle(R.string.my_comments);
                             if(companyComments.isAdded()){
                                 ft.show(companyComments);
                             }
@@ -270,6 +273,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             menu = "comments";
                             break;
                         case R.id.events:
+                            getSupportActionBar().setTitle(R.string.my_events);
                             if(companyEventFragment.isAdded()){
                                 ft.show(companyEventFragment);
                             }
@@ -289,6 +293,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             menu = "events";
                             break;
                         case R.id.images:
+                            getSupportActionBar().setTitle(R.string.my_images);
                             if(companyImagesFragment.isAdded()){
                                 ft.show(companyImagesFragment);
                             }
@@ -308,6 +313,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             menu = "images";
                             break;
                         case R.id.points:
+                            getSupportActionBar().setTitle(R.string.company_points);
                             if(companyPointsFragment.isAdded()){
                                 ft.show(companyPointsFragment);
                             }
@@ -339,6 +345,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
         });
         switch (menu){
             case "home":
+                getSupportActionBar().setTitle(R.string.my_home);
                 fragmentTransaction.replace(R.id.company_container, companyHome,"home");
                 fragmentTransaction.add(R.id.company_container, companyInformation, "information");
                 fragmentTransaction.add(R.id.company_container, companyComments, "comments");
@@ -355,6 +362,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                 navDrawer.getMenu().findItem(R.id.home).setChecked(true);
                 break;
             case "information":
+                getSupportActionBar().setTitle(R.string.my_information);
                 fragmentTransaction.replace(R.id.company_container, companyInformation,"information");
                 fragmentTransaction.add(R.id.company_container, companyHome, "home");
                 fragmentTransaction.add(R.id.company_container, companyComments, "comments");
@@ -371,6 +379,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                 navDrawer.getMenu().findItem(R.id.information).setChecked(true);
                 break;
             case "comments":
+                getSupportActionBar().setTitle(R.string.my_comments);
                 fragmentTransaction.replace(R.id.company_container, companyComments, "comments");
                 fragmentTransaction.add(R.id.company_container, companyInformation, "information");
                 fragmentTransaction.add(R.id.company_container, companyHome, "home");
@@ -387,6 +396,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                 navDrawer.getMenu().findItem(R.id.comments).setChecked(true);
                 break;
             case "events":
+                getSupportActionBar().setTitle(R.string.my_events);
                 fragmentTransaction.replace(R.id.company_container, companyEventFragment, "events");
                 fragmentTransaction.add(R.id.company_container, companyInformation, "information");
                 fragmentTransaction.add(R.id.company_container, companyHome, "home");
@@ -403,6 +413,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                 navDrawer.getMenu().findItem(R.id.events).setChecked(true);
                 break;
             case "images":
+                getSupportActionBar().setTitle(R.string.my_images);
                 fragmentTransaction.replace(R.id.company_container, companyImagesFragment, "images");
                 fragmentTransaction.add(R.id.company_container, companyHome, "home");
                 fragmentTransaction.add(R.id.company_container, companyInformation, "information");
@@ -424,6 +435,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                 navDrawer.getMenu().findItem(R.id.images).setChecked(true);
                 break;
             case "points":
+                getSupportActionBar().setTitle(R.string.company_points);
                 fragmentTransaction.replace(R.id.company_container, companyPointsFragment, "points");
                 fragmentTransaction.add(R.id.company_container, companyInformation, "information");
                 fragmentTransaction.add(R.id.company_container, companyHome, "home");

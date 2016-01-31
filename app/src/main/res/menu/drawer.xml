@@ -55,8 +55,10 @@
     <group android:id="@+id/footer"
         android:checkableBehavior="none">
         <item android:title="@string/action_settings"
+            android:id="@+id/action_settings"
             android:icon="@drawable/ic_settings"></item>
         <item android:title="@string/action_help"
+            android:id="@+id/help"
             android:icon="@drawable/ic_help">
         </item>
     </group>

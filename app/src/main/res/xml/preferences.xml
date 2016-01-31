@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="@string/music_key"
+        android:title="@string/music_title"
+        android:defaultValue="true"/>
+    <CheckBoxPreference
+        android:key="@string/network_key"
+        android:title="@string/network_title"
+        android:summary="@string/network_summary_on"
+        android:defaultValue="false"/>
+    <ListPreference
+        android:key="@string/time_key"
+        android:title="@string/time_title"
+        android:dialogTitle="@string/time_dialog_time"
+        android:summary="@string/time_default_value_string"
+        android:entries="@array/time_entries"
+        android:entryValues="@array/time_values"
+        android:defaultValue="@string/time_default_value"/>
+</PreferenceScreen>

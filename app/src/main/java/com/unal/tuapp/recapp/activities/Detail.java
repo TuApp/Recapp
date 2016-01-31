@@ -245,6 +245,14 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
 
                         }
                         break;
+                    case R.id.help:
+                        Intent intentHelp = new Intent(Detail.this,Help.class);
+                        startActivity(intentHelp);
+                        break;
+                    case R.id.action_settings:
+                        Intent intentSettings = new Intent(Detail.this,Settings.class);
+                        startActivity(intentSettings);
+                        break;
                 }
                 //menuItem.setChecked(true);
                 navigationDrawer.closeDrawers();
@@ -308,7 +316,12 @@ public class Detail extends AppCompatActivity implements LoaderManager.LoaderCal
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            Intent intentSettings = new Intent(Detail.this,Settings.class);
+            startActivity(intentSettings);
+        }
+        if (id == R.id.help){
+            Intent intentHelp = new Intent(Detail.this,Help.class);
+            startActivity(intentHelp);
         }
         if (id == android.R.id.home){
             Intent intentHome = new Intent(Detail.this, NavigationDrawer.class);

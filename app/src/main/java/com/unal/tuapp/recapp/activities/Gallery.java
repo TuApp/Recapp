@@ -86,7 +86,12 @@ public class Gallery extends AppCompatActivity implements LoaderManager.LoaderCa
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            Intent intentSettings = new Intent(Gallery.this,Settings.class);
+            startActivity(intentSettings);
+        }
+        if(id == R.id.help){
+            Intent intentHelp = new Intent(Gallery.this,Help.class);
+            startActivity(intentHelp);
         }
         if (id == android.R.id.home){
             Intent intentHome = new Intent(Gallery.this, NavigationDrawer.class);

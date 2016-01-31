@@ -290,6 +290,14 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
                         fragmentTransaction.hide(fragmentPoints);
                         fragmentTransaction.commit();
                         break;
+                    case R.id.help:
+                        Intent intentHelp = new Intent(UserDetail.this,Help.class);
+                        startActivity(intentHelp);
+                        break;
+                    case R.id.action_settings:
+                        Intent intentSettings = new Intent(UserDetail.this,Settings.class);
+                        startActivity(intentSettings);
+                        break;
 
                 }
                 menuItem.setChecked(true);
@@ -419,7 +427,12 @@ public class UserDetail extends AppCompatActivity implements CommentsFragment.On
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            Intent intentSettings = new Intent(UserDetail.this,Settings.class);
+            startActivity(intentSettings);
+        }
+        if (id == R.id.help){
+            Intent intentHelp = new Intent(UserDetail.this,Help.class);
+            startActivity(intentHelp);
         }
         if(android.R.id.home==id){
             Intent intentHome = new Intent(UserDetail.this, NavigationDrawer.class);

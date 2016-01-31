@@ -6,9 +6,12 @@ import android.accounts.AccountManager;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
@@ -62,16 +65,36 @@ public class Recapp extends AppCompatActivity {
     public static final String AUTHORITY = "com.unal.tuapp.recapp.app";
     public static final String ACCOUNT_TYPE = "example.com";
     public static final String ACCOUNT = "dummyaccount";
+    public static MediaPlayer mediaPlayer;
+    public static boolean network;
 
     public static Account mAccount;
 
     public static ProgressDialog init;
     public static int initValue = 1;
+    private static String time;
+    private boolean isBackgroundMusic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         root = getLayoutInflater().inflate(R.layout.activity_recapp, null);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Recapp.this);
+        isBackgroundMusic = sharedPreferences.getBoolean(getString(R.string.music_key),true);
+        time = sharedPreferences.getString(getString(R.string.time_key),"12");
+        network = sharedPreferences.getBoolean(getString(R.string.network_key),false);
+        if(mediaPlayer==null){
+            mediaPlayer = MediaPlayer.create(this,R.raw.nature);
+        }
+        if(mediaPlayer!=null){
+            if(isBackgroundMusic){
+                mediaPlayer.start();
+                mediaPlayer.setLooping(true);
+            }else{
+                mediaPlayer.release();
+                mediaPlayer =null;
+            }
+        }
         carrousel = (ViewPager) root.findViewById(R.id.view_pager_recapp);
         setContentView(root);
         setUpViewPager();
@@ -83,11 +106,29 @@ public class Recapp extends AppCompatActivity {
     public static Account createSyncAccount(Context context){
         Account newAccount = new Account(ACCOUNT,ACCOUNT_TYPE);
         AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
+        long timeSeconds=0;
+        switch (time){
+            case "1":
+                timeSeconds = 60*60;
+                break;
+            case "3":
+                timeSeconds = 60*60*3;
+                break;
+            case "6":
+                timeSeconds = 60*60*6;
+                break;
+            case "12":
+                timeSeconds = 60*60*12;
+                break;
+            case "24":
+                timeSeconds = 60*60*24;
+                break;
+        }
         if(accountManager.addAccountExplicitly(newAccount,null,null)){
             ContentResolver.setIsSyncable(newAccount, AUTHORITY, 1);
             ContentResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
             Random random = new Random();
-            ContentResolver.addPeriodicSync(newAccount,AUTHORITY,Bundle.EMPTY,26*60*60+60*random.nextInt(6));
+            ContentResolver.addPeriodicSync(newAccount, AUTHORITY, Bundle.EMPTY, timeSeconds + random.nextInt(240));
             return newAccount;
 
         }
@@ -112,7 +153,12 @@ public class Recapp extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            Intent intentSettings = new Intent(Recapp.this,Settings.class);
+            startActivity(intentSettings);
+        }
+        if (id == R.id.help){
+            Intent intentHelp = new Intent(Recapp.this,Help.class);
+            startActivity(intentHelp);
         }
 
         return super.onOptionsItemSelected(item);

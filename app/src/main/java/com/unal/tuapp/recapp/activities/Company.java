@@ -337,6 +337,14 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
                             Intent intent = new Intent(Company.this, Recapp.class);
                             startActivity(intent);
                             break;
+                        case R.id.help:
+                            Intent intentHelp = new Intent(Company.this,Help.class);
+                            startActivity(intentHelp);
+                            break;
+                        case R.id.action_settings:
+                            Intent intentSettings = new Intent(Company.this,Settings.class);
+                            startActivity(intentSettings);
+                            break;
                     }
                     menuItem.setChecked(true);
                     navigationDrawer.closeDrawers();
@@ -471,12 +479,20 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
     }
 
     @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            if (drawerToggle.onOptionsItemSelected(item)) {
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
         }
+        if(item.getItemId() == R.id.action_settings){
+            Intent intentSettings = new Intent(Company.this,Settings.class);
+            startActivity(intentSettings);
+        }
+        if(item.getItemId() == R.id.help){
+            Intent intentHelp = new Intent(Company.this,Help.class);
+            startActivity(intentHelp);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -527,7 +543,7 @@ public class Company extends AppCompatActivity implements LoaderManager.LoaderCa
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString("type",menu);
-        outState.putBoolean("addImage",addImages);
+        outState.putBoolean("addImage", addImages);
     }
     @Override
     public void onBackPressed() {}

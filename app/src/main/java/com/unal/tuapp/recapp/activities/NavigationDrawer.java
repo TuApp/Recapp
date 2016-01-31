@@ -376,6 +376,14 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
 
                         }
                         break;
+                    case R.id.help:
+                        Intent intentHelp = new Intent(NavigationDrawer.this,Help.class);
+                        startActivity(intentHelp);
+                        break;
+                    case R.id.action_settings:
+                        Intent intentSettings = new Intent(NavigationDrawer.this,Settings.class);
+                        startActivity(intentSettings);
+                        break;
                 }
                 menuItem.setChecked(true);
                 navigationDrawer.closeDrawers();
@@ -469,10 +477,12 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             return true;
         }
         if (id == R.id.action_settings) {
-            View view = root.findViewById(R.id.view_pager);
-
-
-            Snackbar.make(view, "algo", Snackbar.LENGTH_LONG).show();
+            Intent intentSettings = new Intent(NavigationDrawer.this,Settings.class);
+            startActivity(intentSettings);
+        }
+        if(id == R.id.help){
+            Intent intentHelp = new Intent(NavigationDrawer.this, Help.class);
+            startActivity(intentHelp);
         }
         if(id == R.id.action_navigation){
             navigationDrawer.openDrawer(navFilterDrawer);

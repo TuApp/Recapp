@@ -89,6 +89,22 @@
     <string name="month">Mes</string>
     <string name="year">Año</string>
     <string name="contest">Torneo</string>
+    <string name="description_help">Por favor dejenos conocer todas tus inquietudes o ideas para para mejorar nuestro app nosotros estamos dispuestos para hacerlos realidad. Gracias a todos por usar y preferir nuestro, nosotros sabemos que  podemos hacer un gran cambio en la manera que la gente piensa y juntos cuidar del medio ambiente</string>
+    <string name="email_help">Nuestro email es: agutierrezt@unal.edu.co.\nPor favor no dude en escribirnos.</string>
+    <string name="time_default_value">12</string>
+    <string name="time_default_value_string">12 horas</string>
+    <string name="music_key">music key</string>
+    <string name="music_title">Quieres escuchar musica de fondo?</string>
+    <string name="network_key">network key</string>
+    <string name="network_title">Quieres usar datos moviles?</string>
+    <string name="network_summary_on">Wifi</string>
+    <string name="network_summary_off">Datos moviles</string>
+    <string name="time_key">time key</string>
+    <string name="time_title">Cada cuanto quiere subir y descargar nueva informacion?</string>
+    <string name="time_dialog_time">Tiempo</string>
+
+
+
 
 
 </resources>

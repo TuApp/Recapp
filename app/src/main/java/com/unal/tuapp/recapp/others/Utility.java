@@ -91,6 +91,16 @@ public class Utility {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo!=null && activeNetworkInfo.isConnected();
     }
+    public static boolean isWifiAvailable(Context context){
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return  activeNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI;
+    }
+    public static boolean isMobileAvailable(Context context){
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return  activeNetworkInfo.getType() ==  ConnectivityManager.TYPE_MOBILE;
+    }
     public static void addUser(Context context,String email,String name,String lastname) throws ExecutionException, InterruptedException {
         Cursor userCursor = context.getContentResolver().query(
                 RecappContract.UserEntry.buildUserEmail(email),

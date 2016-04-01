@@ -1103,9 +1103,11 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
                 inputStream = urlConnection.getInputStream();
                 image = BitmapFactory.decodeStream(inputStream);
             }catch (Exception e){
-                Log.d("Excepcion ", e.getMessage());
+                //Log.d("Excepcion ", e.getMessage());
             }finally {
-                urlConnection.disconnect();
+                if(urlConnection!=null) {
+                    urlConnection.disconnect();
+                }
             }
             return new Object[]{tutorial, image};
         }
@@ -1181,7 +1183,9 @@ public class NavigationDrawer extends AppCompatActivity implements LoaderManager
             }catch (Exception e){
                 Log.e("NewsFragment", e.toString());
             }finally {
-                urlConnection.disconnect();
+                if(urlConnection!=null) {
+                    urlConnection.disconnect();
+                }
                 if(urlConnectionImage!=null){
                     urlConnectionImage.disconnect();
                 }

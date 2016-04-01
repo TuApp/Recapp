@@ -116,6 +116,7 @@ public class EventActivity extends AppCompatActivity {
                 }
                 if (user != null) {
                     Intent intent = new Intent(EventActivity.this, NavigationDrawer.class);
+                    intent.putExtra("email",user.getEmail());
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(EventActivity.this, Company.class);
